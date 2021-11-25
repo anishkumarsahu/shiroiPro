@@ -1,0 +1,184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% block title %}
+        <title>Title</title>
+    {% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="icon" href="{% static 'logo/512.png' %}" type="image/gif" sizes="16x16">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/semantic.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dataTables.semanticui.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/tableCss/dataTables.semanticui.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/tableCss/buttons.semanticui.min.css' %}">
+
+{% block css %}
+
+{% endblock %}
+
+    <style>
+        input {
+            border: 1px solid rgba(34, 36, 38, 0.7) !important;
+        {#            padding: 0.4em 1em !important;#}
+        }
+
+        select {
+            border: 1px solid rgba(34, 36, 38, 0.7) !important;
+        {#            padding: 0.4em 1em !important;#}
+        }
+
+        textarea {
+            border: 1px solid rgba(34, 36, 38, 0.7) !important;
+        {#            padding: 0.4em 1em !important;#}
+        }
+
+        .background {
+            background-color: #2247d024 !important;
+        }
+
+        .preloader {
+            align-items: center;
+            background: rgb(23, 22, 22);
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            left: 0;
+            position: fixed;
+            top: 0;
+            transition: opacity 0.3s linear;
+            width: 100%;
+            z-index: 9999;
+        }
+        .blink_me {
+          animation: blinker 1.5s linear infinite;
+        }
+
+        @keyframes blinker {
+          50% { opacity: 0.25; }
+        }
+        input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+        tbody{
+            font-size: 12.5px!important;
+        }
+        .flexbox{
+            display: flex;
+        }
+        .ui.selection.dropdown {
+    border-color: #000!important;
+{#    -webkit-box-shadow: 0 2px 3px 0 rgb(34 36 38 / 15%);#}
+{#    box-shadow: 0 2px 3px 0 rgb(34 36 38 / 15%);#}
+}
+    </style>
+
+</head>
+<body>
+
+<div class="ui blue six item inverted menu topNav">
+    <a class="item" href="{% url 'homeApp:dashboard' %}">
+        <i class="home icon"></i>
+        Home
+    </a>
+    <a class="item" href="{% url 'homeApp:new_deposit' %}">
+        <i class="download check icon"></i>
+        New Deposit
+    </a>
+
+    <a class="item" href="{% url 'homeApp:deposit_history' %}">
+        <i class="history icon"></i>
+        Deposit History
+    </a>
+
+    <a class="item" href="{% url 'homeApp:daily_report' %}">
+        <i class="hand holding usd icon"></i>
+        Cash Book
+    </a>
+  <a class="item" href="{% url 'homeApp:backup' %}">
+        <i class="hdd outline icon"></i>
+        Back-up
+    </a>
+
+
+    <a class="item" href="{% url 'homeApp:logout' %}">
+        <i class="share square icon"></i>
+        Logout
+    </a>
+
+</div>
+
+
+
+{% block body %}
+
+{% endblock %}
+
+<div class="preloader">
+    <div class="ui active dimmer">
+    <div class="ui medium text loader">Loading</div>
+  </div>
+</div>
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/semantic.min.js' %}"></script>
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/dataTables.semanticui.min.js' %}"></script>
+<script src="{% static 'table/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'table/buttons.semanticui.min.js' %}"></script>
+<script src="{% static 'table/jszip.min.js' %}"></script>
+<script src="{% static 'table/pdfmake.min.js' %}"></script>
+<script src="{% static 'table/buttons.html5.min.js' %}"></script>
+<script src="{% static 'table/buttons.print.min.js' %}"></script>
+<script src="{% static 'table/buttons.colVis.min.js' %}"></script>
+
+
+
+{% block js %}
+
+
+{% endblock %}
+<script>
+    $(window).on("load", function () {
+        $(".preloader").fadeOut(50);
+    });
+</script>
+<script>
+    $(function () {
+        var current = location.pathname;
+        $('.topNav a').each(function () {
+            var $this = $(this);
+            if ($this.attr('href').indexOf(current) !== -1) {
+                $this.css('background-color', 'white').css('color', 'blue');
+            }
+        })
+    })
+    $(document).ready(function () {
+        $(document).on('focus', ':input', function () {
+            $(this).attr('autocomplete', 'off');
+        });
+    });
+
+    $('.ui.dropdown')
+        .dropdown()
+    ;
+
+
+$('.mypopup')
+  .popup()
+;
+
+
+
+
+</script>
+
+</body>
+</html>

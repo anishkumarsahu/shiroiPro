@@ -1,0 +1,436 @@
+{% extends 'home/index.html' %}
+{% load static %}
+{% block title %}
+    <title>Cash Book</title>
+{% endblock %}
+
+{% block css %}
+     <style>
+ .cwide {
+            width: 75% !important;
+        }
+
+        #dTable_filter {
+            position: absolute;
+    right: 10px;
+    top: 10px;
+
+        }
+
+
+        .dt-buttons {
+            position: absolute;
+            left: 200px;
+        }
+    table .dataTables_scrollHeadInner{
+        width: 100%!important;
+    }
+    </style>
+{% endblock %}
+{% block body %}
+
+    <div class="ui left aligned segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <div class="ui bottom attached segment">
+                    <form class="ui tiny form" id="categoryForm">
+                        <h5 class="ui horizontal left aligned divider header">
+                            <i class="left align icon"></i>
+                            IN FLOW <span style="color: green;font-size: 20px">+</span>
+                        </h5>
+                            <div class="three fields">
+
+                                <div class="field" >
+                                    <label>Remark</label>
+                                    <input type="text" name="inRemark" id="inRemark" placeholder="Remark">
+                                    {% csrf_token %}
+                                </div>
+                                  <div class="field"  >
+                                    <label>Amount</label>
+                                    <input type="number" name="inAmount" id="inAmount" placeholder="Amount">
+                                </div>
+
+
+                                <div class="field" style="padding-top: 1.666em;">
+                                    <button type="button" id="addCategoryBtn" class="ui green button"
+                                            onclick="inflowAdd()">
+                                        <i class="icon plus square"></i>
+                                        Add
+                                    </button>
+                                    <button class="ui red button" type="button" onclick="clearCategoryForm()">
+                                        <i class="icon times circle"></i>
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+
+                    </form>
+                </div>
+            </div>
+            <div class="eight wide column">
+                <div class="ui bottom attached segment">
+                    <form class="ui tiny form" id="outForm">
+                        <h5 class="ui horizontal left aligned divider header">
+                            <i class="left align icon"></i>
+                            OUT-FLOW <span style="color: red;font-size: 20px">-</span>
+                        </h5>
+
+                            <div class="three fields">
+
+
+                                <div class="field">
+                                    <label>Remark</label>
+                                    <input type="text" name="outRemark" placeholder="Remark" id="outRemark">
+                                    {% csrf_token %}
+                                </div>
+
+                                <div class="field">
+                                    <label>Amount</label>
+                                    <input type="number" name="outAmount" placeholder="Amount" id="outAmount">
+                                </div>
+                                <div class="field" style="padding-top: 1.666em;">
+                                    <button id="addHSNBtn" class="ui green button" type="button" onclick="outflowAdd()">
+                                        <i class="icon plus square"></i>
+                                        Add
+                                    </button>
+                                    <button class="ui red button" type="button" onclick="clearHSNForm()">
+                                        <i class="icon times circle"></i>
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+
+                    </form>
+                </div>
+           </div>
+        </div>
+        <div class="ui  vertical divider" >
+            &
+        </div>
+    </div>
+
+
+<div class="row">
+
+                    <div class="ui internally padded grid">
+                        <div class="row" style="padding-bottom: 0!important;padding-top: 5px!important;">
+
+                            <div class="eight wide column">
+                                <div class="ui form">
+
+
+                                    <form class="ui tiny form">
+
+                                        <div class="field inline" id="custom_date">
+                            <span style="float: left;padding: 7px;">
+                            <i class="calendar alternate icon"></i>
+                            <label>Filter By Date Range</label>
+                            </span>
+                                            <div class="three fields">
+                                                <div class="field">
+                                                    <div class="ui calendar" id="rangestartP">
+                                                        <div class="ui input left icon">
+                                                            <input class="" type="text" placeholder="Start Date"
+                                                                   style="width:100%;"
+                                                                   id="startDateP">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="ui calendar" id="rangeendP">
+                                                        <div class="ui input left icon">
+                                                            <input class="" type="text" placeholder="End Date"
+                                                                   style="width:100%;"
+                                                                   id="endDateP">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="ui calendar">
+                                                        <div class="ui input left icon">
+                                                            <button class="ui tiny active button" type="button"
+                                                                    onclick="pDetails()">
+                                                                <i class="funnel dollar icon"></i>
+                                                                Search
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="ui internally celled grid">
+                        <div class="row">
+                            <div class="sixteen wide column">
+                                <table id="dTable" class="ui sortable celled very compact table"
+                                       style="margin-top: 5px;width: 100%">
+                                    <thead>
+                                    <tr>
+                                         <th>Amount(₹)</th>
+                                        <th>Remark</th>
+                                        <th>Type</th>
+                                        <th>Balance(₹)</th>
+                                        <th>EnteredOn</th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+{% endblock %}
+
+
+{% block js %}
+    <script>
+        function inflowAdd() {
+            var inRemark = $('#inRemark').val();
+            var inAmount = $('#inAmount').val();
+            if (inRemark === '' || inAmount === '') {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: 'Remark and Amount required !'
+                    })
+                ;
+            }
+            else {
+
+                var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']").val();
+                data = new FormData();
+                data.append('Remark', inRemark);
+                data.append('Amount', inAmount);
+                data.append('tType', 'Credit');
+                data.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
+                $.ajax({
+                    type: 'post',
+                    url: '{% url "homeApp:inflow_post" %}',
+                    data: data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+
+
+                    success: function (response) {
+                        if (response.message === 'success') {
+                            $('body')
+                                .toast({
+                                    class: 'success',
+                                    message: 'InFlow Added Successfully.'
+                                })
+                            ;
+
+                            cashTab.ajax.reload();
+                            $('#categoryForm').trigger('reset')
+                        }
+                        else {
+                            $('body')
+                                .toast({
+                                    class: 'warning',
+                                    message: '' + response.message
+                                })
+                            ;
+
+                        }
+
+                        return response;
+                    },
+                    error: function () {
+                        $('body')
+                            .toast({
+                                class: 'error',
+                                message: 'An error occured !'
+                            })
+                        ;
+                    }
+                });
+
+
+            }
+
+        }
+        function outflowAdd() {
+            var outRemark = $('#outRemark').val();
+            var outAmount = $('#outAmount').val();
+            if (outRemark === '' || outAmount === '') {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: 'Remark and Amount required !'
+                    })
+                ;
+            }
+            else {
+
+                var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']").val();
+                data = new FormData();
+                data.append('Remark', outRemark);
+                data.append('Amount', outAmount);
+                data.append('tType', 'Debit');
+                data.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
+                $.ajax({
+                    type: 'post',
+                    url: '{% url "homeApp:outflow_post" %}',
+                    data: data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+
+
+                    success: function (response) {
+                        if (response.message === 'success') {
+                            $('body')
+                                .toast({
+                                    class: 'success',
+                                    message: 'OutFlow Added Successfully.'
+                                })
+                            ;
+
+                            cashTab.ajax.reload();
+                            $('#outForm').trigger('reset')
+                        }
+                        else {
+                            $('body')
+                                .toast({
+                                    class: 'warning',
+                                    message: '' + response.message
+                                })
+                            ;
+
+                        }
+
+                        return response;
+                    },
+                    error: function () {
+                        $('body')
+                            .toast({
+                                class: 'error',
+                                message: 'An error occured !'
+                            })
+                        ;
+                    }
+                });
+
+
+            }
+
+        }
+
+        function clearHSNForm() {
+            $('#hsnForm').trigger('reset');
+            $('#addHSNBtn').css('display', '');
+            $('#updateHSNBtn').css('display', 'none');
+
+        }
+
+        //Category
+        function clearCategoryForm() {
+            $('#categoryForm').trigger('reset')
+            $('#addCategoryBtn').css('display', '');
+            $('#updateCategoryBtn').css('display', 'none');
+
+        }
+
+
+    var today = new Date();
+        $('#rangestartP').calendar({
+            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+            monthFirst: false,
+            type: 'date',
+            endCalendar: $('#rangeendP'),
+            formatter: {
+                date: function (date, settings) {
+                    if (!date) return '';
+                    var day = date.getDate();
+                    var month = date.getMonth() + 1;
+                    var year = date.getFullYear();
+                    return day + '/' + month + '/' + year;
+                }
+            }
+        });
+        $('#rangeendP').calendar({
+            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+            monthFirst: false,
+            type: 'date',
+            startCalendar: $('#rangestartP'),
+            formatter: {
+                date: function (date, settings) {
+                    if (!date) return '';
+                    var day = date.getDate();
+                    var month = date.getMonth() + 1;
+                    var year = date.getFullYear();
+                    return day + '/' + month + '/' + year;
+                }
+            }
+        });
+        $(cashbook());
+ var cashTab;
+        function cashbook() {
+            var startDate = $('#startDateP').val();
+            var endDate = $('#endDateP').val();
+
+
+            cashTab = $('#dTable').DataTable({
+                dom: 'Blfrtip',
+                "scrollY": "310px",
+                buttons: [{
+                    extend: 'excel',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4]
+                    }
+                }, {
+                    extend: 'print',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4]
+                    }
+                }
+                    , {
+                        extend: 'colvis',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4]
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    {"name": "amount", "targets": 0, "orderable": true},
+                    {"name": "remark", "targets": 1, "orderable": true},
+                    {"name": "transactionType", "targets": 2, "orderable": true},
+                    {"name": "availableBalance", "targets": 3, "orderable": true},
+                    {"name": "datetime", "targets": 4, "orderable": true},
+
+                ],
+                aaSorting: [[4, 'desc']],
+                "lengthMenu": [[8, 25, 50, 100, -1], [8, 25, 50, 100, "All"]],
+                "pageLength": 8,
+                "processing": true,
+                "serverSide": true,
+                "ajax": '{% url 'homeApp:CashBookListJson' %}?startDate=' + startDate + '&endDate=' + endDate
+            });
+        }
+
+                function pDetails() {
+            var startDate = $('#startDateP').val();
+            var endDate = $('#endDateP').val();
+            cashTab.ajax.url('{% url 'homeApp:CashBookListJson' %}?startDate=' + startDate + '&endDate=' + endDate).load();
+
+        }
+    </script>
+
+{% endblock %}

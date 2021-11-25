@@ -1,0 +1,705 @@
+{% extends 'home/index.html' %}
+{% block title %}
+    <title>New Deposit</title>
+{% endblock %}
+{% block body %}
+    <style>
+
+        .ui.vertical.menu .item {
+            display: block;
+            background: 0 0;
+            border-top: none;
+            border-right: none;
+            padding-left: 2px;
+            padding-right: 2px;
+        }
+
+        .ui.grid > .column:not(.row) {
+            padding-top: 0;
+            padding-bottom: 0.2rem;
+        }
+    </style>
+
+    <div class="ui padded grid">
+
+        <div class="sixteen wide column">
+            <div class="ui segment">
+                <div class="ui tiny form">
+                    <h5 class="ui horizontal left aligned divider header">
+                        <i class="left align icon"></i>
+                        Calculator
+                    </h5>
+                    <div class="five fields">
+                        <div class="field required">
+                            <label>Weight (g)</label>
+                            <input type="number" placeholder="Weight (g)" id="cWeight">
+                        </div>
+                        <div class="field required">
+                            <label>Rate(Per 11.66g)(₹)</label>
+                            <input type="number" placeholder="Rate" id="cRate">
+                        </div>
+                        <div class="field required">
+                            <label>Interest Rate (% Per Month)</label>
+                            <input type="number" placeholder="Interest Rate" value="2.0" id="cInterestRate">
+                        </div>
+                        <div class="field required">
+                            <label>Interest (Per Month)(₹)</label>
+                            <input type="number" placeholder="Interest" readonly style="background-color: lightgrey"
+                                   id="cAmount">
+                        </div>
+                        <div class="field" style="padding-top: 1.3rem;">
+                            <button class="ui fluid red button" onclick="clearCalculator()">Clear</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sixteen wide column">
+            <div class="ui segment" style="min-height: 450px;">
+                <h5 class="ui horizontal left aligned divider header">
+                    <i class="left align icon"></i>
+                    New Deposit <span style="color: green;font-weight: bold;font-size: 20px;">({{ ID }})</span>
+                </h5>
+                <div class="ui internally celled  grid">
+
+                    <div class="twelve wide column">
+                        <div class="ui tiny form" id="depositForm">
+                            <div class="five fields">
+                                <div class="field">
+                                    <label>Old ID</label>
+                                    <input type="text" placeholder="Old ID" id="oldID" value="N/A">
+                                </div>
+                                <div class="field required">
+                                    <label>Customer Name</label>
+                                    <input type="text" placeholder="Customer Name" id="customerName">
+                                </div>
+                                <div class="field required">
+                                    <label>Phone Number</label>
+                                    <input type="number" placeholder="Phone Number" id="phoneNumber">
+                                </div>
+                                <div class="field required">
+                                    <label>Address</label>
+                                    <input type="text" placeholder="Address" id="address">
+                                </div>
+                                <div class="field required" id="standard_calendar">
+
+                                    <label>Deposit Date</label>
+
+                                    <input type="text" name="DepositDate" placeholder="Deposit Date"
+                                           autocomplete="off"
+                                           id="date">
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <div class="ui mini form">
+
+                            <div class="seven fields">
+                                <input type="hidden" id="itemID">
+                                <div class="field required">
+                                    <label>Item Name</label>
+                                    <input placeholder="Item Name" type="text" id="itemName">
+                                </div>
+                                <div class="field required" style="width: 8%">
+                                    <label>Weight (g)</label>
+                                    <input placeholder="Item Weight" type="number" id="itemWeight">
+                                    <span style="color: teal;font-weight: bold;" id="meitei"></span>
+                                </div>
+                                <div class="field required">
+                                    <label>Item Rate(Per 11.66g)(₹)</label>
+                                    <input placeholder="Item Rate(Per 11.66g)" type="number" id="itemRate">
+                                </div>
+                                <div class="field required" style="width: 8%">
+                                    <label>Interest Rate</label>
+                                    <input placeholder="Interest Rate" value="2.0" type="number" id="itemInterestRate">
+                                </div>
+                                <div class="field" style="width: 18%">
+                                    <label>Item Description</label>
+                                    <input placeholder="Item Description" type="text" id="itemDescription"
+                                    >
+                                </div>
+                                <div class="field required">
+                                    <label>Item Total Amount(₹)</label>
+                                    <input placeholder="Item Total Amount" type="number" id="itemTotalAmount"
+                                           >
+                                </div>
+
+                                <div class="field" style="    padding-top: 1.3rem;">
+                                    <div class="ui buttons">
+                                        <button class="ui positive button" id="addItemBtn" type="button"
+                                                onclick="addSubItems()"><i class="plus icon"></i>Add
+                                        </button>
+                                        <button style="display: none" type="button" id="updateItemBtn"
+                                                onclick="updateSubItems()" class="ui orange button">
+                                            <i class="icon redo"></i>
+                                            Update
+                                        </button>
+                                        <div class="or"></div>
+                                        <button class="ui button red" type="button" onclick="ClearData()"><i
+                                                class="minus icon"></i>
+                                            Clear
+                                        </button>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="ui very compact table " id="itemTable" style="font-size: 0.8em">
+                            <thead>
+                            <tr>
+                                <th>Sl No.</th>
+                                <th>Item Name</th>
+                                <th>Weight(g)</th>
+                                <th>Rate(₹)</th>
+                                <th>Interest(%)</th>
+                                <th>Item Description</th>
+                                <th>Total(₹)</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="four wide column">
+                        <div class="ui vertical menu"
+                             style="width: 99%;float: right;position: absolute;text-align: left;margin-bottom: 0; margin-top: 0.5em;">
+                            <a class="teal item ">
+                                <strong style="color: black;">Total Weight :</strong>
+                                <div class="ui violet label" id="totalWeight">0.00</div>
+                            </a>
+                            <a class="teal item ">
+                                <strong style="color: black;">Total Weight (Local) :</strong>
+                                <div class="ui violet label" id="totalWeightL"> 0 T 0 S 0 C </div>
+                            </a>
+                            <a class="teal item ">
+                                <strong style="color: black;">Total Amount(₹) :</strong>
+                                <div class="ui violet label" id="totalAmount">0.00</div>
+                            </a>
+
+                        </div>
+
+                        <div class="ui center aligned basic segment"
+                             style="margin-top: 200px;padding-top: 0;padding-bottom: 0;">
+
+
+                            <div class="ui teal segment" style="padding:2rem">
+                                <div class="ui one column very relaxed grid">
+                                    <div class="column">
+                                        <a onclick="salesSave()" style="cursor: pointer;color: teal">
+                                            <i class="save icon" style="font-size: 3rem"></i>
+                                            <p>Save Now</p>
+                                        </a>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+                            <div class="ui small basic icon buttons">
+  <button class="ui button " onclick="openInfo()"><i class="info icon green"></i></button>
+
+</div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="ui basic modal custom" id="delItemModal">
+        <div class="ui icon header">
+            <i class="archive icon"></i>
+            Item will be Deleted.
+        </div>
+        <div class="content">
+            <p style="text-align: center">The Item detail will be deleted, are you sure to delete
+                this Item?</p>
+        </div>
+        <div class="actions">
+            <div class="ui red basic cancel inverted button">
+                <i class="remove icon"></i>
+                No
+            </div>
+            <input type="hidden" id="itemDelID">
+            <div class="ui green ok inverted button" onclick="deleteItem()">
+                <i class="checkmark icon"></i>
+                Yes
+            </div>
+        </div>
+    </div>
+
+
+    <div class="ui modal tiny " id="PrintOption">
+        <i class="close icon"></i>
+        <div class="header">
+            Select Printing Option
+            <input type="hidden" id="printSaleID">
+        </div>
+        <div class="image content">
+            <div class="description">
+                <div class="ui center aligned basic segment">
+
+
+                    <div class="ui segment" style="padding: 3rem">
+                        <div class="ui two column very relaxed grid">
+                            <div class="column" style="padding-left: 0;padding-right: 0">
+                                <a onclick="printA4()" style="cursor: pointer;">
+                                    <i class="print icon" style="font-size: 2rem"></i>
+                                    <p>Print A4</p>
+                                </a>
+                            </div>
+                            <div class="column" style="padding-left: 0;padding-right: 0">
+                                <a onclick="printA5()" style="cursor: pointer;">
+                                    <i class="print icon" style="font-size: 2rem"></i>
+                                    <p>Print A5</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button">
+                Close
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="ui modal tiny " id="BasicInfo">
+        <i class="close icon"></i>
+        <div class="header">
+            Gold Basic Unit
+            <input type="hidden" id="printSaleID">
+        </div>
+        <div class="image content">
+            <table class="ui definition table">
+  <thead>
+    <tr><th></th>
+    <th>TOLA (11.66g)</th>
+    <th>SAN (2.915g)</th>
+    <th>CHANING (0.121g)</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>1</td>
+      <td>4</td>
+      <td>96</td>
+    </tr>
+    <tr>
+      <td><sup>1</sup>/ <sub>2</sub></td>
+      <td><sup>1</sup>/ <sub>2</sub></td>
+      <td>2</td>
+      <td>48</td>
+    </tr>
+    <tr>
+      <td><sup>1</sup>/ <sub>4</sub></td>
+      <td><sup>1</sup>/ <sub>4</sub></td>
+      <td>1</td>
+      <td>24</td>
+    </tr>
+</tbody></table>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button">
+                Close
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+{% endblock %}
+
+{% block js %}
+    <script>
+
+        var today = new Date();
+        $('#standard_calendar')
+            .calendar({
+                    initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+                    monthFirst: false,
+                    type: 'date',
+                    formatter: {
+                        date: function (date, settings) {
+
+                            if (!date) return '';
+                            var day = String(date.getDate());
+                            var month = String(date.getMonth() + 1);
+                            var year = date.getFullYear();
+                            return day + '/' + month + '/' + year;
+                        }
+                    }
+                }
+            );
+
+        function commonCalculator() {
+            var cWeight = $('#cWeight').val();
+            var cRate = $('#cRate').val();
+            var cInterestRate = $('#cInterestRate').val();
+            var cAmount = (parseFloat(cWeight).toFixed(2) * parseFloat(cRate).toFixed(2) * parseFloat(cInterestRate).toFixed(2)) / 1166.0;
+            $('#cAmount').val(parseFloat(cAmount).toFixed(2));
+        }
+
+        $("#cWeight").keyup(function () {
+            commonCalculator();
+        });
+
+        $("#cRate").keyup(function () {
+            commonCalculator();
+        });
+
+        $("#cInterestRate").keyup(function () {
+            commonCalculator();
+        });
+
+
+        function clearCalculator() {
+            $('#cWeight').val('');
+            $('#cRate').val('');
+            $('#cInterestRate').val('2.0');
+            $('#cAmount').val('');
+        }
+
+        function itemCalculator() {
+            var itemWeight = $('#itemWeight').val();
+            var itemInterestRate = $('#itemInterestRate').val();
+            var itemRate = $('#itemRate').val();
+            var itemTotalAmount = (parseFloat(itemWeight).toFixed(2) * parseFloat(itemRate).toFixed(2)) / 11.66;
+            $('#itemTotalAmount').val(parseFloat(itemTotalAmount).toFixed(2));
+        }
+
+        $("#itemWeight").keyup(function () {
+            itemCalculator();
+        });
+
+        $("#itemInterestRate").keyup(function () {
+            itemCalculator();
+        });
+
+        $("#itemRate").keyup(function () {
+            itemCalculator();
+        });
+
+        function addSubItems() {
+            var lastItemID = $('#itemTable tr:last').attr('id');
+            var itemName = $('#itemName').val();
+            var itemWeight = $('#itemWeight').val();
+            var itemRate = $('#itemRate').val();
+            var itemInterestRate = $('#itemInterestRate').val();
+            var itemDescription = $('#itemDescription').val();
+            var itemTotalAmount = $('#itemTotalAmount').val();
+
+            if (itemName === '' || itemWeight === '' || itemRate === '' ||
+                itemInterestRate === '' || itemTotalAmount === '') {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: 'Item Name, Weight, Interest and Total are required !'
+                    })
+                ;
+            }
+            else {
+                if (lastItemID === undefined) {
+                    $('#itemTable tbody').append('<tr id ="1" ><td id ="row' + 1 + '">#</td> <td id ="itemName' + 1 + '">' + itemName + '</td><td id ="itemWeight' + 1 + '">' + itemWeight + '</td><td id ="itemRate' + 1 + '">' + itemRate + '</td><td id ="itemInterestRate' + 1 + '">' + itemInterestRate + '</td><td id ="itemDescription' + 1 + '">' + itemDescription + '</td><td id ="itemTotalAmount' + 1 + '">' + itemTotalAmount + '</td><td><button style="font-size:10px;" onclick="GetItemDetail(' + 1 + ')" class="ui circular facebook icon button green"><i class="pen icon"></i></button><button style="font-size:10px;" onclick="delItem(' + 1 + ')" class="ui circular youtube icon button"><i class="trash alternate icon"></i></button></td></tr>');
+
+
+                }
+                else {
+                    lastItemID = parseInt(lastItemID) + 1;
+                    $('#itemTable tbody').append('<tr id ="' + lastItemID + '" ><td id ="row' + lastItemID + '">#</td> <td id ="itemName' + lastItemID + '">' + itemName + '</td><td id ="itemWeight' + lastItemID + '">' + itemWeight + '</td><td id ="itemRate' + lastItemID + '">' + itemRate + '</td><td id ="itemInterestRate' + lastItemID + '">' + itemInterestRate + '</td><td id ="itemDescription' + lastItemID + '">' + itemDescription + '</td><td id ="itemTotalAmount' + lastItemID + '">' + itemTotalAmount + '</td><td><button style="font-size:10px;" onclick="GetItemDetail(' + lastItemID + ')" class="ui circular facebook icon button green"><i class="pen icon"></i></button><button style="font-size:10px;" onclick="delItem(' + lastItemID + ')" class="ui circular youtube icon button"><i class="trash alternate icon"></i></button></td></tr>');
+                }
+                ClearData();
+                calTaxAndTotal();
+            }
+
+        }
+
+
+        function GetItemDetail(id) {
+            $('#addItemBtn').css('display', 'none');
+            $('#updateItemBtn').css('display', '');
+            var itemName = $('#itemName' + id).html();
+            var itemWeight = $('#itemWeight' + id).html();
+            var itemRate = $('#itemRate' + id).html();
+            var itemInterestRate = $('#itemInterestRate' + id).html();
+            var itemDescription = $('#itemDescription' + id).html();
+            var itemTotalAmount = $('#itemTotalAmount' + id).html();
+
+            $('#itemID').val(id);
+            $('#itemName').val(itemName);
+            $('#itemWeight').val(itemWeight);
+            $('#itemRate').val(itemRate);
+            $('#itemInterestRate').val(itemInterestRate);
+            $('#itemDescription').val(itemDescription);
+            $('#itemTotalAmount').val(itemTotalAmount);
+        }
+
+
+        function updateSubItems() {
+            var id = $('#itemID').val();
+            var itemName = $('#itemName').val();
+            var itemWeight = $('#itemWeight').val();
+            var itemRate = $('#itemRate').val();
+            var itemInterestRate = $('#itemInterestRate').val();
+            var itemDescription = $('#itemDescription').val();
+            var itemTotalAmount = $('#itemTotalAmount').val();
+
+            if (itemName === '' || itemWeight === '' || itemRate === '' ||
+                itemInterestRate === '' || itemTotalAmount === '') {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: 'Item Name, Weight, Interest and Total are required !'
+                    })
+                ;
+            }
+            else {
+                $('#itemName' + id).html(itemName);
+                $('#itemWeight' + id).html(itemWeight);
+                $('#itemRate' + id).html(itemRate);
+                $('#itemInterestRate' + id).html(itemInterestRate);
+                $('#itemDescription' + id).html(itemDescription);
+                $('#itemTotalAmount' + id).html(itemTotalAmount);
+
+                ClearData();
+                calTaxAndTotal();
+            }
+
+        }
+
+        function delItem(id) {
+            $('#delItemModal')
+                .modal('show')
+            ;
+            $('#itemDelID').val(id)
+        }
+
+        function deleteItem() {
+            var id = $('#itemDelID').val();
+            $('#' + id).remove();
+            calTaxAndTotal();
+
+
+        }
+        function ClearData() {
+
+            $('#addItemBtn').css('display', '');
+            $('#updateItemBtn').css('display', 'none');
+
+            $('#itemName').val('');
+            $('#itemWeight').val('');
+            $('#itemRate').val('');
+            $('#itemInterestRate').val('2.0');
+            $('#itemDescription').val('');
+            $('#itemTotalAmount').val('');
+        }
+
+        function calTaxAndTotal() {
+            var TotalAmount = 0.0;
+            var TotalWeight = 0.0;
+            debugger;
+            $('#itemTable tbody tr').each(function () {
+                var id = $(this).closest('tr').attr('id');
+                var itemTotalAmount = $('#itemTotalAmount' + id).html();
+                var itemWeight = $('#itemWeight' + id).html();
+                TotalAmount = TotalAmount + parseFloat(itemTotalAmount);
+                TotalWeight = TotalWeight + parseFloat(itemWeight);
+            });
+
+            $('#totalAmount').html(parseFloat(TotalAmount).toFixed(2));
+            $('#totalWeight').html(parseFloat(TotalWeight).toFixed(2));
+            convert(parseFloat(TotalWeight).toFixed(2));
+
+        }
+
+        function clearCustomerDetail() {
+            $('#customerName').val('');
+            $('#phoneNumber').val('');
+            $('#address').val('');
+            $('#date').val('');
+
+        }
+        //post
+        function salesSave() {
+            var customerName = $('#customerName').val();
+            var phoneNumber = $('#phoneNumber').val();
+            var address = $('#address').val();
+            var date = $('#date').val();
+            var totalAmount = $('#totalAmount').html();
+            var totalWeight = $('#totalWeight').html();
+            var totalWeightL = $('#totalWeightL').html();
+            var oldID = $('#oldID').val();
+
+            var datas = '';
+            $('#itemTable tbody tr').each(function () {
+                var id = $(this).closest('tr').attr('id');
+                var itemName = $('#itemName' + id).html();
+                var itemWeight = $('#itemWeight' + id).html();
+                var itemRate = $('#itemRate' + id).html();
+                var itemInterestRate = $('#itemInterestRate' + id).html();
+                var itemDescription = $('#itemDescription' + id).html();
+                var itemTotalAmount = $('#itemTotalAmount' + id).html();
+                datas = datas + '' + id + '|' + itemName + '|' + itemWeight + '|' + itemRate + '|' + itemInterestRate + '|' + itemDescription + '|' + itemTotalAmount + '@'
+
+
+            });
+
+
+            if (customerName === '' || phoneNumber === '' || address === '' || date === '' || totalAmount === ''
+                || datas === '') {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: 'Customer Name, Deposit Date, Items, total are required !'
+                    })
+                ;
+            } else {
+                data = new FormData();
+                data.append('customerName', customerName);
+                data.append('phoneNumber', phoneNumber);
+                data.append('address', address);
+                data.append('date', date);
+                data.append('totalAmount', totalAmount);
+                data.append('datas', datas);
+                data.append('oldID', oldID);
+                data.append('totalWeight', totalWeight);
+                data.append('totalWeightL', totalWeightL);
+
+
+                $.ajax({
+                    type: 'post',
+                    url: '{% url "homeApp:deposit_post" %}',
+                    data: data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+
+
+                    success: function (response) {
+                        if (response.message === 'success') {
+                            $('body')
+                                .toast({
+                                    class: 'success',
+                                    message: 'New Deposit created Successfully.'
+                                });
+                            clearCustomerDetail();
+                            $('#itemTable tbody tr').remove();
+                            ClearData();
+                            $('#totalAmount').html('0.00');
+                            $('#totalWeight').html('0.00');
+                            $('#totalWeightL').html('0 T 0 S 0 C');
+                            $('#oldID').val('N/A');
+                            var today = new Date();
+                            $('#standard_calendar')
+                                .calendar({
+                                        initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+                                        monthFirst: false,
+                                        type: 'date',
+                                        formatter: {
+                                            date: function (date, settings) {
+
+                                                if (!date) return '';
+                                                var day = String(date.getDate());
+                                                var month = String(date.getMonth() + 1);
+                                                var year = date.getFullYear();
+                                                return day + '/' + month + '/' + year;
+                                            }
+                                        }
+                                    }
+                                );
+
+
+                            PrintOption();
+                            $('#printSaleID').val(response.depoID)
+
+                        }
+                        else {
+                            $('body')
+                                .toast({
+                                    class: 'error',
+                                    message: 'An error occurred !'
+                                })
+                            ;
+
+                        }
+
+                        return response;
+                    },
+                    error: function () {
+                        $('body')
+                            .toast({
+                                class: 'error',
+                                message: 'An error occurred !'
+                            })
+                        ;
+                    }
+                });
+
+
+            }
+
+        }
+
+        function printA4() {
+          var id = $('#printSaleID').val();
+            window.open('/print_billA4/?q=' + id, 'popUpWindow', 'height=screen.availHeight,width=screen.availWidth,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+
+        }
+
+        function printA5() {
+            var id = $('#printSaleID').val();
+            window.open('/print_billA5/?q=' + id, 'popUpWindow', 'height=screen.availHeight,width=screen.availWidth,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+
+        }
+
+
+
+        function PrintOption() {
+
+            $('#PrintOption')
+                .modal('show')
+            ;
+
+        }
+
+
+        function convert(a) {
+            a = parseFloat(a).toFixed(2);
+            var tola = Math.floor(a/11.66);
+            var rem_tola = a % 11.66;
+             var san = Math.floor(rem_tola/(11.66 / 4));
+            var rem_san = rem_tola % (11.66 / 4);
+            var chaning =  Math.floor(rem_san/(11.66 / 96));
+            var rem_chaning = rem_san % (11.66 / 96);
+{#            console.log(tola, san, chaning, rem_chaning)#}
+            $('#totalWeightL').html(tola+" T "+ san +" S " + chaning +" C")
+
+
+
+        }
+
+        function openInfo() {
+
+            $('#BasicInfo')
+                .modal('show')
+            ;
+
+        }
+
+    </script>
+{% endblock %}

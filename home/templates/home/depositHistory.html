@@ -1,0 +1,921 @@
+{% extends 'home/index.html' %}
+{% block title %}
+    <title>Deposit History</title>
+{% endblock %}
+
+{% block body %}
+    <style>
+        .cwide {
+            width: 75% !important;
+        }
+
+        #completeTable_length, #partialTable_length, #incompleteTable_length {
+            left: 10px;
+            position: absolute;
+        }
+
+
+        .dt-buttons {
+            position: absolute;
+            left: 200px;
+        }
+    .dataTables_scrollHeadInner{
+        width: 100%!important;
+    }
+    table{
+        width: 100%!important;
+    }
+    </style>
+
+    <div class="ui right aligned basic  grid">
+        <div class="sixteen wide column">
+            <div class="ui  pointing secondary menu">
+                <div style="cursor: pointer;" class="item active" data-tab="P">Partially Completed</div>
+                <div style="cursor: pointer;" class="item" data-tab="I">Incomplete</div>
+                <div style="cursor: pointer;" class="item" data-tab="C">Completed</div>
+            </div>
+
+            <div class="ui tab  active" data-tab="P">
+                <div class="row">
+
+                    <div class="ui internally grid">
+                        <div class="row" style="padding-bottom: 0!important;padding-top: 5px!important;">
+
+                            <div class="eight wide column">
+                                <div class="ui form">
+
+
+                                    <form class="ui tiny form">
+
+                                        <div class="field inline" id="custom_date">
+                            <span style="float: left;padding: 7px;">
+                            <i class="calendar alternate icon"></i>
+                            <label>Filter By Date Range</label>
+                            </span>
+                                            <div class="three fields">
+                                                <div class="field">
+                                                    <div class="ui calendar" id="rangestartP">
+                                                        <div class="ui input left icon">
+                                                            <input class="" type="text" placeholder="Start Date"
+                                                                   style="width:100%;"
+                                                                   id="startDateP">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="ui calendar" id="rangeendP">
+                                                        <div class="ui input left icon">
+                                                            <input class="" type="text" placeholder="End Date"
+                                                                   style="width:100%;"
+                                                                   id="endDateP">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="ui calendar">
+                                                        <div class="ui input left icon">
+                                                            <button class="ui tiny active button" type="button"
+                                                                    onclick="pDetails()">
+                                                                <i class="funnel dollar icon"></i>
+                                                                Search
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="ui internally celled grid">
+                        <div class="row">
+                            <div class="sixteen wide column">
+                                <table id="partialTable" class="ui sortable celled very compact table"
+                                        style="margin-top: 5px;width: 100%!important;">
+                                    <thead>
+                                    <tr>
+                                         <th>OldID</th>
+                                        <th>DepositID</th>
+                                        <th>CustomerName</th>
+                                        <th>PhoneNumber</th>
+                                        <th>Address</th>
+                                        <th>DepositDate</th>
+                                        <th>Status</th>
+                                        <th>TotalAmount(₹)</th>
+                                        <th>Interest(₹)</th>
+                                        <th>ClearanceDate</th>
+                                        <th>EnteredOn</th>
+                                        <th>TakeAction</th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="ui tab " data-tab="I">
+                <div class="row">
+
+                    <div class="ui internally grid">
+                        <div class="row" style="padding-bottom: 0!important;padding-top: 5px!important;">
+
+                            <div class="eight wide column">
+                                <div class="ui form">
+
+
+                                    <form class="ui tiny form">
+
+                                        <div class="field inline" id="custom_date">
+                            <span style="float: left;padding: 7px;">
+                            <i class="calendar alternate icon"></i>
+                            <label>Filter By Date Range</label>
+                            </span>
+                                            <div class="three fields">
+                                                <div class="field">
+                                                    <div class="ui calendar" id="rangestartI">
+                                                        <div class="ui input left icon">
+                                                            <input class="" type="text" placeholder="Start Date"
+                                                                   style="width:100%;"
+                                                                   id="startDateI">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="ui calendar" id="rangeendI">
+                                                        <div class="ui input left icon">
+                                                            <input class="" type="text" placeholder="End Date"
+                                                                   style="width:100%;"
+                                                                   id="endDateI">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="ui calendar">
+                                                        <div class="ui input left icon">
+                                                            <button class="ui tiny active button" type="button"
+                                                                    onclick="iDetails()">
+                                                                <i class="funnel dollar icon"></i>
+                                                                Search
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="ui internally celled grid">
+                        <div class="row">
+                            <div class="sixteen wide column">
+                                <table id="incompleteTable" class="ui sortable celled very compact table"
+                                       style="margin-top: 5px;width: 100%!important;">
+                                    <thead>
+                                    <tr>
+                                         <th>OldID</th>
+                                        <th>DepositID</th>
+                                        <th>CustomerName</th>
+                                        <th>PhoneNumber</th>
+                                        <th>Address</th>
+                                        <th>DepositDate</th>
+                                        <th>Status</th>
+                                        <th>TotalAmount(₹)</th>
+                                        <th>Interest(₹)</th>
+                                        <th>ClearanceDate</th>
+                                        <th>EnteredOn</th>
+                                        <th>TakeAction</th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="ui tab " data-tab="C">
+                <div class="row">
+
+                    <div class="ui internally grid">
+                        <div class="row" style="padding-bottom: 0!important;padding-top: 5px!important;">
+
+                            <div class="eight wide column">
+                                <div class="ui form">
+
+
+                                    <form class="ui tiny form">
+
+                                        <div class="field inline" id="custom_date">
+                            <span style="float: left;padding: 7px;">
+                            <i class="calendar alternate icon"></i>
+                            <label>Filter By Date Range</label>
+                            </span>
+                                            <div class="three fields">
+                                                <div class="field">
+                                                    <div class="ui calendar" id="rangestartC">
+                                                        <div class="ui input left icon">
+                                                            <input class="" type="text" placeholder="Start Date"
+                                                                   style="width:100%;"
+                                                                   id="startDateC">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="ui calendar" id="rangeendC">
+                                                        <div class="ui input left icon">
+                                                            <input class="" type="text" placeholder="End Date"
+                                                                   style="width:100%;"
+                                                                   id="endDateC">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="ui calendar">
+                                                        <div class="ui input left icon">
+                                                            <button class="ui tiny active button" type="button"
+                                                                    onclick="cDetails()">
+                                                                <i class="funnel dollar icon"></i>
+                                                                Search
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="ui internally celled grid">
+                        <div class="row">
+                            <div class="sixteen wide column">
+                                <table id="completeTable" class="ui sortable celled very compact table"
+                                       style="margin-top: 5px;width: 100%!important;">
+                                    <thead>
+                                    <tr>
+                                        <th>OldID</th>
+                                        <th>DepositID</th>
+                                        <th>CustomerName</th>
+                                        <th>PhoneNumber</th>
+                                        <th>Address</th>
+                                        <th>DepositDate</th>
+                                        <th>Status</th>
+                                        <th>TotalAmount(₹)</th>
+                                        <th>Interest(₹)</th>
+                                        <th>ClearanceDate</th>
+                                        <th>EnteredOn</th>
+                                        <th>TakeAction</th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="ui overlay fullscreen modal front transition scrolling win">
+        <div class="header">
+            Deposit <span class="ui teal text">Detail.</span> <span id="billDetail"></span>
+            <input type="hidden" id="salesID">
+            <div class="ui small basic icon buttons" style="float: right;">
+                 <button class="ui  button" onclick="printWithA4()" data-tooltip="Print Withdraw Slip A4"
+                        data-position="bottom right"><i class="print icon green"></i>
+                </button>
+                 <button class="ui button" onclick="printWithA5()" data-tooltip="Print Withdraw Slip A5"
+                        data-position="bottom right"><i class="print icon green"></i>
+                </button>
+                <button class="ui button" onclick="printInvoice()" data-tooltip="Print Deposit Slip A4"
+                        data-position="bottom right"><i class="print icon"></i>
+                </button>
+                <button class="ui button" onclick="printInvoicea5()" data-tooltip="Print  Deposit Slip A5"
+                        data-position="bottom right"><i class="print icon"></i>
+                </button>
+            </div>
+        </div>
+        <div class="content" style="padding-top: 0!important;">
+            <div class="description">
+                <div class="ui right aligned basic segment">
+
+                    <div class="ui pointing secondary menu">
+                        <a class="item active" data-tab="first">Basic Details</a>
+                    </div>
+                    <div class="ui tab segment active" data-tab="first">
+                        <div class="ui internally grid">
+                            <div class="row" style="padding-bottom: 5px!important;padding-top: 5px!important;">
+                                <div class="five wide column">
+
+
+                                <table class="ui red definition table">
+                                  <tbody>
+                                    <tr>
+                                      <td class="two wide column">Name</td>
+                                      <td id="Name">1" x 2"</td>
+                                    </tr>
+                                    <tr>
+                                      <td>PhoneNumber</td>
+                                      <td id="Phone">6 ounces</td>
+                                    </tr>
+                                    <tr>
+                                      <td>Address</td>
+                                      <td id="Address">Yellowish</td>
+                                    </tr>
+
+                                  </tbody>
+                                </table>
+                                </div>
+                                <div class="three wide column">
+
+
+                                <table class="ui red definition table">
+                                  <tbody>
+                                    <tr>
+                                      <td class="two wide column">DepositDate</td>
+                                      <td id="DepositDate">1" x 2"</td>
+                                    </tr>
+                                    <tr>
+                                      <td>ClearanceDate</td>
+                                      <td id="ClearanceDate">6 ounces</td>
+                                    </tr>
+                                    <tr>
+                                      <td>Total</td>
+                                      <td id="TotalAmount">Yellowish</td>
+                                    </tr>
+
+                                  </tbody>
+                                </table>
+                                </div>
+                                <div class="four wide column">
+
+
+                                <table class="ui red definition table">
+                                  <tbody>
+                                    <tr>
+                                      <td class="two wide column">InterestPaid</td>
+                                      <td id="TotalInterestPaid">1" x 2"</td>
+                                    </tr>
+                                    <tr>
+                                      <td>Status</td>
+                                      <td id="Status" class="pink">6 ounces</td>
+                                    </tr>
+                                  <tr>
+                                      <td>SerialNumber</td>
+                                      <td id="DepositSerialID" class="green">6 ounces</td>
+                                    </tr>
+
+                                  </tbody>
+                                </table>
+                                </div>
+                                 <div class="four wide column">
+
+
+                                <table class="ui red definition table">
+                                  <tbody>
+                                    <tr>
+                                      <td class="two wide column">TotalWeight</td>
+                                      <td id="totalWeight">1" x 2"</td>
+                                    </tr>
+                                    <tr>
+                                      <td>TotalWeight(L)</td>
+                                      <td id="totalWeightL" class="pink"></td>
+                                    </tr>
+
+
+                                  </tbody>
+                                </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <h4 style="text-align: left">LIST OF DEPOSIT ITEMS:</h4>
+                    <div class="row" style="padding-bottom: 0!important;padding-top: 0!important;">
+                        <div class="twelve wide column" style="padding-top: 0!important;padding-bottom: 0;">
+                            <table class="ui very compact table" id="itemTableReport">
+                                <thead>
+                                <tr>
+                                    <th>Sl No.</th>
+                                    <th>ItemName</th>
+                                    <th>Weight</th>
+                                    <th>Rate/11.66g</th>
+                                    <th>Rate(%)</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>IsWithdrawn</th>
+                                    <th>withdrawnDate</th>
+                                    <th>InterestPaid</th>
+                                </tr>
+                                </thead>
+                                <tbody id="my_body">
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+
+            <div class="ui primary approve button">
+                Close
+                <i class="compress arrows alternate icon"></i>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="ui basic modal custom" id="delSaleModal">
+        <div class="ui icon header">
+            <i class="archive icon"></i>
+            Deposit detail will be Deleted.
+        </div>
+        <div class="content">
+            <p style="text-align: center">The deposit detail will be deleted, are you sure to delete
+                this Deposit?</p>
+        </div>
+        <div class="actions">
+            <div class="ui red basic cancel inverted button">
+                <i class="remove icon"></i>
+                No
+            </div>
+            <input type="hidden" id="DepositID">
+            <div class="ui green ok inverted button" onclick="deleteDeposit()">
+                <i class="checkmark icon"></i>
+                Yes
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $('.menu .item').tab();
+        $('#standard_calendar')
+            .calendar({
+                    monthFirst: false,
+                    type: 'date',
+                    formatter: {
+                        date: function (date, settings) {
+                            if (!date) return '';
+                            var day = date.getDate();
+                            var month = date.getMonth() + 1;
+                            var year = date.getFullYear();
+                            return day + '/' + month + '/' + year;
+                        }
+                    }
+                }
+            );
+        var today = new Date();
+        $('#rangestartP').calendar({
+            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+            monthFirst: false,
+            type: 'date',
+            endCalendar: $('#rangeendP'),
+            formatter: {
+                date: function (date, settings) {
+                    if (!date) return '';
+                    var day = date.getDate();
+                    var month = date.getMonth() + 1;
+                    var year = date.getFullYear();
+                    return day + '/' + month + '/' + year;
+                }
+            }
+        });
+        $('#rangeendP').calendar({
+            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+            monthFirst: false,
+            type: 'date',
+            startCalendar: $('#rangestartP'),
+            formatter: {
+                date: function (date, settings) {
+                    if (!date) return '';
+                    var day = date.getDate();
+                    var month = date.getMonth() + 1;
+                    var year = date.getFullYear();
+                    return day + '/' + month + '/' + year;
+                }
+            }
+        });
+
+        $('#rangestartI').calendar({
+            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+            monthFirst: false,
+            type: 'date',
+            endCalendar: $('#rangeendI'),
+            formatter: {
+                date: function (date, settings) {
+                    if (!date) return '';
+                    var day = date.getDate();
+                    var month = date.getMonth() + 1;
+                    var year = date.getFullYear();
+                    return day + '/' + month + '/' + year;
+                }
+            }
+        });
+        $('#rangeendI').calendar({
+            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+            monthFirst: false,
+            type: 'date',
+            startCalendar: $('#rangestartI'),
+            formatter: {
+                date: function (date, settings) {
+                    if (!date) return '';
+                    var day = date.getDate();
+                    var month = date.getMonth() + 1;
+                    var year = date.getFullYear();
+                    return day + '/' + month + '/' + year;
+                }
+            }
+        });
+
+
+        $('#rangestartC').calendar({
+            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+            monthFirst: false,
+            type: 'date',
+            endCalendar: $('#rangeendC'),
+            formatter: {
+                date: function (date, settings) {
+                    if (!date) return '';
+                    var day = date.getDate();
+                    var month = date.getMonth() + 1;
+                    var year = date.getFullYear();
+                    return day + '/' + month + '/' + year;
+                }
+            }
+        });
+        $('#rangeendC').calendar({
+            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+            monthFirst: false,
+            type: 'date',
+            startCalendar: $('#rangestartC'),
+            formatter: {
+                date: function (date, settings) {
+                    if (!date) return '';
+                    var day = date.getDate();
+                    var month = date.getMonth() + 1;
+                    var year = date.getFullYear();
+                    return day + '/' + month + '/' + year;
+                }
+            }
+        });
+
+        $(getIncomplete());
+        $(getPartial());
+        $(getComplete());
+        var incompleteTab;
+        var partialTab;
+        var completeTab;
+        function getIncomplete() {
+            var startDate = $('#startDateI').val();
+            var endDate = $('#endDateI').val();
+
+
+            incompleteTab = $('#incompleteTable').DataTable({
+                dom: 'Blfrtip',
+                "scrollY": "310px",
+                stateSave:true,
+                buttons: [{
+                    extend: 'excel',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                    }
+                }, {
+                    extend: 'print',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                    }
+                }
+                    , {
+                        extend: 'colvis',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    {"name": "oldID", "targets": 0, "orderable": true},
+                    {"name": "depositSerialID", "targets": 1, "orderable": true},
+                    {"name": "customerName", "targets": 2, "orderable": true},
+                    {"name": "phone", "targets": 3, "orderable": true},
+                    {"name": "address", "targets": 4, "orderable": true},
+                    {"name": "depositDate", "targets": 5, "orderable": true},
+                    {"name": "statusID", "targets": 6, "orderable": true},
+                    {"name": "totalAmount", "targets": 7, "orderable": true},
+                    {"name": "totalInterestPaid", "targets": 8, "orderable": true},
+                    {"name": "clearanceDate", "targets": 9, "orderable": true},
+                    {"name": "datetime", "targets": 10, "orderable": true},
+                    {"name": "action", "targets": 11, "orderable": false}
+
+                ],
+                aaSorting: [[10, 'desc']],
+                "lengthMenu": [[8, 25, 50, 100, -1], [8, 25, 50, 100, "All"]],
+                "pageLength": 8,
+                "processing": true,
+                "serverSide": true,
+                "ajax": '{% url 'homeApp:IncompleteDepositListJson' %}?startDate=' + startDate + '&endDate=' + endDate
+            });
+        }
+
+        function getPartial() {
+            var startDate = $('#startDateP').val();
+            var endDate = $('#endDateP').val();
+
+
+            partialTab = $('#partialTable').DataTable({
+                dom: 'Blfrtip',
+                "scrollY": "310px",
+                stateSave:true,
+                buttons: [{
+                    extend: 'excel',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                    }
+                }, {
+                    extend: 'print',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                    }
+                }
+                    , {
+                        extend: 'colvis',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                        }
+                    }
+                ],
+                "columnDefs": [
+                           {"name": "oldID", "targets": 0, "orderable": true},
+                    {"name": "depositSerialID", "targets": 1, "orderable": true},
+                    {"name": "customerName", "targets": 2, "orderable": true},
+                    {"name": "phone", "targets": 3, "orderable": true},
+                    {"name": "address", "targets": 4, "orderable": true},
+                    {"name": "depositDate", "targets": 5, "orderable": true},
+                    {"name": "statusID", "targets": 6, "orderable": true},
+                    {"name": "totalAmount", "targets": 7, "orderable": true},
+                    {"name": "totalInterestPaid", "targets": 8, "orderable": true},
+                    {"name": "clearanceDate", "targets": 9, "orderable": true},
+                    {"name": "datetime", "targets": 10, "orderable": true},
+                    {"name": "action", "targets": 11, "orderable": false}
+
+                ],
+                aaSorting: [[10, 'desc']],
+                "lengthMenu": [[8, 25, 50, 100, -1], [8, 25, 50, 100, "All"]],
+                "pageLength": 8,
+                "processing": true,
+                "serverSide": true,
+                "ajax": '{% url 'homeApp:PartiallyCompletedDepositListJson' %}?startDate=' + startDate + '&endDate=' + endDate
+            });
+        }
+
+        function getComplete() {
+            var startDate = $('#startDateC').val();
+            var endDate = $('#endDateC').val();
+
+
+            completeTab = $('#completeTable').DataTable({
+                dom: 'Blfrtip',
+                stateSave:true,
+                "scrollY": "310px",
+                buttons: [{
+                    extend: 'excel',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                    }
+                }, {
+                    extend: 'print',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                    }
+                }
+                    , {
+                        extend: 'colvis',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    {"name": "oldID", "targets": 0, "orderable": true},
+                    {"name": "depositSerialID", "targets": 1, "orderable": true},
+                    {"name": "customerName", "targets": 2, "orderable": true},
+                    {"name": "phone", "targets": 3, "orderable": true},
+                    {"name": "address", "targets": 4, "orderable": true},
+                    {"name": "depositDate", "targets": 5, "orderable": true},
+                    {"name": "statusID", "targets": 6, "orderable": true},
+                    {"name": "totalAmount", "targets": 7, "orderable": true},
+                    {"name": "totalInterestPaid", "targets": 8, "orderable": true},
+                    {"name": "clearanceDate", "targets": 9, "orderable": true},
+                    {"name": "datetime", "targets": 10, "orderable": true},
+                    {"name": "action", "targets": 11, "orderable": false}
+
+                ],
+                aaSorting: [[10, 'desc']],
+                "lengthMenu": [[8, 25, 50, 100, -1], [8, 25, 50, 100, "All"]],
+                "pageLength": 8,
+                "processing": true,
+                "serverSide": true,
+                "ajax": '{% url 'homeApp:PartiallyCompletedDepositListJson' %}?startDate=' + startDate + '&endDate=' + endDate
+            });
+        }
+
+
+        function pDetails() {
+            var startDate = $('#startDateP').val();
+            var endDate = $('#endDateP').val();
+            partialTab.ajax.url('{% url 'homeApp:PartiallyCompletedDepositListJson' %}?startDate=' + startDate + '&endDate=' + endDate).load();
+
+        }
+        function iDetails() {
+            var startDate = $('#startDateI').val();
+            var endDate = $('#endDateI').val();
+            incompleteTab.ajax.url('{% url 'homeApp:IncompleteDepositListJson' %}?startDate=' + startDate + '&endDate=' + endDate).load();
+
+        }
+        function cDetails() {
+            var startDate = $('#startDateC').val();
+            var endDate = $('#endDateC').val();
+            completeTab.ajax.url('{% url 'homeApp:CompletedDepositListJson' %}?startDate=' + startDate + '&endDate=' + endDate).load();
+
+        }
+
+        function delSale(id) {
+            $('#delSaleModal')
+                .modal('show')
+            ;
+            $('#DepositID').val(id)
+        }
+
+
+        function deleteDeposit() {
+                    var id = $('#DepositID').val();
+                    var formdata = new FormData();
+                    formdata.append('ID', id);
+                    $.ajax({
+                        url: "{% url 'homeApp:delete_deposit' %}",
+                        type: "post",
+                        data: formdata,
+                        contentType: false,
+                        cache: false,
+                        processData: false,
+
+                        success: function (response) {
+                            if (response.message === 'success') {
+                                $('body')
+                                    .toast({
+                                        class: 'success',
+                                        message: 'Deposit Detail Deleted Successfully.'
+                                    })
+                                ;
+
+
+                                incompleteTab.ajax.reload();
+                                partialTab.ajax.reload();
+                                completeTab.ajax.reload();
+                            } else {
+                                $('body')
+                                    .toast({
+                                        class: 'error',
+                                        message: 'An error occurred !'
+                                    })
+                                ;
+
+                            }
+
+                            return response;
+                        },
+                        error: function () {
+                            $('body')
+                                .toast({
+                                    class: 'error',
+                                    message: 'An error occurred !'
+                                })
+                            ;
+                        }
+                    });
+
+                }
+
+
+        function GetSaleDetail(id) {
+            $('#salesID').val(id);
+            $.ajax({
+                type: 'get',
+                url: '/api/get_deposit_detail/' + id + '/',
+
+                success: function (response) {
+
+
+                    $('#itemTableReport tbody tr').remove();
+                    $('#DepositSerialID').html(response.data.Basic['DepositSerialID']);
+                    $('#Name').html(response.data.Basic['Name']);
+                    $('#Phone').html(response.data.Basic['Phone']);
+                    $('#Address').html(response.data.Basic['Address']);
+                    $('#DepositDate').html(response.data.Basic['DepositDate']);
+                    $('#Status').html(response.data.Basic['Status']);
+                    $('#TotalAmount').html(response.data.Basic['TotalAmount']);
+                    $('#TotalInterestPaid').html(response.data.Basic['TotalInterestPaid']);
+                    $('#ClearanceDate').html(response.data.Basic['ClearanceDate']);
+                    $('#totalWeight').html(response.data.Basic['TotalWeight']);
+                    $('#totalWeightL').html(response.data.Basic['TotalWeightL']);
+
+                    var i;
+                    for (i = 0; i < response.data.Items.length; i++) {
+                        $('#itemTableReport tbody').append('<tr ><td>#</td> <td>' + response.data.Items[i]['ItemName'] + '</td><td >' + response.data.Items[i]['Weight'] + '</td><td >' + response.data.Items[i]['ItemRatePerTenGram'] + '</td><td >' + response.data.Items[i]['InterestRate'] + '</td><td >' + response.data.Items[i]['Description'] + '</td><td>' + response.data.Items[i]['ItemAmount'] + '</td><td >' + response.data.Items[i]['IsWithdrawn'] + '</td><td >' + response.data.Items[i]['WithdrawalDate'] + '</td><td >' + response.data.Items[i]['InterestPaid'] + '</td></tr>');
+
+                    }
+
+
+                },
+
+                error: function () {
+                    $('body')
+                        .toast({
+                            class: 'error',
+                            message: 'An error occurred !'
+                        })
+                    ;
+                }
+            });
+            $('.overlay.fullscreen.modal')
+                .modal('show')
+            ;
+
+        }
+        function printInvoice() {
+            var id = $('#salesID').val();
+            window.open('/print_billA4/?q=' + id, 'popUpWindow', 'height=screen.availHeight,width=screen.availWidth,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+
+        }
+        function printInvoicea5() {
+            var id = $('#salesID').val();
+            window.open('/print_billA5/?q=' + id, 'popUpWindow', 'height=screen.availHeight,width=screen.availWidth,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+
+        }
+         function printWithA5() {
+            var id = $('#salesID').val();
+            window.open('/with_print_billA5/?q=' + id, 'popUpWindow', 'height=screen.availHeight,width=screen.availWidth,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+
+        }
+        function printWithA4() {
+            var id = $('#salesID').val();
+            window.open('/with_print_billA4/?q=' + id, 'popUpWindow', 'height=screen.availHeight,width=screen.availWidth,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+
+        }
+$(fullTable());
+function fullTable() {
+    $('.dataTables_scrollHeadInner').css('width', '100%');
+    $('.dataTable').css('width', '100%')
+}
+
+    </script>
+{% endblock %}

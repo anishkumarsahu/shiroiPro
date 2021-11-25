@@ -1,0 +1,339 @@
+{% extends 'home/index.html' %}
+{% block title %}
+    <title>BackUp</title>
+{% endblock %}
+
+{% block body %}
+<div class="row" style="padding-left: 50px; padding-right: 50px">
+                    <div class="ui placeholder segment">
+                        <div class="ui icon header">
+                            <i class="hdd outline icon"></i>
+                            Take daily backup of your data for data security and integrity.
+                        </div>
+                        <a href="{% url 'homeApp:download_backup' %}" class="ui primary button">Download Back-Up Now</a>
+                    </div>
+
+                </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+
+        var today = new Date();
+        $('#standard_calendar')
+            .calendar({
+                    initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+                    monthFirst: false,
+                    type: 'date',
+                    formatter: {
+                        date: function (date, settings) {
+
+                            if (!date) return '';
+                            var day = String(date.getDate());
+                            if (day.length < 2) {
+                                day = '0' + day;
+                            }
+                            var month = String(date.getMonth() + 1);
+                            if (month.length < 2) {
+                                month = '0' + month;
+                            }
+                            var year = date.getFullYear();
+                            return "{{ instance.depositDate|date:"d/m/Y" }}";
+                        }
+                    }
+                }
+            );
+
+
+        function GetItemDetail(id) {
+            ClearData();
+            $('#showBtns').css('display', '');
+            var itemName = $('#itemName' + id).html();
+            var itemWeight = $('#itemWeight' + id).html();
+            var itemRate = $('#itemRate' + id).html();
+            var itemInterestRate = $('#itemInterestRate' + id).html();
+            var itemDescription = $('#itemDescription' + id).html();
+            var itemTotalAmount = $('#itemTotalAmount' + id).html();
+            var isWithdrawn = $('#isWithdrawn' + id).html();
+            var interestPaid = $('#interestPaid' + id).html();
+            var withdrawalDate = $('#withdrawalDate' + id).html();
+            var amountWithInterest = $('#amountWithInterest' + id).html();
+            var month = $('#month' + id).html();
+
+            $('#itemID').val(id);
+            $('#itemName').val(itemName);
+            $('#itemWeight').val(itemWeight);
+            $('#itemRate').val(itemRate);
+            $('#itemInterestRate').val(itemInterestRate);
+            $('#itemDescription').val(itemDescription);
+            $('#itemTotalAmount').val(itemTotalAmount);
+            $('#isWithdrawn').val(isWithdrawn);
+            $('#interestPaid').val(interestPaid);
+            $('#withdrawalDate').val(withdrawalDate);
+            $('#amountWithInterest').val(amountWithInterest);
+            $('#month').val(month);
+            setTimeout(function () {
+                $('#isWithdrawn').val(isWithdrawn).change();
+            }, 500);
+            if (isWithdrawn === "False") {
+                $('#standard_calendarW')
+                    .calendar({
+                            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+                            monthFirst: false,
+                            type: 'date',
+                            formatter: {
+                                date: function (date, settings) {
+
+                                    if (!date) return '';
+                                    var day = String(date.getDate());
+                                    if (day.length < 2) {
+                                        day = '0' + day;
+                                    }
+                                    var month = String(date.getMonth() + 1);
+                                    if (month.length < 2) {
+                                        month = '0' + month;
+                                    }
+                                    var year = date.getFullYear();
+                                    return day + '/' + month + '/' + year;
+                                }
+                            },
+                            onChange: function (date, text, mode) {
+                                calMonth();
+                            }
+                        }
+                    );
+            }
+
+        }
+
+
+        function updateSubItems() {
+            var id = $('#itemID').val();
+            var itemName = $('#itemName').val();
+            var itemWeight = $('#itemWeight').val();
+            var itemRate = $('#itemRate').val();
+            var itemInterestRate = $('#itemInterestRate').val();
+            var itemDescription = $('#itemDescription').val();
+            var itemTotalAmount = $('#itemTotalAmount').val();
+            var isWithdrawn = $('#isWithdrawn').val();
+            var withdrawalDate = $('#withdrawalDate').val();
+            var interestPaid = $('#interestPaid').val();
+            var amountWithInterest = $('#amountWithInterest').val();
+            var month = $('#month').val();
+
+            if (itemName === '' || itemWeight === '' || itemRate === '' ||
+                itemInterestRate === '' || itemTotalAmount === '') {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: 'Item Name, Weight, Interest and Total are required !'
+                    })
+                ;
+            }
+            else {
+                $('#itemName' + id).html(itemName);
+                $('#itemWeight' + id).html(itemWeight);
+                $('#itemRate' + id).html(itemRate);
+                $('#itemInterestRate' + id).html(itemInterestRate);
+                $('#itemDescription' + id).html(itemDescription);
+                $('#itemTotalAmount' + id).html(itemTotalAmount);
+                $('#isWithdrawn' + id).html(isWithdrawn);
+                $('#withdrawalDate' + id).html(withdrawalDate);
+                $('#interestPaid' + id).html(interestPaid);
+                $('#amountWithInterest' + id).html(amountWithInterest);
+                $('#month' + id).html(month);
+                if (isWithdrawn === 'False') {
+                    $('#withdrawalDate' + id).html('None');
+                    $('#interestPaid' + id).html('0.0');
+                    $('#amountWithInterest' + id).html('0.0');
+                    $('#month' + id).html('0.0');
+                }
+
+                ClearData();
+                calTaxAndTotal();
+            }
+
+        }
+
+
+        function ClearData() {
+
+            $('#showBtns').css('display', 'none');
+
+            $('#itemName').val('');
+            $('#itemWeight').val('');
+            $('#itemRate').val('');
+            $('#itemInterestRate').val('2.0');
+            $('#itemDescription').val('');
+            $('#itemTotalAmount').val('');
+            $('#withdrawalDate').val('');
+            $("#ICalculate").val('');
+            $("#amountWithInterest").val('');
+            $("#interestPaid").val('0.0');
+            $("#month").val('0.0');
+        }
+
+        function calTaxAndTotal() {
+            var TotalAmount = 0.0;
+            $('#itemTable tbody tr').each(function () {
+                var id = $(this).closest('tr').attr('id');
+                var actualStatus = $('#actualStatus' + id).html();
+                if (actualStatus === 'False') {
+                    var amountWithInterest = $('#amountWithInterest' + id).html();
+
+                    TotalAmount = TotalAmount + parseFloat(amountWithInterest);
+                }
+            });
+
+            $('#totalAmount').html(parseFloat(TotalAmount).toFixed(2));
+        }
+
+
+        //post
+        function salesSave() {
+            var totalAmount = $('#totalAmount').html();
+            var depositID = $('#depositID').val();
+
+            var datas = '';
+            $('#itemTable tbody tr').each(function () {
+                var id = $(this).closest('tr').attr('id');
+                var actualStatus = $('#actualStatus' + id).html();
+                var isWithdrawn = $('#isWithdrawn' + id).html();
+                var withdrawalDate = $('#withdrawalDate' + id).html();
+                var interestPaid = $('#interestPaid' + id).html();
+                var amountWithInterest = $('#amountWithInterest' + id).html();
+                var month = $('#month' + id).html();
+                if (actualStatus === 'False' && isWithdrawn === "True") {
+                    datas = datas + '' + id + '|' + withdrawalDate + '|' + interestPaid + '|' + amountWithInterest + '|' + month + '@'
+                }
+
+            });
+
+
+            if (datas === '') {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: 'No Changes made. Please change any of the item status !'
+                    })
+                ;
+            } else {
+                data = new FormData();
+                data.append('depositID', depositID);
+                data.append('totalAmount', totalAmount);
+                data.append('datas', datas);
+
+                debugger;
+                $.ajax({
+                    type: 'post',
+                    url: '{% url "homeApp:item_closing_post" %}',
+                    data: data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+
+
+                    success: function (response) {
+                        if (response.message === 'success') {
+                            $('body')
+                                .toast({
+                                    class: 'success',
+                                    message: 'Updated Deposit status.'
+                                });
+
+                            location.reload();
+
+                        }
+                        else {
+                            $('body')
+                                .toast({
+                                    class: 'error',
+                                    message: 'An error occurred !'
+                                })
+                            ;
+
+                        }
+
+                        return response;
+                    },
+                    error: function () {
+                        $('body')
+                            .toast({
+                                class: 'error',
+                                message: 'An error occurred !'
+                            })
+                        ;
+                    }
+                });
+
+
+            }
+
+        }
+        function calMonth() {
+            var isWithdrawn = $('#isWithdrawn').val();
+            if (isWithdrawn === "True") {
+                var Ddate = $("#Ddate").val().toString();
+                var withdrawalDate = $("#withdrawalDate").val().toString();
+                var yearThen = parseInt(Ddate.substring(6, 10), 10);
+                var monthThen = parseInt(Ddate.substring(3, 5), 10);
+                var dayThen = parseInt(Ddate.substring(0, 2), 10);
+                var yearThenW = parseInt(withdrawalDate.substring(6, 10), 10);
+                var monthThenW = parseInt(withdrawalDate.substring(3, 5), 10);
+                var dayThenW = parseInt(withdrawalDate.substring(0, 2), 10);
+                var today = new Date(yearThenW, monthThenW - 1, dayThenW);
+                var birthday = new Date(yearThen, monthThen - 1, dayThen);
+
+                var differenceInMilisecond = today.valueOf() - birthday.valueOf();
+
+                var year_age = Math.floor(differenceInMilisecond / 31536000000);
+                var day_age = Math.floor((differenceInMilisecond % 31536000000) / 86400000);
+
+
+                var month_age = Math.floor(day_age / 30);
+
+                day_age = day_age % 30;
+                var mon;
+                if (day_age >= 15 && day_age <= 29) {
+                    mon = month_age + 1;
+
+                } else if (day_age >= 1 && day_age <= 14) {
+                    mon = month_age + 0.5;
+                }
+                else {
+                    mon = month_age;
+                }
+
+                $('#time').html('' + year_age + ' Y ' + month_age + ' M ' + day_age + ' D');
+                $('#month').val("" + mon);
+                interestCal();
+                totalAmount();
+            }
+            else {
+                $("#month").val('');
+                $("#ICalculate").val('');
+                $("#amountWithInterest").val('0.0');
+                $("#interestPaid").val('0.0');
+
+            }
+        }
+
+        function interestCal() {
+            var time = $("#month").val();
+            var itemTotalAmount = $("#itemTotalAmount").val();
+            var itemInterestRate = $("#itemInterestRate").val();
+
+            var interest;
+
+            interest = (parseFloat(time) * parseFloat(itemTotalAmount) * parseFloat(itemInterestRate)) / 100.0
+            $('#ICalculate').val(parseFloat(interest).toFixed(2));
+        }
+        function totalAmount() {
+            var interestPaid = $('#interestPaid').val();
+            var itemTotalAmount = $('#itemTotalAmount').val();
+            var t = parseFloat(interestPaid) + parseFloat(itemTotalAmount);
+            $('#amountWithInterest').val(parseFloat(t).toFixed(2));
+
+        }
+    </script>
+{% endblock %}

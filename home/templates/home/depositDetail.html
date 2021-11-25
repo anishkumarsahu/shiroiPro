@@ -1,0 +1,711 @@
+{% extends 'home/index.html' %}
+{% block title %}
+    <title>Deposit Detail</title>
+{% endblock %}
+
+{% block body %}
+    <style>
+
+        .ui.vertical.menu .item {
+            display: block;
+            background: 0 0;
+            border-top: none;
+            border-right: none;
+            padding-left: 2px;
+            padding-right: 2px;
+        }
+
+        .ui.grid > .column:not(.row) {
+            padding-top: 0;
+            padding-bottom: 0.2rem;
+        }
+    </style>
+
+    <div class="ui padded grid">
+        <div class="row" style="padding-bottom: 5px!important;padding-top: 5px!important;">
+            <div class="five wide column">
+
+                <table class="ui red definition table">
+                    <tbody>
+                    <tr>
+                        <td class="two wide column">Name</td>
+                        <td id="Name">{{ instance.customerName }}</td>
+                        <input type="hidden" value="{{ instance.pk }}" id="depositID">
+
+                    </tr>
+                    <tr>
+                        <td>PhoneNumber</td>
+                        <td id="Phone">{{ instance.phone }}</td>
+                    </tr>
+                    <tr>
+                        <td>Address</td>
+                        <td id="Address">{{ instance.address }}</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="three wide column">
+
+
+                <table class="ui red definition table">
+                    <tbody>
+                    <tr>
+                        <td class="two wide column">DepositDate</td>
+                        <td id="DepositDate">{{ instance.depositDate|date:"d/m/Y" }}</td>
+                    </tr>
+                    <tr>
+                        <td>ClearanceDate</td>
+                        <td id="ClearanceDate">{{ instance.clearanceDate }}</td>
+                    </tr>
+                    <tr>
+                        <td>Total</td>
+                        <td id="TotalAmount">{{ instance.totalAmount }}</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="four wide column">
+
+
+                <table class="ui red definition table">
+                    <tbody>
+                    <tr>
+                        <td class="two wide column">InterestPaid</td>
+                        <td id="TotalInterestPaid">{{ instance.totalInterestPaid }}</td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td id="Status" class="pink">{{ instance.statusID }}</td>
+                    </tr>
+                    <tr>
+                        <td>SerialNumber</td>
+                        <td id="DepositSerialID" class="green">{{ instance.depositSerialID }} ({{ instance.oldID }})</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="four wide column">
+
+
+                                <table class="ui red definition table">
+                                  <tbody>
+                                    <tr>
+                                      <td class="two wide column">TotalWeight</td>
+                                      <td id="totalWeight">{{ instance.totalWeight }} g</td>
+                                    </tr>
+                                    <tr>
+                                      <td>TotalWeight(L)</td>
+                                      <td id="totalWeightL" class="pink">{{ instance.totalWeightL }}</td>
+                                    </tr>
+
+
+                                  </tbody>
+                                </table>
+                                </div>
+        </div>
+
+        <div class="sixteen wide column">
+            <div class="ui segment" style="min-height: 450px;">
+                <h5 class="ui horizontal left aligned divider header">
+                    <i class="left align icon"></i>
+                    Deposit Items
+                </h5>
+                <div class="ui internally celled  grid">
+
+                    <div class="fourteen wide column">
+                        <div class="ui tiny form" id="depositForm">
+                            <div class="six fields">
+                                <div class="field required">
+                                    <label>Item Name</label>
+                                    <input placeholder="Item Name" type="text" id="itemName" readonly
+                                           style="background-color: lightgrey">
+                                </div>
+                                <div class="field required">
+                                    <label>Item Description</label>
+                                    <input placeholder="Item Description" type="text" id="itemDescription" readonly
+                                           style="background-color: lightgrey">
+                                </div>
+
+                                <div class="field required" id="standard_calendar">
+
+                                    <label>Deposit Date</label>
+
+                                    <input type="text" name="DepositDate" placeholder="Deposit Date"
+                                           autocomplete="off" readonly style="background-color: lightgrey"
+                                           id="Ddate">
+                                </div>
+
+
+                                <div class="field required">
+                                    <label>Is Withdrawn?</label>
+                                    <select class="ui fluid dropdown" id="isWithdrawn" onchange="calMonth()"
+                                            style="border-color:black!important;">
+                                        <option value="False">No</option>
+                                        <option value="True">Yes</option>
+
+
+                                    </select>
+                                </div>
+                                <div class="field required" id="standard_calendarW">
+
+                                    <label>Withdraw Date</label>
+
+                                    <input type="text" name="WithdrawDate" placeholder="Withdraw Date"
+                                           autocomplete="off"
+                                           id="withdrawalDate">
+                                </div>
+                                <div class="field required">
+                                    <label>Item Total Amount(₹)</label>
+                                    <input placeholder="Item Total Amount" type="number" id="itemTotalAmount" readonly
+                                           style="background-color: lightgrey">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ui mini form">
+
+                            <div class="eight fields">
+                                <input type="hidden" id="itemID">
+                                <div class="field required">
+
+                                    <label>Month <span id="time" style="color: green;"></span></label>
+
+                                    <input type="number" name="month" placeholder="Month"
+                                           autocomplete="off"
+                                           id="month" readonly style="background-color: lightgrey">
+                                </div>
+                                <div class="field required">
+
+                                    <label>Interest Calculated</label>
+
+                                    <input type="number" name="DepositDate" placeholder="Interest Calculated"
+                                           autocomplete="off"
+                                           id="ICalculate" readonly style="background-color: lightgreen">
+                                </div>
+                                <div class="field required" style="width: 10%">
+                                    <label>Weight (g)</label>
+                                    <input placeholder="Item Weight" type="number" id="itemWeight" readonly
+                                           style="background-color: lightgrey">
+                                </div>
+                                <div class="field required">
+                                    <label>Item Rate(Per 10g)(₹)</label>
+                                    <input placeholder="Item Rate(Per 10g)" type="number" id="itemRate" readonly
+                                           style="background-color: lightgrey">
+                                </div>
+                                <div class="field required" style="width: 10%">
+                                    <label>Interest Rate</label>
+                                    <input placeholder="Interest Rate" value="2.0" type="number" id="itemInterestRate"
+                                           readonly style="background-color: lightgrey">
+                                </div>
+                                <div class="field required">
+                                    <label>Interest Paid</label>
+                                    <input onkeyup="totalAmount()" placeholder="Interest Paid" type="number"
+                                           id="interestPaid">
+                                </div>
+                                <div class="field required">
+                                    <label>Amount With Interest(₹)</label>
+                                    <input placeholder="Amount With Interest" type="number" id="amountWithInterest"
+                                           readonly
+                                           style="background-color: lightblue">
+                                </div>
+
+                                <div class="field" style="    padding-top: 1.3rem;">
+                                    <div class="ui  buttons" style="display: none" id="showBtns">
+                                        <button type="button" id="updateItemBtn"
+                                                onclick="updateSubItems()" class="ui tiny orange button">
+                                            <i class="icon redo"></i>
+                                            Update
+                                        </button>
+                                        <div class="or"></div>
+                                        <button class="ui button tiny red" type="button" onclick="ClearData()"><i
+                                                class="minus icon"></i>
+                                            Clear
+                                        </button>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="ui very compact table " id="itemTable" style="font-size: 0.8em">
+                            <thead>
+                            <tr>
+                                <th>Sl No.</th>
+                                <th>Item Name</th>
+                                <th>Weight(g)</th>
+                                <th>Rate(₹)</th>
+                                <th>Interest(%)</th>
+                                <th>Item Description</th>
+                                <th>Total(₹)(T)</th>
+                                <th>IsWithdrawn</th>
+                                <th>WithdrawnDate</th>
+                                <th>Month</th>
+                                <th>InterestPaid(I)</th>
+                                <th>(₹)(A+I)</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in items %}
+                                <tr id="{{ item.pk }}">
+                                    <td id="row{{ item.pk }}">{{ forloop.counter }}</td>
+                                    <td id="itemName{{ item.pk }}">{{ item.itemName }}</td>
+                                    <td id="itemWeight{{ item.pk }}">{{ item.weight }}</td>
+                                    <td id="itemRate{{ item.pk }}">{{ item.itemRatePerTenGram }}</td>
+                                    <td id="itemInterestRate{{ item.pk }}">{{ item.interestRate }}</td>
+                                    <td id="itemDescription{{ item.pk }}">{{ item.description }}</td>
+                                    <td id="itemTotalAmount{{ item.pk }}">{{ item.itemAmount }}</td>
+                                    <td id="isWithdrawn{{ item.pk }}">{{ item.isWithdrawn }}</td>
+                                    <td id="withdrawalDate{{ item.pk }}">{{ item.withdrawalDate }}</td>
+                                    <td id="month{{ item.pk }}">{{ item.month }}</td>
+                                    <td id="interestPaid{{ item.pk }}">{{ item.interestPaid }}</td>
+                                    <td id="amountWithInterest{{ item.pk }}">{{ item.total }}</td>
+                                    <td id="actualStatus{{ item.pk }}" style="display: None">{{ item.isWithdrawn }}</td>
+                                    <td>
+                                        <button style="font-size:10px;"
+                                                onclick="GetItemDetail('{{ item.pk }}')"
+                                                {% if item.isWithdrawn == True %} disabled {% else %} {% endif %}
+                                                class="ui circular facebook icon button green"><i class="pen icon"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="two wide column">
+                        <div class="ui vertical menu"
+                             style="width: 99%;float: right;position: absolute;text-align: left;margin-bottom: 0; margin-top: 0.5em;">
+                            <a class="teal item ">
+                                <strong style="color: black;">Total(₹) :</strong>
+                                <div class="ui violet label" id="totalAmount">0.00</div>
+                            </a>
+
+                        </div>
+
+                        <div class="ui center aligned basic segment"
+                             style="margin-top: 200px;padding-top: 0;padding-bottom: 0;">
+
+
+                            <div class="ui teal segment" style="padding:2rem">
+                                <div class="ui one column very relaxed grid">
+                                    <div class="column">
+                                        <a onclick="salesSave()" style="cursor: pointer;color: teal">
+                                            <i class="save icon" style="font-size: 3rem"></i>
+                                            <p>Save Now</p>
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+ <div class="ui small basic icon buttons" >
+                 <button class="ui  button" onclick="printWithA4()" data-tooltip="Print Withdraw Slip A4"
+                        data-position="bottom right"><i class="print icon green"></i>
+                </button>
+                 <button class="ui button" onclick="printWithA5()" data-tooltip="Print Withdraw Slip A5"
+                        data-position="bottom right"><i class="print icon green"></i>
+                </button>
+                <button class="ui button" onclick="printInvoice()" data-tooltip="Print Deposit Slip A4"
+                        data-position="bottom right"><i class="print icon"></i>
+                </button>
+                <button class="ui button" onclick="printInvoicea5()" data-tooltip="Print  Deposit Slip A5"
+                        data-position="bottom right"><i class="print icon"></i>
+                </button>
+            </div>
+                         <input type="hidden" id="salesID" value="{{ instance.pk }}">
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="ui modal tiny " id="PrintOption">
+        <i class="close icon"></i>
+        <div class="header">
+            Select Printing Option
+            <input type="hidden" id="printSaleID">
+        </div>
+        <div class="image content">
+            <div class="description">
+                <div class="ui center aligned basic segment">
+
+
+                    <div class="ui segment" style="padding: 3rem">
+                        <div class="ui two column very relaxed grid">
+                            <div class="column" style="padding-left: 0;padding-right: 0">
+                                <a onclick="printA4()" style="cursor: pointer;">
+                                    <i class="print icon" style="font-size: 2rem"></i>
+                                    <p>Print A4</p>
+                                </a>
+                            </div>
+                            <div class="column" style="padding-left: 0;padding-right: 0">
+                                <a onclick="printA5()" style="cursor: pointer;">
+                                    <i class="print icon" style="font-size: 2rem"></i>
+                                    <p>Print A5</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button">
+                Close
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+
+        var today = new Date();
+        $('#standard_calendar')
+            .calendar({
+                    initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+                    monthFirst: false,
+                    type: 'date',
+                    formatter: {
+                        date: function (date, settings) {
+
+                            if (!date) return '';
+                            var day = String(date.getDate());
+                            if (day.length < 2) {
+                                day = '0' + day;
+                            }
+                            var month = String(date.getMonth() + 1);
+                            if (month.length < 2) {
+                                month = '0' + month;
+                            }
+                            var year = date.getFullYear();
+                            return "{{ instance.depositDate|date:"d/m/Y" }}";
+                        }
+                    }
+                }
+            );
+
+
+        function GetItemDetail(id) {
+            ClearData();
+            $('#showBtns').css('display', '');
+            var itemName = $('#itemName' + id).html();
+            var itemWeight = $('#itemWeight' + id).html();
+            var itemRate = $('#itemRate' + id).html();
+            var itemInterestRate = $('#itemInterestRate' + id).html();
+            var itemDescription = $('#itemDescription' + id).html();
+            var itemTotalAmount = $('#itemTotalAmount' + id).html();
+            var isWithdrawn = $('#isWithdrawn' + id).html();
+            var interestPaid = $('#interestPaid' + id).html();
+            var withdrawalDate = $('#withdrawalDate' + id).html();
+            var amountWithInterest = $('#amountWithInterest' + id).html();
+            var month = $('#month' + id).html();
+
+            $('#itemID').val(id);
+            $('#itemName').val(itemName);
+            $('#itemWeight').val(itemWeight);
+            $('#itemRate').val(itemRate);
+            $('#itemInterestRate').val(itemInterestRate);
+            $('#itemDescription').val(itemDescription);
+            $('#itemTotalAmount').val(itemTotalAmount);
+            $('#isWithdrawn').val(isWithdrawn);
+            $('#interestPaid').val(interestPaid);
+            $('#withdrawalDate').val(withdrawalDate);
+            $('#amountWithInterest').val(amountWithInterest);
+            $('#month').val(month);
+            setTimeout(function () {
+                $('#isWithdrawn').val(isWithdrawn).change();
+            }, 500);
+            if (isWithdrawn === "False") {
+                $('#standard_calendarW')
+                    .calendar({
+                            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+                            monthFirst: false,
+                            type: 'date',
+                            formatter: {
+                                date: function (date, settings) {
+
+                                    if (!date) return '';
+                                    var day = String(date.getDate());
+                                    if (day.length < 2) {
+                                        day = '0' + day;
+                                    }
+                                    var month = String(date.getMonth() + 1);
+                                    if (month.length < 2) {
+                                        month = '0' + month;
+                                    }
+                                    var year = date.getFullYear();
+                                    return day + '/' + month + '/' + year;
+                                }
+                            },
+                            onChange: function (date, text, mode) {
+                                calMonth();
+                            }
+                        }
+                    );
+            }
+
+        }
+
+
+        function updateSubItems() {
+            var id = $('#itemID').val();
+            var itemName = $('#itemName').val();
+            var itemWeight = $('#itemWeight').val();
+            var itemRate = $('#itemRate').val();
+            var itemInterestRate = $('#itemInterestRate').val();
+            var itemDescription = $('#itemDescription').val();
+            var itemTotalAmount = $('#itemTotalAmount').val();
+            var isWithdrawn = $('#isWithdrawn').val();
+            var withdrawalDate = $('#withdrawalDate').val();
+            var interestPaid = $('#interestPaid').val();
+            var amountWithInterest = $('#amountWithInterest').val();
+            var month = $('#month').val();
+
+            if (itemName === '' || itemWeight === '' || itemRate === '' ||
+                itemInterestRate === '' || itemTotalAmount === '') {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: 'Item Name, Weight, Interest and Total are required !'
+                    })
+                ;
+            }
+            else {
+                $('#itemName' + id).html(itemName);
+                $('#itemWeight' + id).html(itemWeight);
+                $('#itemRate' + id).html(itemRate);
+                $('#itemInterestRate' + id).html(itemInterestRate);
+                $('#itemDescription' + id).html(itemDescription);
+                $('#itemTotalAmount' + id).html(itemTotalAmount);
+                $('#isWithdrawn' + id).html(isWithdrawn);
+                $('#withdrawalDate' + id).html(withdrawalDate);
+                $('#interestPaid' + id).html(interestPaid);
+                $('#amountWithInterest' + id).html(amountWithInterest);
+                $('#month' + id).html(month);
+                if (isWithdrawn === 'False') {
+                    $('#withdrawalDate' + id).html('None');
+                    $('#interestPaid' + id).html('0.0');
+                    $('#amountWithInterest' + id).html('0.0');
+                    $('#month' + id).html('0.0');
+                }
+
+                ClearData();
+                calTaxAndTotal();
+            }
+
+        }
+
+
+        function ClearData() {
+
+            $('#showBtns').css('display', 'none');
+
+            $('#itemName').val('');
+            $('#itemWeight').val('');
+            $('#itemRate').val('');
+            $('#itemInterestRate').val('2.0');
+            $('#itemDescription').val('');
+            $('#itemTotalAmount').val('');
+            $('#withdrawalDate').val('');
+            $("#ICalculate").val('');
+            $("#amountWithInterest").val('');
+            $("#interestPaid").val('0.0');
+            $("#month").val('0.0');
+        }
+
+        function calTaxAndTotal() {
+            var TotalAmount = 0.0;
+            $('#itemTable tbody tr').each(function () {
+                var id = $(this).closest('tr').attr('id');
+                var actualStatus = $('#actualStatus' + id).html();
+                if (actualStatus === 'False') {
+                    var amountWithInterest = $('#amountWithInterest' + id).html();
+
+                    TotalAmount = TotalAmount + parseFloat(amountWithInterest);
+                }
+            });
+
+            $('#totalAmount').html(parseFloat(TotalAmount).toFixed(2));
+        }
+
+
+        //post
+        function salesSave() {
+            var totalAmount = $('#totalAmount').html();
+            var depositID = $('#depositID').val();
+
+            var datas = '';
+            $('#itemTable tbody tr').each(function () {
+                var id = $(this).closest('tr').attr('id');
+                var actualStatus = $('#actualStatus' + id).html();
+                var isWithdrawn = $('#isWithdrawn' + id).html();
+                var withdrawalDate = $('#withdrawalDate' + id).html();
+                var interestPaid = $('#interestPaid' + id).html();
+                var amountWithInterest = $('#amountWithInterest' + id).html();
+                var month = $('#month' + id).html();
+                if (actualStatus === 'False' && isWithdrawn === "True") {
+                    datas = datas + '' + id + '|' + withdrawalDate + '|' + interestPaid + '|' + amountWithInterest + '|' + month + '@'
+                }
+
+            });
+
+
+            if (datas === '') {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: 'No Changes made. Please change any of the item status !'
+                    })
+                ;
+            } else {
+                data = new FormData();
+                data.append('depositID', depositID);
+                data.append('totalAmount', totalAmount);
+                data.append('datas', datas);
+
+                debugger;
+                $.ajax({
+                    type: 'post',
+                    url: '{% url "homeApp:item_closing_post" %}',
+                    data: data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+
+
+                    success: function (response) {
+                        if (response.message === 'success') {
+                            $('body')
+                                .toast({
+                                    class: 'success',
+                                    message: 'Updated Deposit status.'
+                                });
+
+                            location.reload();
+
+                        }
+                        else {
+                            $('body')
+                                .toast({
+                                    class: 'error',
+                                    message: 'An error occurred !'
+                                })
+                            ;
+
+                        }
+
+                        return response;
+                    },
+                    error: function () {
+                        $('body')
+                            .toast({
+                                class: 'error',
+                                message: 'An error occurred !'
+                            })
+                        ;
+                    }
+                });
+
+
+            }
+
+        }
+        function calMonth() {
+            var isWithdrawn = $('#isWithdrawn').val();
+            if (isWithdrawn === "True") {
+                var Ddate = $("#Ddate").val().toString();
+                var withdrawalDate = $("#withdrawalDate").val().toString();
+                var yearThen = parseInt(Ddate.substring(6, 10), 10);
+                var monthThen = parseInt(Ddate.substring(3, 5), 10);
+                var dayThen = parseInt(Ddate.substring(0, 2), 10);
+                var yearThenW = parseInt(withdrawalDate.substring(6, 10), 10);
+                var monthThenW = parseInt(withdrawalDate.substring(3, 5), 10);
+                var dayThenW = parseInt(withdrawalDate.substring(0, 2), 10);
+                var today = new Date(yearThenW, monthThenW - 1, dayThenW);
+                var birthday = new Date(yearThen, monthThen - 1, dayThen);
+
+                var differenceInMilisecond = today.valueOf() - birthday.valueOf();
+
+                var year_age = Math.floor(differenceInMilisecond / 31536000000);
+                var day_age = Math.floor((differenceInMilisecond % 31536000000) / 86400000);
+
+
+                var month_age = Math.floor(day_age / 30);
+
+                day_age = day_age % 30;
+                var mon;
+                if (day_age > 18 && day_age <= 29) {
+                    mon = month_age + 1;
+
+                } else if (day_age >= 1 && day_age <= 18) {
+                    mon = month_age + 0.5;
+                }
+                else {
+                    mon = month_age;
+                }
+
+                $('#time').html('' + year_age + ' Y ' + month_age + ' M ' + day_age + ' D');
+                $('#month').val("" + mon);
+                interestCal();
+                totalAmount();
+            }
+            else {
+                $("#month").val('');
+                $("#ICalculate").val('');
+                $("#amountWithInterest").val('0.0');
+                $("#interestPaid").val('0.0');
+
+            }
+        }
+
+        function interestCal() {
+            var time = $("#month").val();
+            var itemTotalAmount = $("#itemTotalAmount").val();
+            var itemInterestRate = $("#itemInterestRate").val();
+
+            var interest;
+
+            interest = (parseFloat(time) * parseFloat(itemTotalAmount) * parseFloat(itemInterestRate)) / 100.0
+            $('#ICalculate').val(parseFloat(interest).toFixed(2));
+        }
+        function totalAmount() {
+            var interestPaid = $('#interestPaid').val();
+            var itemTotalAmount = $('#itemTotalAmount').val();
+            var t = parseFloat(interestPaid) + parseFloat(itemTotalAmount);
+            $('#amountWithInterest').val(parseFloat(t).toFixed(2));
+
+        }
+
+                function printInvoice() {
+            var id = $('#salesID').val();
+            window.open('/print_billA4/?q=' + id, 'popUpWindow', 'height=screen.availHeight,width=screen.availWidth,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+
+        }
+        function printInvoicea5() {
+            var id = $('#salesID').val();
+            window.open('/print_billA5/?q=' + id, 'popUpWindow', 'height=screen.availHeight,width=screen.availWidth,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+
+        }
+         function printWithA5() {
+            var id = $('#salesID').val();
+            window.open('/with_print_billA5/?q=' + id, 'popUpWindow', 'height=screen.availHeight,width=screen.availWidth,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+
+        }
+        function printWithA4() {
+            var id = $('#salesID').val();
+            window.open('/with_print_billA4/?q=' + id, 'popUpWindow', 'height=screen.availHeight,width=screen.availWidth,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+
+        }
+
+    </script>
+{% endblock %}

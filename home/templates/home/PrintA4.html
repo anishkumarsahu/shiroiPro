@@ -1,0 +1,195 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+
+    <style>
+        body {
+            margin: 25px;
+            font-size:14px;
+        }
+
+        tr td:nth-child(5) {
+            text-align: right;
+
+        }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            padding: 5px;
+            line-height: 1.22857143;
+            vertical-align: top;
+            border-top: 1px solid #ddd;
+            font-size: 13px !important;
+        }
+
+        .classComp {
+            font-size: 14px;
+        }
+
+        .blank_row {
+            height: 30px;
+        }
+
+        @page {
+            size: A4;
+            margin-top: 2mm;
+            margin-right: 5mm;
+            margin-bottom: 2mm;
+            margin-left: 5mm;
+
+        }
+
+        @media print {
+            body {
+                margin-top: 2mm;
+                margin-right: 5mm;
+                margin-bottom: 2mm;
+                margin-left: 5mm;
+            }
+
+            p {
+                font-size: 14px;
+            }
+
+        }
+    </style>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+</head>
+<body onload="myFunction()">
+<div class="row ">
+    <p class="text-center " style="font-weight: bold"><u>RECEIPT</u></p>
+</div>
+<div class="row classComp">
+    <div class="col-xs-12 text-center">
+        <h3 style="font-family: serif;font-weight: bold;">SHIROI STORE</h3>
+        <span style="font-weight: 400">Uripok Tourangbam Leikai</span><br>
+    </div>
+</div>
+<div class="row">
+    <p class="text-right">Deposit Date: <span style="border-bottom: 1px dotted">{{ depo.depositDate|date:"d-m-Y" }}</span></p>
+    <span class="text-left"> NAME:{{ depo.customerName|upper }}</span><br>
+    <span class="text-left"> ADDRESS: {{ depo.address|upper }}</span><br>
+    <span style="margin-bottom: 5px;">Deposit No. : <b>{{ depo.depositSerialID }}</b></span> <br><br>
+
+    <table class="table table-bordered">
+
+        <thead>
+        <tr>
+            <th>Sl No.</th>
+            <th>Item Description</th>
+            <th>Weight(g)</th>
+            <th>Rate/11.66g <br>(Rs.)</th>
+            <th>Interest%</th>
+            <th style="text-align: right">Amount <br>(Rs.)</th>
+        </tr>
+
+        </thead>
+        <tbody>
+        {% for foo in depo_list %}
+
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ foo.itemName|capfirst }}({{ foo.description|capfirst }})</td>
+                <td  style="text-align: right">{{ foo.weight }}</td>
+                <td  style="text-align: right">{{ foo.itemRatePerTenGram }}</td>
+                <td>{{ foo.interestRate }}</td>
+                <td style="text-align: right">{{ foo.itemAmount }}</td>
+            </tr>
+        {% endfor %}
+
+        <tr class="blank_row">
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th style="text-align: right"></th>
+        </tr>
+        {% if left > 0 %}
+            {% for l in loo %}
+                <tr class="blank_row">
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th style="text-align: right"></th>
+                </tr>
+            {% endfor %}
+        {% endif %}
+<tr class="blank_row">
+                    <th></th>
+                    <th class="text-right">Total</th>
+                    <th>{{ depo.totalWeight }} g <br>{{ depo.totalWeightL }} </th>
+                    <th></th>
+                    <th></th>
+                    <th style="text-align: right">{{ depo.totalAmount }}</th>
+                </tr>
+        <tr>
+            <td rowspan="2" colspan="6">
+                <b>In words:</b> <span style="border-bottom: 1px dotted"> {{ TotalInWords }}</span>
+            </td>
+       </tr>
+        <tr>
+
+        </tr>
+        <tr>
+            <td rowspan="3" colspan="6">
+                <div class="row">
+                    <div class="col-xs-12"> <b>Office Hrs. : </b>Monday to Saturday - 9:00 am to 5:00 pm
+Sunday Closed on General Holidays.
+
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+
+        </tr>
+        <tr>
+
+        </tr>
+        <tr>
+            <td rowspan="3" colspan="6">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <b>N.B.</b>
+                        <li>Valid for 6 (Six) months only.</li>
+                        <li>We are not responsible for any invalid item.</li>
+                        <li>Validity can be extended upon payment of the whole or partial interest.</li>
+                        <li>Items will be handed over on the same day after 2:00p.m. if requested
+(in person or by phone) before 11:30am, otherwise will be delivered on
+the next day.</li>
+                        <li>Interest calculated every 1/2 month with a grace period of 3 days. (1/2
+month interest applies form the day 1)</li>
+                        <li>Interest wil be calculated on the date of re-payment.</li>
+                        <li>No. items will be handed over without the presentation of this receipt.</li>
+                    </div>
+                </div>
+
+
+            </td>
+
+
+        </tr>
+
+
+        </tbody>
+    </table>
+</div>
+
+<div class="row text-right" style="margin-top: 30px;">
+    <p style="padding-right: 60px;margin: 0">For,</p>
+    <p style="padding-right: 25px;"><b>SHIROI STORE</b></p></div>
+<script>
+    function myFunction() {
+        window.print();
+
+    }
+</script>
+</body>
+</html>

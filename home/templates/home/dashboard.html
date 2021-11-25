@@ -1,0 +1,169 @@
+{% load static %}
+{% load pwa %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    {% progressive_web_app_meta %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'logo/512.png' %}" type="image/gif" sizes="16x16">
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/semantic.min.css' %}">
+    <script src="{% static 'js/semantic.min.js' %}"></script>
+    <script src="{% static 'sw/app.js' %}"></script>
+</head>
+<body>
+
+<div class="ui vertically divided grid inverted" style="text-align: center">
+    <div class="one column row">
+        <div class="column">
+            <p style="text-transform: uppercase;
+    font-size: 25px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.7);
+    font-family: monospace;
+    padding-top: 10px;
+    padding-bottom: 0px;
+    text-shadow: 2px 8px 6px rgba(0,0,0,0.2),
+                 0px -5px 35px rgba(255,255,255,0.3);
+    margin-bottom: 0;"
+            >A Management Software<span style="font-size: 12px">  (V 1.0.0) </span></p>
+            <img src="{% static 'logo/512.png' %}" alt="" width="80" height="80">
+
+            <p style="color:grey;font-family: serif;font-style: italic;">"By Ziva Infotech"</p>
+        </div>
+    </div>
+    <div class="three column row">
+
+        <div class="column">
+            <a href="{% url 'homeApp:new_deposit' %}">
+                <p><i class="download icon" style="font-size: 5rem;"></i><br>NEW DEPOSIT </p>
+            </a>
+        </div>
+        <div class="column">
+            <a href="{% url 'homeApp:deposit_history' %}">
+                <p><i class="history icon" style="font-size: 5rem;"></i><br>DEPOSIT HISTORY </p>
+            </a>
+        </div>
+        <div class="column">
+            <a href="{% url 'homeApp:logout' %}">
+                <p><i class="share square icon" style="font-size: 5rem;"></i><br>LOGOUT </p>
+            </a>
+        </div>
+
+    </div>
+    <div class="three column row">
+
+        <div class="column">
+            <a href="{% url 'homeApp:daily_report' %}">
+                <p><i class="hand holding usd icon
+" style="font-size: 5rem;"></i><br>CASH BOOK</p>
+            </a>
+        </div>
+        <div class="column">
+            <div class="ui blue raised segment">
+                <h4>Quick Search By Serial No.</h4>
+                <div class="ui action input">
+                    <input type="text" id="search" placeholder="Search..." autofocus>
+                    <div class="ui buttons">
+                        <button onclick="SearchDeposit()" class="ui green button">Search</button>
+                        <div class="or"></div>
+                        <button class="ui red button" onclick="clearBtn()">Clear</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="column">
+            <a href="{% url 'homeApp:backup' %}">
+                <p><i class="hdd outline icon" style="font-size: 5rem;"></i><br>BACKUP </p>
+            </a>
+        </div>
+
+    </div>
+
+    <div class="three column row">
+
+        <div class="column">
+
+        </div>
+
+        <div class="column">
+
+        </div>
+
+    </div>
+
+</div>
+<div class="ui error message" style="height: 60px;width: 50%;margin: 0 auto;">
+    <i class="close icon"></i>
+    <div class="header">
+        ZIVAINFOTECH Reminder!
+    </div>
+    {{ message }}
+</div>
+<script>
+    $('.message .close')
+        .on('click', function () {
+            $(this)
+                .closest('.message')
+                .transition('fade')
+            ;
+        })
+    ;
+
+
+    function SearchDeposit() {
+        var search = $('#search').val();
+        var formdata = new FormData();
+        formdata.append('Search', search);
+        $.ajax({
+            url: "{% url 'homeApp:search_deposit' %}",
+            type: "post",
+            data: formdata,
+            contentType: false,
+            cache: false,
+            processData: false,
+
+            success: function (response) {
+                if (response.message === 'success') {
+                    $('body')
+                        .toast({
+                            class: 'success',
+                            message: 'Deposit Detail Found.'
+                        })
+                    ;
+                    window.location.href = "/deposit_detail/" + response.id + "/";
+
+                } else {
+                    $('body')
+                        .toast({
+                            class: 'warning',
+                            message: 'No Deposit Detail Found ! Please try again.'
+                        })
+                    ;
+
+                }
+
+                return response;
+            },
+            error: function () {
+                $('body')
+                    .toast({
+                        class: 'error',
+                        message: 'An error occurred !'
+                    })
+                ;
+            }
+        });
+
+    }
+    function clearBtn() {
+        $('#search').val('');
+
+    }
+
+</script>
+</body>
+</html>
