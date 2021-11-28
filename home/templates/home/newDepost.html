@@ -281,36 +281,48 @@
         <i class="close icon"></i>
         <div class="header">
             Gold Basic Unit
+            <div class="ui small right labeled left icon input">
+                <i class="tags icon"></i>
+                <input type="text" placeholder="Enter Rate" style="width: 150px" value="8000" id="rateCalc"
+                       onkeyup="rateCalculator()">
+                <a class="ui tag label">
+                    Rate
+                </a>
+            </div>
+
             <input type="hidden" id="printSaleID">
         </div>
         <div class="image content">
             <table class="ui definition table">
-  <thead>
-    <tr><th></th>
-    <th>TOLA (11.66g)</th>
-    <th>SAN (2.915g)</th>
-    <th>CHANING (0.121g)</th>
-  </tr></thead>
-  <tbody>
-    <tr>
-      <td>1</td>
-      <td>1</td>
-      <td>4</td>
-      <td>96</td>
-    </tr>
-    <tr>
-      <td><sup>1</sup>/ <sub>2</sub></td>
-      <td><sup>1</sup>/ <sub>2</sub></td>
-      <td>2</td>
-      <td>48</td>
-    </tr>
-    <tr>
-      <td><sup>1</sup>/ <sub>4</sub></td>
-      <td><sup>1</sup>/ <sub>4</sub></td>
-      <td>1</td>
-      <td>24</td>
-    </tr>
-</tbody></table>
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>TOLA (11.66g)</th>
+                    <th>SAN (2.915g)</th>
+                    <th>CHANING (0.121g)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>1( Rs. <span class="tola"></span>)</td>
+                    <td>4 ( Rs. <span class="tola"></span>)</td>
+                    <td>96( Rs. <span class="tola"></span>)</td>
+                </tr>
+                <tr>
+                    <td><sup>1</sup>/ <sub>2</sub></td>
+                    <td><sup>1</sup>/ <sub>2</sub> ( Rs. <span class="san"></span>)</td>
+                    <td>2 ( Rs. <span class="san"></span>)</td>
+                    <td>48 ( Rs. <span class="san"></span>)</td>
+                </tr>
+                <tr>
+                    <td><sup>1</sup>/ <sub>4</sub></td>
+                    <td><sup>1</sup>/ <sub>4</sub>( Rs. <span class="chaning"></span>)</td>
+                    <td>1( Rs. <span class="chaning"></span>)</td>
+                    <td>24( Rs. <span class="chaning"></span>)</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
         <div class="actions">
             <div class="ui black deny button">
@@ -690,7 +702,6 @@
             $('#totalWeightL').html(tola+" T "+ san +" S " + chaning +" C")
 
 
-
         }
 
         function openInfo() {
@@ -698,6 +709,18 @@
             $('#BasicInfo')
                 .modal('show')
             ;
+
+        }
+
+        $(rateCalculator());
+
+        function rateCalculator() {
+            let rate = $('#rateCalc').val();
+            console.log(rate);
+            $('.tola').html(rate * 4);
+            $('.san').html(rate * 2);
+            $('.chaning').html(rate * 1);
+
 
         }
 
