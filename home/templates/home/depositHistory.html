@@ -443,7 +443,8 @@
                                 <tr>
                                     <th>Sl No.</th>
                                     <th>ItemName</th>
-                                    <th>Weight</th>
+                                    <th>Weight(g)</th>
+                                    <th>Weight(Local)</th>
                                     <th>Rate/11.66g</th>
                                     <th>Rate(%)</th>
                                     <th>Description</th>
@@ -870,7 +871,7 @@
 
                     var i;
                     for (i = 0; i < response.data.Items.length; i++) {
-                        $('#itemTableReport tbody').append('<tr ><td>#</td> <td>' + response.data.Items[i]['ItemName'] + '</td><td >' + response.data.Items[i]['Weight'] + '</td><td >' + response.data.Items[i]['ItemRatePerTenGram'] + '</td><td >' + response.data.Items[i]['InterestRate'] + '</td><td >' + response.data.Items[i]['Description'] + '</td><td>' + response.data.Items[i]['ItemAmount'] + '</td><td >' + response.data.Items[i]['IsWithdrawn'] + '</td><td >' + response.data.Items[i]['WithdrawalDate'] + '</td><td >' + response.data.Items[i]['InterestPaid'] + '</td></tr>');
+                        $('#itemTableReport tbody').append('<tr ><td>#</td> <td>' + response.data.Items[i]['ItemName'] + '</td><td >' + response.data.Items[i]['Weight'] + '</td><td >' + response.data.Items[i]['WeightLocal'] + '</td><td >' + response.data.Items[i]['ItemRatePerTenGram'] + '</td><td >' + response.data.Items[i]['InterestRate'] + '</td><td >' + response.data.Items[i]['Description'] + '</td><td>' + response.data.Items[i]['ItemAmount'] + '</td><td >' + response.data.Items[i]['IsWithdrawn'] + '</td><td >' + response.data.Items[i]['WithdrawalDate'] + '</td><td >' + response.data.Items[i]['InterestPaid'] + '</td></tr>');
 
                     }
 

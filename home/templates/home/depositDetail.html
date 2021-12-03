@@ -140,8 +140,8 @@
 
 
                                 <div class="field required">
-                                    <label>Is Withdrawn?</label>
-                                    <select class="ui fluid dropdown" id="isWithdrawn" onchange="calMonth()"
+                                    <label style="color: red;font-weight: bold">Is Withdrawn?</label>
+                                    <select class="ui fluid  dropdown" id="isWithdrawn" onchange="calMonth()"
                                             style="border-color:black!important;">
                                         <option value="False">No</option>
                                         <option value="True">Yes</option>
@@ -237,6 +237,7 @@
                                 <th>Sl No.</th>
                                 <th>Item Name</th>
                                 <th>Weight(g)</th>
+                                <th>Weight(Lcl)</th>
                                 <th>Rate(₹)</th>
                                 <th>Interest(%)</th>
                                 <th>Item Description</th>
@@ -255,6 +256,7 @@
                                     <td id="row{{ item.pk }}">{{ forloop.counter }}</td>
                                     <td id="itemName{{ item.pk }}">{{ item.itemName }}</td>
                                     <td id="itemWeight{{ item.pk }}">{{ item.weight }}</td>
+                                    <td id="itemWeightLocal{{ item.pk }}">{{ item.tola }} T {{ item.san }} S {{ item.chaning }} C </td>
                                     <td id="itemRate{{ item.pk }}">{{ item.itemRatePerTenGram }}</td>
                                     <td id="itemInterestRate{{ item.pk }}">{{ item.interestRate }}</td>
                                     <td id="itemDescription{{ item.pk }}">{{ item.description }}</td>

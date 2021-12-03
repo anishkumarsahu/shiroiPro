@@ -80,9 +80,9 @@
         <tr>
             <th>Sl No.</th>
             <th>Item Description</th>
-            <th>Weight(g)</th>
-            <th>Rate/11.66g(Rs.)</th>
-            <th>Interest%</th>
+            <th style="text-align: right">Weight(g)</th>
+            <th style="text-align: right">Rate/11.66g(Rs.)</th>
+            <th style="text-align: right">Interest%</th>
             <th style="text-align: right">Amount(Rs.)</th>
         </tr>
 
@@ -93,9 +93,9 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ foo.itemName|capfirst }}({{ foo.description|capfirst }})</td>
-                <td  style="text-align: right">{{ foo.weight }}</td>
+                <td  style="text-align: right">{{ foo.weight }} <span>({{ foo.tola }} T {{ foo.san }} S {{ foo.chaning }} C )</span></td>
                 <td  style="text-align: right">{{ foo.itemRatePerTenGram }}</td>
-                <td>{{ foo.interestRate }}</td>
+                <td style="text-align: right">{{ foo.interestRate }}</td>
                 <td style="text-align: right">{{ foo.itemAmount }}</td>
             </tr>
         {% endfor %}
@@ -123,7 +123,7 @@
         <tr class="blank_row">
                     <th></th>
                     <th class="text-right">Total</th>
-                    <th>{{ depo.totalWeight }} g <br>{{ depo.totalWeightL }} </th>
+                    <th style="text-align: right">{{ depo.totalWeight }} g <br>{{ depo.totalWeightL }} </th>
                     <th></th>
                     <th></th>
                     <th style="text-align: right">{{ depo.totalAmount }}</th>

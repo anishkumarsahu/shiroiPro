@@ -82,12 +82,12 @@
         <tr>
             <th>Sl <br> No.</th>
             <th>Item Description</th>
-            <th>Weight <br>(g)</th>
-            <th>Total <br>(Rs.)</th>
-            <th>Closing <br> Date</th>
-            <th>Month</th>
-            <th>Interest</th>
-            <th>Status</th>
+            <th  style="text-align: right">Weight <br>(g)</th>
+            <th  style="text-align: right">Total <br>(Rs.)</th>
+            <th  style="text-align: right">Closing <br> Date</th>
+            <th  style="text-align: right">Month</th>
+            <th  style="text-align: right">Interest</th>
+            <th  style="text-align: right" >Status</th>
             <th style="text-align: right">Amount <br>(Rs.)</th>
         </tr>
 
@@ -98,7 +98,7 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ foo.itemName|capfirst }}({{ foo.description|capfirst }})</td>
-                <td  style="text-align: right">{{ foo.weight }}</td>
+                <td  style="text-align: right">{{ foo.weight }}  <span>({{ foo.tola }} T {{ foo.san }} S {{ foo.chaning }} C )</span></td>
                 <td  style="text-align: right">{{ foo.itemAmount }}</td>
                 {% if foo.isWithdrawn == False %}
                 <td>N/A</td>

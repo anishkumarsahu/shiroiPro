@@ -82,6 +82,9 @@ def deposit_post(request):
         p.interestRate = float(item_details[4])
         p.description = item_details[5]
         p.itemAmount = float(item_details[6])
+        p.tola = float(item_details[7])
+        p.san = float(item_details[8])
+        p.chaning = float(item_details[9])
 
         p.save()
     debit(depo.totalAmount, "Given for amount Rs. {} with depositID {}".format(depo.totalAmount, depo.depositSerialID))
@@ -314,6 +317,7 @@ def get_deposit_detail(request, id=None):
             'IsWithdrawn': i.isWithdrawn,
             'WithdrawalDate': i.withdrawalDate,
             'InterestPaid': i.interestPaid,
+            'WeightLocal': str(i.tola) +' T '+str(i.san) +' S '+str(i.chaning) +' C',
 
         }
         item_list.append(item_dic)
@@ -454,10 +458,10 @@ def credit(amount, remark):
         book = CashBook()
         book.amount = float(amount)
         book.remark = remark
-        book.balanceThatTime = last_book.availableBalance + float(amount)
-        book.availableBalance = last_book.availableBalance + float(amount)
+        book.balanceThatTime = round((last_book.availableBalance + float(amount)),2)
+        book.availableBalance = round((last_book.availableBalance + float(amount)),2)
         book.transactionType = "Credit"
-        book.totalCredit = last_book.totalCredit + float(amount)
+        book.totalCredit = round((last_book.totalCredit + float(amount)),2)
         book.save()
 
 
@@ -478,10 +482,10 @@ def debit(amount, remark):
         book = CashBook()
         book.amount = float(amount)
         book.remark = remark
-        book.balanceThatTime = (last_book.balanceThatTime - float(amount))
-        book.availableBalance = (last_book.availableBalance - float(amount))
+        book.balanceThatTime = round((last_book.balanceThatTime - float(amount)),2)
+        book.availableBalance = round((last_book.availableBalance - float(amount)),2)
         book.transactionType = "Debit"
-        book.totalDebit = (last_book.totalDebit + float(amount))
+        book.totalDebit = round((last_book.totalDebit + float(amount)),2)
         book.save()
 
 

@@ -18,6 +18,10 @@
             padding-top: 0;
             padding-bottom: 0.2rem;
         }
+    .ui.table>tbody>tr>td, .ui.table>tr>td {
+    padding: 0.4571429em 0.78571429em;
+    text-align: inherit;
+}
     </style>
 
     <div class="ui padded grid">
@@ -63,7 +67,7 @@
                 </h5>
                 <div class="ui internally celled  grid">
 
-                    <div class="twelve wide column">
+                    <div class="twelve wide column" style="padding-left: 0">
                         <div class="ui tiny form" id="depositForm">
                             <div class="five fields">
                                 <div class="field">
@@ -103,25 +107,25 @@
                                     <label>Item Name</label>
                                     <input placeholder="Item Name" type="text" id="itemName">
                                 </div>
-                                <div class="field required" style="width: 8%">
+                                <div class="field required" style="width: 9%">
                                     <label>Weight (g)</label>
-                                    <input placeholder="Item Weight" type="number" id="itemWeight">
+                                    <input placeholder="Item Weight" type="number" id="itemWeight" onkeyup="ItemLocalConvert()">
                                     <span style="color: teal;font-weight: bold;" id="meitei"></span>
                                 </div>
-                                <div class="field required" style="width: 16%">
-                                    <table class="ui red table">
+                                <div class="field required" style="width: 17%">
+                                    <table class="ui teal table" style="text-align: center">
                                         <thead>
                                         <tr>
-                                            <th>T</th>
-                                            <th>S</th>
-                                            <th>C</th>
+                                            <th style="padding: 0">T</th>
+                                            <th style="padding: 0">S</th>
+                                            <th style="padding: 0">C</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         <tr>
-                                            <td>100</td>
-                                            <td>200</td>
-                                            <td>0g</td>
+                                            <td onkeyup="calWeight()" class="pink" contenteditable="true" id="tola">0</td>
+                                            <td onkeyup="calWeight()" class="blue" contenteditable="true" id="san">0</td>
+                                            <td onkeyup="calWeight()" class="orange" contenteditable="true" id="chaning">0</td>
                                         </tr>
 
                                         </tbody>
@@ -131,11 +135,11 @@
                                     <label>Rate(Per 11.66g)(₹)</label>
                                     <input placeholder="Item Rate(Per 11.66g)" type="number" id="itemRate">
                                 </div>
-                                <div class="field required" style="width: 8%">
-                                    <label>Interest Rate</label>
+                                <div class="field required" style="width: 7%">
+                                    <label>Ints. Rate</label>
                                     <input placeholder="Interest Rate" value="2.0" type="number" id="itemInterestRate">
                                 </div>
-                                <div class="field" style="width: 12%">
+                                <div class="field">
                                     <label>Quality</label>
                                     <input placeholder="Item Quality" type="text" id="itemDescription"
                                     >
@@ -146,8 +150,8 @@
                                     >
                                 </div>
 
-                                <div class="field" style="    padding-top: 1.3rem;">
-                                    <div class="ui buttons">
+                                <div class="field" style="    padding-top: 1.6rem;">
+                                    <div class="ui mini buttons">
                                         <button class="ui positive button" id="addItemBtn" type="button"
                                                 onclick="addSubItems()"><i class="plus icon"></i>Add
                                         </button>
@@ -174,6 +178,7 @@
                                 <th>Sl No.</th>
                                 <th>Item Name</th>
                                 <th>Weight(g)</th>
+                                <th>Weight(Local)</th>
                                 <th>Rate(₹)</th>
                                 <th>Interest(%)</th>
                                 <th>Item Description</th>
@@ -300,7 +305,7 @@
         <i class="close icon"></i>
         <div class="header">
             Gold Basic Unit
-            <div class="ui small right labeled left icon input">
+            <div class="ui tiny right labeled left icon input">
                 <i class="tags icon"></i>
                 <input type="text" placeholder="Enter Rate" style="width: 150px" value="8000" id="rateCalc"
                        onkeyup="rateCalculator()">
@@ -434,9 +439,13 @@
             var itemInterestRate = $('#itemInterestRate').val();
             var itemDescription = $('#itemDescription').val();
             var itemTotalAmount = $('#itemTotalAmount').val();
+            var tola = $('#tola').html();
+            var san = $('#san').html();
+            var chaning = $('#chaning').html();
+
 
             if (itemName === '' || itemWeight === '' || itemRate === '' ||
-                itemInterestRate === '' || itemTotalAmount === '') {
+                itemInterestRate === '' || itemTotalAmount === ''|| tola === ''|| san === ''|| chaning === '') {
                 $('body')
                     .toast({
                         class: 'orange',
@@ -446,13 +455,13 @@
             }
             else {
                 if (lastItemID === undefined) {
-                    $('#itemTable tbody').append('<tr id ="1" ><td id ="row' + 1 + '">#</td> <td id ="itemName' + 1 + '">' + itemName + '</td><td id ="itemWeight' + 1 + '">' + itemWeight + '</td><td id ="itemRate' + 1 + '">' + itemRate + '</td><td id ="itemInterestRate' + 1 + '">' + itemInterestRate + '</td><td id ="itemDescription' + 1 + '">' + itemDescription + '</td><td id ="itemTotalAmount' + 1 + '">' + itemTotalAmount + '</td><td><button style="font-size:10px;" onclick="GetItemDetail(' + 1 + ')" class="ui circular facebook icon button green"><i class="pen icon"></i></button><button style="font-size:10px;" onclick="delItem(' + 1 + ')" class="ui circular youtube icon button"><i class="trash alternate icon"></i></button></td></tr>');
+                    $('#itemTable tbody').append('<tr id ="1" ><td id ="row' + 1 + '">#</td> <td id ="itemName' + 1 + '">' + itemName + '</td><td id ="itemWeight' + 1 + '">' + itemWeight + '</td><td id ="local' + 1 + '"><span id="tola'+1+'"> '+ tola +'  </span> T <span id="san'+1+'"> '+ san +' </span> S<span id="chaning'+1+'"> '+ chaning +'</span> C</td><td id ="itemRate' + 1 + '">' + itemRate + '</td><td id ="itemInterestRate' + 1 + '">' + itemInterestRate + '</td><td id ="itemDescription' + 1 + '">' + itemDescription + '</td><td id ="itemTotalAmount' + 1 + '">' + itemTotalAmount + '</td><td><button style="font-size:10px;" onclick="GetItemDetail(' + 1 + ')" class="ui circular facebook icon button green"><i class="pen icon"></i></button><button style="font-size:10px;" onclick="delItem(' + 1 + ')" class="ui circular youtube icon button"><i class="trash alternate icon"></i></button></td></tr>');
 
 
                 }
                 else {
                     lastItemID = parseInt(lastItemID) + 1;
-                    $('#itemTable tbody').append('<tr id ="' + lastItemID + '" ><td id ="row' + lastItemID + '">#</td> <td id ="itemName' + lastItemID + '">' + itemName + '</td><td id ="itemWeight' + lastItemID + '">' + itemWeight + '</td><td id ="itemRate' + lastItemID + '">' + itemRate + '</td><td id ="itemInterestRate' + lastItemID + '">' + itemInterestRate + '</td><td id ="itemDescription' + lastItemID + '">' + itemDescription + '</td><td id ="itemTotalAmount' + lastItemID + '">' + itemTotalAmount + '</td><td><button style="font-size:10px;" onclick="GetItemDetail(' + lastItemID + ')" class="ui circular facebook icon button green"><i class="pen icon"></i></button><button style="font-size:10px;" onclick="delItem(' + lastItemID + ')" class="ui circular youtube icon button"><i class="trash alternate icon"></i></button></td></tr>');
+                    $('#itemTable tbody').append('<tr id ="' + lastItemID + '" ><td id ="row' + lastItemID + '">#</td> <td id ="itemName' + lastItemID + '">' + itemName + '</td><td id ="itemWeight' + lastItemID + '">' + itemWeight + '</td><td id ="local' + lastItemID + '"><span id="tola'+lastItemID+'"> '+ tola +'</span> T <span id="san'+lastItemID+'"> '+ san +'</span> S<span id="chaning'+lastItemID+'"> '+ chaning +' </span>C</td><td id ="itemRate' + lastItemID + '">' + itemRate + '</td><td id ="itemInterestRate' + lastItemID + '">' + itemInterestRate + '</td><td id ="itemDescription' + lastItemID + '">' + itemDescription + '</td><td id ="itemTotalAmount' + lastItemID + '">' + itemTotalAmount + '</td><td><button style="font-size:10px;" onclick="GetItemDetail(' + lastItemID + ')" class="ui circular facebook icon button green"><i class="pen icon"></i></button><button style="font-size:10px;" onclick="delItem(' + lastItemID + ')" class="ui circular youtube icon button"><i class="trash alternate icon"></i></button></td></tr>');
                 }
                 ClearData();
                 calTaxAndTotal();
@@ -478,6 +487,7 @@
             $('#itemInterestRate').val(itemInterestRate);
             $('#itemDescription').val(itemDescription);
             $('#itemTotalAmount').val(itemTotalAmount);
+            ItemLocalConvert();
         }
 
 
@@ -489,9 +499,12 @@
             var itemInterestRate = $('#itemInterestRate').val();
             var itemDescription = $('#itemDescription').val();
             var itemTotalAmount = $('#itemTotalAmount').val();
+            var tola = $('#tola').html();
+            var san = $('#san').html();
+            var chaning = $('#chaning').html();
 
             if (itemName === '' || itemWeight === '' || itemRate === '' ||
-                itemInterestRate === '' || itemTotalAmount === '') {
+                itemInterestRate === '' || itemTotalAmount === ''|| tola === ''|| san === ''|| chaning === '') {
                 $('body')
                     .toast({
                         class: 'orange',
@@ -506,6 +519,9 @@
                 $('#itemInterestRate' + id).html(itemInterestRate);
                 $('#itemDescription' + id).html(itemDescription);
                 $('#itemTotalAmount' + id).html(itemTotalAmount);
+                $('#tola' + id).html(tola);
+                $('#san' + id).html(san);
+                $('#chaning' + id).html(chaning);
 
                 ClearData();
                 calTaxAndTotal();
@@ -537,13 +553,14 @@
             $('#itemRate').val('');
             $('#itemInterestRate').val('2.0');
             $('#itemDescription').val('');
-            $('#itemTotalAmount').val('');
+            $('#tola').html('0');
+            $('#san').html('0');
+            $('#chaning').html('0');
         }
 
         function calTaxAndTotal() {
             var TotalAmount = 0.0;
             var TotalWeight = 0.0;
-            debugger;
             $('#itemTable tbody tr').each(function () {
                 var id = $(this).closest('tr').attr('id');
                 var itemTotalAmount = $('#itemTotalAmount' + id).html();
@@ -585,7 +602,10 @@
                 var itemInterestRate = $('#itemInterestRate' + id).html();
                 var itemDescription = $('#itemDescription' + id).html();
                 var itemTotalAmount = $('#itemTotalAmount' + id).html();
-                datas = datas + '' + id + '|' + itemName + '|' + itemWeight + '|' + itemRate + '|' + itemInterestRate + '|' + itemDescription + '|' + itemTotalAmount + '@'
+                var tola = $('#tola' + id).html();
+                var san = $('#san' + id).html();
+                var chaning = $('#chaning' + id).html();
+                datas = datas + '' + id + '|' + itemName + '|' + itemWeight + '|' + itemRate + '|' + itemInterestRate + '|' + itemDescription + '|' + itemTotalAmount +'|' + tola +'|' + san +'|' + chaning + '@'
 
 
             });
@@ -740,6 +760,34 @@
             $('.san').html(rate * 2);
             $('.chaning').html(rate * 1);
 
+
+        }
+
+
+        function ItemLocalConvert() {
+            var itemWeight = $('#itemWeight').val();
+            a = parseFloat(itemWeight).toFixed(2);
+            var tola = Math.floor(a/11.66);
+            var rem_tola = a % 11.66;
+             var san = Math.floor(rem_tola/(11.66 / 4));
+            var rem_san = rem_tola % (11.66 / 4);
+            var chaning =  Math.floor(rem_san/(11.66 / 96));
+            var rem_chaning = rem_san % (11.66 / 96);
+{#            console.log(tola, san, chaning, rem_chaning)#}
+
+            $('#tola').html(tola);
+            $('#san').html( san);
+            $('#chaning').html(chaning);
+
+
+        }
+        function calWeight() {
+           var tola =  $('#tola').html();
+            var san = $('#san').html();
+            var chaning = $('#chaning').html();
+
+            var total = (parseFloat(tola).toFixed(2)*11.66) + (parseFloat(san).toFixed(2)*(11.66/4)) + (parseFloat(chaning).toFixed(2)*(11.66/96));
+            $('#itemWeight').val(parseFloat(total).toFixed(2));
 
         }
 
