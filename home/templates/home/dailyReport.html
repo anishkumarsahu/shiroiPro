@@ -6,26 +6,34 @@
 
 {% block css %}
      <style>
- .cwide {
-            width: 75% !important;
-        }
+         .cwide {
+             width: 75% !important;
+         }
 
-        #dTable_filter {
-            position: absolute;
-    right: 10px;
-    top: 10px;
+         #dTable_filter {
+             position: absolute;
+             right: 10px;
+             top: 10px;
 
-        }
+         }
+
+         #cTable_filter {
+             position: absolute;
+             right: 10px;
+             top: 10px;
+
+         }
 
 
-        .dt-buttons {
-            position: absolute;
-            left: 200px;
-        }
-    table .dataTables_scrollHeadInner{
-        width: 100%!important;
-    }
-    </style>
+         .dt-buttons {
+             position: absolute;
+             left: 200px;
+         }
+
+         table .dataTables_scrollHeadInner {
+             width: 100% !important;
+         }
+     </style>
 {% endblock %}
 {% block body %}
 
@@ -162,38 +170,80 @@
                                 </div>
 
                             </div>
+                            <div class="eight wide column">
+                                <div class="ui teal label">
+                                    <i class="rupee icon"></i>
+                                    {{ o_balance }}
+                                    <a class="detail">Opening Balance</a>
+                                </div>
+                                <div class="ui purple label">
+                                    <i class="rupee icon"></i>
+                                    {{ c }}
+                                    <a class="detail">Available Balance</a>
+                                </div>
+                            </div>
+                            <div class="eight wide column">
+                                <h5 class="ui horizontal left aligned divider header">
+                                    <i class="left align icon"></i>
+                                    CREDIT <span style="color: green;font-size: 20px">+</span>
+                                </h5>
+                            </div>
+                            <div class="eight wide column">
 
-                        </div>
-                    </div>
-
-                    <div class="ui internally celled grid">
-                        <div class="row">
-                            <div class="sixteen wide column">
-                                <table id="dTable" class="ui sortable celled very compact table"
-                                       style="margin-top: 5px;width: 100%">
-                                    <thead>
-                                    <tr>
-                                         <th>Amount(₹)</th>
-                                        <th>Remark</th>
-                                        <th>Type</th>
-                                        <th>Balance(₹)</th>
-                                        <th>EnteredOn</th>
-
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-
-
-                                    </tbody>
-                                </table>
+                                <h5 class="ui horizontal left aligned divider header">
+                                    <i class="left align icon"></i>
+                                    DEBIT <span style="color: red;font-size: 20px">-</span>
+                                </h5>
                             </div>
 
-
                         </div>
                     </div>
 
+    <div class="ui internally celled grid">
+        <div class="row">
+            <div class="eight wide column">
+                <table id="cTable" class="ui sortable celled very compact table"
+                       style="margin-top: 5px;width: 100%">
+                    <thead>
+                    <tr>
+                        <th>Amount(₹)</th>
+                        <th>Remark</th>
+                        <th>Balance(₹)</th>
+                        <th>EnteredOn</th>
 
-                </div>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="eight wide column">
+
+                <table id="dTable" class="ui sortable celled very compact table"
+                       style="margin-top: 5px;width: 100%">
+                    <thead>
+                    <tr>
+                        <th>Amount(₹)</th>
+                        <th>Remark</th>
+                        <th>Balance(₹)</th>
+                        <th>EnteredOn</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
 
 {% endblock %}
 
@@ -237,10 +287,9 @@
                                 })
                             ;
 
-                            cashTab.ajax.reload();
+                            cTab.ajax.reload();
                             $('#categoryForm').trigger('reset')
-                        }
-                        else {
+                        } else {
                             $('body')
                                 .toast({
                                     class: 'warning',
@@ -256,7 +305,7 @@
                         $('body')
                             .toast({
                                 class: 'error',
-                                message: 'An error occured !'
+                                message: 'An error occurred !'
                             })
                         ;
                     }
@@ -266,6 +315,7 @@
             }
 
         }
+
         function outflowAdd() {
             var outRemark = $('#outRemark').val();
             var outAmount = $('#outAmount').val();
@@ -303,10 +353,9 @@
                                 })
                             ;
 
-                            cashTab.ajax.reload();
+                            dTab.ajax.reload();
                             $('#outForm').trigger('reset')
-                        }
-                        else {
+                        } else {
                             $('body')
                                 .toast({
                                     class: 'warning',
@@ -322,7 +371,7 @@
                         $('body')
                             .toast({
                                 class: 'error',
-                                message: 'An error occured !'
+                                message: 'An error occurred !'
                             })
                         ;
                     }
@@ -381,54 +430,80 @@
             }
         });
         $(cashbook());
- var cashTab;
+        var cTab;
+        var dTab;
+
         function cashbook() {
             var startDate = $('#startDateP').val();
             var endDate = $('#endDateP').val();
 
 
-            cashTab = $('#dTable').DataTable({
+            dTab = $('#dTable').DataTable({
                 dom: 'Blfrtip',
                 "scrollY": "310px",
                 buttons: [{
                     extend: 'excel',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4]
+                        columns: [0, 1, 2, 3]
                     }
                 }, {
                     extend: 'print',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4]
+                        columns: [0, 1, 2, 3]
                     }
                 }
-                    , {
-                        extend: 'colvis',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4]
-                        }
-                    }
                 ],
                 "columnDefs": [
                     {"name": "amount", "targets": 0, "orderable": true},
                     {"name": "remark", "targets": 1, "orderable": true},
-                    {"name": "transactionType", "targets": 2, "orderable": true},
-                    {"name": "availableBalance", "targets": 3, "orderable": true},
-                    {"name": "datetime", "targets": 4, "orderable": true},
+                    {"name": "availableBalance", "targets": 2, "orderable": true},
+                    {"name": "datetime", "targets": 3, "orderable": true},
 
                 ],
-                aaSorting: [[4, 'desc']],
+                aaSorting: [[3, 'desc']],
                 "lengthMenu": [[8, 25, 50, 100, -1], [8, 25, 50, 100, "All"]],
                 "pageLength": 8,
                 "processing": true,
                 "serverSide": true,
-                "ajax": '{% url 'homeApp:CashBookListJson' %}?startDate=' + startDate + '&endDate=' + endDate
+                "ajax": '{% url 'homeApp:CashBookDebitListJson' %}?startDate=' + startDate + '&endDate=' + endDate
+            });
+
+            cTab = $('#cTable').DataTable({
+                dom: 'Blfrtip',
+                "scrollY": "310px",
+                buttons: [{
+                    extend: 'excel',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3]
+                    }
+                }, {
+                    extend: 'print',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3]
+                    }
+                }
+                ],
+                "columnDefs": [
+                    {"name": "amount", "targets": 0, "orderable": true},
+                    {"name": "remark", "targets": 1, "orderable": true},
+                    {"name": "availableBalance", "targets": 2, "orderable": true},
+                    {"name": "datetime", "targets": 3, "orderable": true},
+
+                ],
+                aaSorting: [[3, 'desc']],
+                "lengthMenu": [[8, 25, 50, 100, -1], [8, 25, 50, 100, "All"]],
+                "pageLength": 8,
+                "processing": true,
+                "serverSide": true,
+                "ajax": '{% url 'homeApp:CashBookCreditListJson' %}?startDate=' + startDate + '&endDate=' + endDate
             });
         }
 
-                function pDetails() {
+        function pDetails() {
             var startDate = $('#startDateP').val();
             var endDate = $('#endDateP').val();
-            cashTab.ajax.url('{% url 'homeApp:CashBookListJson' %}?startDate=' + startDate + '&endDate=' + endDate).load();
+            dTab.ajax.url('{% url 'homeApp:CashBookDebitListJson' %}?startDate=' + startDate + '&endDate=' + endDate).load();
+            cTab.ajax.url('{% url 'homeApp:CashBookCreditListJson' %}?startDate=' + startDate + '&endDate=' + endDate).load();
 
         }
     </script>

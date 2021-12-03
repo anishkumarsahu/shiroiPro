@@ -485,8 +485,8 @@ def debit(amount, remark):
         book.save()
 
 
-class CashBookListJson(BaseDatatableView):
-    order_columns = ['amount', 'remark', 'transactionType', 'availableBalance', 'datetime', ]
+class CashBookDebitListJson(BaseDatatableView):
+    order_columns = ['amount', 'remark', 'availableBalance', 'datetime', ]
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
@@ -494,7 +494,7 @@ class CashBookListJson(BaseDatatableView):
         startDate = datetime.strptime(sDate, '%d/%m/%Y')
         endDate = datetime.strptime(eDate, '%d/%m/%Y')
         return CashBook.objects.filter(isDeleted__exact=False, datetime__gte=startDate.date(),
-                                       datetime__lte=endDate.date() + timedelta(days=1))
+                                       datetime__lte=endDate.date() + timedelta(days=1), transactionType__exact='Debit')
 
     def filter_queryset(self, qs):
         search = self.request.GET.get('search[value]', None)
@@ -510,10 +510,10 @@ class CashBookListJson(BaseDatatableView):
     def prepare_results(self, qs):
         json_data = []
         for item in qs:
-            if item.transactionType == "Credit":
-                t = '<button class="mini ui green button">Credit</button>'
-            else:
-                t = '<button class="mini ui red button">Debit</button>'
+            # if item.transactionType == "Credit":
+            #     t = '<button class="mini ui green button">Credit</button>'
+            # else:
+            #     t = '<button class="mini ui red button">Debit</button>'
             # action = '''<a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
             #                    <i class="rupee sign icon"></i>
             #                  </a>
@@ -528,7 +528,57 @@ class CashBookListJson(BaseDatatableView):
 
                 escape(item.amount),
                 escape(item.remark),
-                t,
+                escape(item.availableBalance),
+                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
+
+            ])
+        return json_data
+
+
+class CashBookCreditListJson(BaseDatatableView):
+    order_columns = ['amount', 'remark', 'availableBalance', 'datetime', ]
+
+    def get_initial_queryset(self):
+        sDate = self.request.GET.get('startDate')
+        eDate = self.request.GET.get('endDate')
+        startDate = datetime.strptime(sDate, '%d/%m/%Y')
+        endDate = datetime.strptime(eDate, '%d/%m/%Y')
+        return CashBook.objects.filter(isDeleted__exact=False, datetime__gte=startDate.date(),
+                                       datetime__lte=endDate.date() + timedelta(days=1),
+                                       transactionType__exact='Credit')
+
+    def filter_queryset(self, qs):
+        search = self.request.GET.get('search[value]', None)
+        if search:
+            qs = qs.filter(
+                Q(amount__icontains=search) | Q(remark__icontains=search) | Q(transactionType__icontains=search) | Q(
+                    availableBalance__icontains=search)
+                | Q(datetime__icontains=search)
+            )
+
+        return qs
+
+    def prepare_results(self, qs):
+        json_data = []
+        for item in qs:
+            # if item.transactionType == "Credit":
+            #     t = '<button class="mini ui green button">Credit</button>'
+            # else:
+            #     t = '<button class="mini ui red button">Debit</button>'
+            # action = '''<a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
+            #                    <i class="rupee sign icon"></i>
+            #                  </a>
+            #                  <button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green">
+            #                    <i class="receipt icon"></i>
+            #                  </button>
+            #                  <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px">
+            #                    <i class="trash alternate icon"></i>
+            #                  </button>'''.format(item.pk, item.pk, item.pk),
+
+            json_data.append([
+
+                escape(item.amount),
+                escape(item.remark),
                 escape(item.availableBalance),
                 escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
 

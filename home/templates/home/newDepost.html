@@ -97,7 +97,7 @@
 
                         <div class="ui mini form">
 
-                            <div class="seven fields">
+                            <div class="eight fields">
                                 <input type="hidden" id="itemID">
                                 <div class="field required">
                                     <label>Item Name</label>
@@ -108,23 +108,42 @@
                                     <input placeholder="Item Weight" type="number" id="itemWeight">
                                     <span style="color: teal;font-weight: bold;" id="meitei"></span>
                                 </div>
+                                <div class="field required" style="width: 16%">
+                                    <table class="ui red table">
+                                        <thead>
+                                        <tr>
+                                            <th>T</th>
+                                            <th>S</th>
+                                            <th>C</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>100</td>
+                                            <td>200</td>
+                                            <td>0g</td>
+                                        </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
                                 <div class="field required">
-                                    <label>Item Rate(Per 11.66g)(₹)</label>
+                                    <label>Rate(Per 11.66g)(₹)</label>
                                     <input placeholder="Item Rate(Per 11.66g)" type="number" id="itemRate">
                                 </div>
                                 <div class="field required" style="width: 8%">
                                     <label>Interest Rate</label>
                                     <input placeholder="Interest Rate" value="2.0" type="number" id="itemInterestRate">
                                 </div>
-                                <div class="field" style="width: 18%">
-                                    <label>Item Description</label>
-                                    <input placeholder="Item Description" type="text" id="itemDescription"
+                                <div class="field" style="width: 12%">
+                                    <label>Quality</label>
+                                    <input placeholder="Item Quality" type="text" id="itemDescription"
                                     >
                                 </div>
                                 <div class="field required">
-                                    <label>Item Total Amount(₹)</label>
+                                    <label>Landing Amount(₹)</label>
                                     <input placeholder="Item Total Amount" type="number" id="itemTotalAmount"
-                                           >
+                                    >
                                 </div>
 
                                 <div class="field" style="    padding-top: 1.3rem;">

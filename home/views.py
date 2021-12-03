@@ -113,26 +113,24 @@ def download_backup(request, id=None):
 
 def daily_report(request):
     if request.user.is_authenticated:
-        depo = Deposit.objects.filter(depositDate__icontains=datetime.today().date()).aggregate(Sum('totalAmount'))
-        depo_item = DepositItem.objects.filter(withdrawalDate__icontains=datetime.today().date()).aggregate(Sum('total'))
-        if depo_item['total__sum'] is None:
-            inflow = 0
-        else:
-            inflow = depo_item['total__sum']
-
-        if depo['totalAmount__sum'] is None:
-            outflow = 0
-        else:
-            outflow = depo['totalAmount__sum']
+        try:
+            opening = CashBook.objects.filter(datetime__lt=datetime.today().date()).last()
+            o_balance = opening.availableBalance
+        except:
+            o_balance = 0.0
+        try:
+            current = CashBook.objects.all().last()
+            c = current.availableBalance
+        except:
+            c = 0.0
         context = {
-            'in':inflow,
-            'out':outflow,
-            'total':inflow-outflow,
-            'date':datetime.today().date(),
+            'o_balance': o_balance,
+            'c': c,
+            'date': datetime.today().date(),
 
         }
 
-        return render(request, 'home/dailyReport.html',context)
+        return render(request, 'home/dailyReport.html', context)
     else:
         return redirect('homeApp:loginPage')
 
