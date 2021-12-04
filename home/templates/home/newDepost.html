@@ -776,19 +776,21 @@
 {#            console.log(tola, san, chaning, rem_chaning)#}
 
             $('#tola').html(tola);
-            $('#san').html( san);
+            $('#san').html(san);
             $('#chaning').html(chaning);
+            itemCalculator();
 
 
         }
+
         function calWeight() {
-           var tola =  $('#tola').html();
+            var tola = $('#tola').html();
             var san = $('#san').html();
             var chaning = $('#chaning').html();
 
-            var total = (parseFloat(tola).toFixed(2)*11.66) + (parseFloat(san).toFixed(2)*(11.66/4)) + (parseFloat(chaning).toFixed(2)*(11.66/96));
+            var total = (parseFloat(tola).toFixed(2) * 11.66) + (parseFloat(san).toFixed(2) * (11.66 / 4)) + (parseFloat(chaning).toFixed(2) * (11.66 / 96));
             $('#itemWeight').val(parseFloat(total).toFixed(2));
-
+            itemCalculator();
         }
 
     </script>

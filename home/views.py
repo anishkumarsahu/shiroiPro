@@ -49,13 +49,10 @@ def loginPage(request):
 @is_activated()
 def new_deposit(request):
     if request.user.is_authenticated:
-        try:
-            depo = Deposit.objects.last()
-            depo = 'SS' + str(depo.pk + 1).zfill(5)
-        except:
-            depo ='SS00001'
+        depo = Deposit.objects.filter(isDeleted=False).count()
+        depo = 'SS' + str(depo + 1).zfill(5)
 
-        context ={
+        context = {
             'ID': depo
         }
         return render(request, 'home/newDepost.html', context)
