@@ -56,6 +56,7 @@ def deposit_post(request):
     oldID = request.POST.get("oldID")
     totalWeight = request.POST.get("totalWeight")
     totalWeightL = request.POST.get("totalWeightL")
+    de = Deposit.objects.all().count()
 
     depo = Deposit()
     depo.customerName = customerName
@@ -68,7 +69,7 @@ def deposit_post(request):
     depo.totalWeight = totalWeight
     depo.totalWeightL = totalWeightL
     depo.save()
-    depo.depositSerialID = 'SS' + str(depo.pk).zfill(5)
+    depo.depositSerialID = 'SS' + str(de+1).zfill(5)
     depo.save()
     splited_receive_item = datas.split("@")
     for item in splited_receive_item[:-1]:
