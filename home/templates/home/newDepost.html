@@ -76,7 +76,7 @@
                                 </div>
                                 <div class="field required">
                                     <label>Customer Name</label>
-                                    <input type="text" placeholder="Customer Name" id="customerName">
+                                    <input type="text" placeholder="Customer Name" id="customerName" autocomplete="off">
                                 </div>
                                 <div class="field required">
                                     <label>Phone Number</label>
@@ -84,7 +84,7 @@
                                 </div>
                                 <div class="field required">
                                     <label>Address</label>
-                                    <input type="text" placeholder="Address" id="address">
+                                    <input type="text" placeholder="Address" id="address" autocomplete="off">
                                 </div>
                                 <div class="field required" id="standard_calendar">
 
@@ -263,7 +263,7 @@
 
 
     <div class="ui modal tiny " id="PrintOption">
-        <i class="close icon"></i>
+        <i class="close icon" onclick="reloadPage()"></i>
         <div class="header">
             Select Printing Option
             <input type="hidden" id="printSaleID">
@@ -293,7 +293,7 @@
             </div>
         </div>
         <div class="actions">
-            <div class="ui black deny button">
+            <div class="ui black deny button" onclick="reloadPage()">
                 Close
             </div>
         </div>
@@ -792,6 +792,9 @@
             $('#itemWeight').val(parseFloat(total).toFixed(2));
             itemCalculator();
         }
+        function reloadPage() {
+            window.location.reload();
 
+        }
     </script>
 {% endblock %}
