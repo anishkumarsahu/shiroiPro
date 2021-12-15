@@ -126,14 +126,17 @@ class IncompleteDepositListJson(BaseDatatableView):
             else:
                 clearDate = item.clearanceDate
 
-            action = '''<a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
+            action = '''<a style="font-size:10px;"href="/edit_deposit/{}/" class="ui circular  icon button orange">
+                              <i class="edit icon"></i>
+                             </a>
+                             <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
                                <i class="rupee sign icon"></i>
                              </a><button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green">
                                <i class="receipt icon"></i>
                              </button>
                              <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px">
                                <i class="trash alternate icon"></i>
-                             </button>'''.format(item.pk, item.pk, item.pk),
+                             </button>'''.format(item.pk, item.pk, item.pk, item.pk),
 
             json_data.append([
                 escape(item.oldID),

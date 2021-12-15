@@ -12,6 +12,7 @@ urlpatterns = [
     path('logout/', user_logout, name='logout'),
 
     path('new_deposit/', new_deposit, name='new_deposit'),
+    path('edit_deposit/<int:id>/', edit_deposit, name='edit_deposit'),
     path('deposit_history/', deposit_history, name='deposit_history'),
     path('deposit_detail/<int:id>/', deposit_detail, name='deposit_detail'),
     path('backup/', backup, name='backup'),

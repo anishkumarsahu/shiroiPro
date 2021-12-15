@@ -61,6 +61,21 @@ def new_deposit(request):
 
 
 @is_activated()
+def edit_deposit(request, id=None):
+    if request.user.is_authenticated:
+        instance = get_object_or_404(Deposit, pk = int(id))
+        items = DepositItem.objects.filter(depositID_id = instance.pk)
+
+        context = {
+            'instance': instance,
+            'items':items
+        }
+        return render(request, 'home/editDepost.html', context)
+    else:
+        return redirect('homeApp:loginPage')
+
+
+@is_activated()
 def deposit_history(request):
     if request.user.is_authenticated:
         return render(request, 'home/depositHistory.html')
