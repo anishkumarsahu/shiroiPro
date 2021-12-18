@@ -15,6 +15,7 @@ urlpatterns = [
     path('edit_deposit/<int:id>/', edit_deposit, name='edit_deposit'),
     path('deposit_history/', deposit_history, name='deposit_history'),
     path('deposit_detail/<int:id>/', deposit_detail, name='deposit_detail'),
+    path('edit_deposit_detail/<int:id>/', edit_deposit_detail, name='edit_deposit_detail'),
     path('backup/', backup, name='backup'),
     path('download_backup/', download_backup, name='download_backup'),
     path('daily_flow/', daily_report, name='daily_report'),
@@ -26,6 +27,7 @@ urlpatterns = [
 
     # API
     path('api/deposit_post/', deposit_post, name='deposit_post'),
+    path('api/edit_deposit_post/', edit_deposit_post, name='edit_deposit_post'),
     path('api/IncompleteDepositListJson/', IncompleteDepositListJson.as_view(), name='IncompleteDepositListJson'),
     path('api/PartiallyCompletedDepositListJson/', PartiallyCompletedDepositListJson.as_view(),
          name='PartiallyCompletedDepositListJson'),

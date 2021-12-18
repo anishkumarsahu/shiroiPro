@@ -107,6 +107,21 @@ def deposit_detail(request, id=None):
         return redirect('homeApp:loginPage')
 
 
+
+@is_activated()
+def edit_deposit_detail(request, id=None):
+    if request.user.is_authenticated:
+        instance = get_object_or_404(Deposit, id=int(id))
+        items = DepositItem.objects.filter(depositID_id=instance.pk)
+        context = {
+            'instance': instance,
+            'items': items
+        }
+
+        return render(request, 'home/editDepositDetail.html', context)
+    else:
+        return redirect('homeApp:loginPage')
+
 @is_activated()
 def download_backup(request, id=None):
     if request.user.is_authenticated:

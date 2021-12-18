@@ -69,6 +69,7 @@
 
                     <div class="twelve wide column" style="padding-left: 0">
                         <div class="ui tiny form" id="depositForm">
+                            <input type="hidden" id="dID" value="{{ instance.pk }}">
                             <div class="five fields">
                                 <div class="field">
                                     <label>Old ID</label>
@@ -589,6 +590,7 @@
         }
         //post
         function salesSave() {
+            var dID = $('#dID').val();
             var customerName = $('#customerName').val();
             var phoneNumber = $('#phoneNumber').val();
             var address = $('#address').val();
@@ -626,6 +628,7 @@
                 ;
             } else {
                 data = new FormData();
+                data.append('dID', dID);
                 data.append('customerName', customerName);
                 data.append('phoneNumber', phoneNumber);
                 data.append('address', address);
@@ -639,7 +642,7 @@
 
                 $.ajax({
                     type: 'post',
-                    url: '{% url "homeApp:deposit_post" %}',
+                    url: '{% url "homeApp:edit_deposit_post" %}',
                     data: data,
                     contentType: false,
                     cache: false,

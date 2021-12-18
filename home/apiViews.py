@@ -91,6 +91,57 @@ def deposit_post(request):
     debit(depo.totalAmount, "Given for amount Rs. {} with depositID {}".format(depo.totalAmount, depo.depositSerialID))
     return JsonResponse({'message': 'success', 'depoID': depo.pk}, safe=False)
 
+@csrf_exempt
+def edit_deposit_post(request):
+    dID = request.POST.get("dID")
+    customerName = request.POST.get("customerName")
+    phoneNumber = request.POST.get("phoneNumber")
+    address = request.POST.get("address")
+    pDate = request.POST.get("date")
+    totalAmount = request.POST.get("totalAmount")
+    datas = request.POST.get("datas")
+    oldID = request.POST.get("oldID")
+    totalWeight = request.POST.get("totalWeight")
+    totalWeightL = request.POST.get("totalWeightL")
+
+
+    depo = Deposit.objects.get(id=int(dID))
+    credit(depo.totalAmount, "Credited amount Rs. {} with depositID {} for updating the deposit.".format(depo.totalAmount, depo.depositSerialID))
+    depo.customerName = customerName
+    depo.oldID = oldID
+    depo.phone = phoneNumber
+    depo.address = address
+    depo.totalAmount = float(totalAmount)
+    depo.depositDate = datetime.strptime(pDate, '%d/%m/%Y')
+    depo.statusID_id = 1
+    depo.totalWeight = totalWeight
+    depo.totalWeightL = totalWeightL
+    depo.save()
+    del_items = DepositItem.objects.filter(depositID_id=depo.pk)
+    del_items.delete()
+
+    splited_receive_item = datas.split("@")
+    for item in splited_receive_item[:-1]:
+        item_details = item.split('|')
+
+        p = DepositItem()
+        p.depositID_id = depo.pk
+        p.itemName = item_details[1]
+        p.weight = float(item_details[2])
+        p.itemRatePerTenGram = float(item_details[3])
+        p.interestRate = float(item_details[4])
+        p.description = item_details[5]
+        p.itemAmount = float(item_details[6])
+        p.tola = float(item_details[7])
+        p.san = float(item_details[8])
+        p.chaning = float(item_details[9])
+
+        p.save()
+    debit(depo.totalAmount, "Given for amount Rs. {} with depositID {} for updating".format(depo.totalAmount, depo.depositSerialID))
+    return JsonResponse({'message': 'success', 'depoID': depo.pk}, safe=False)
+
+
+
 
 class IncompleteDepositListJson(BaseDatatableView):
     order_columns = ['oldID', 'depositSerialID', 'customerName', 'phone', 'address', 'depositDate',
@@ -190,7 +241,11 @@ class PartiallyCompletedDepositListJson(BaseDatatableView):
             else:
                 clearDate = item.clearanceDate
 
-            action = '''<a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
+            action = '''
+            <a style="font-size:10px;"href="/edit_deposit_detail/{}/" class="ui circular  icon button orange">
+                              <i class="edit icon"></i>
+                             </a>
+            <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
                                <i class="rupee sign icon"></i>
                              </a>
             <button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green">
@@ -198,7 +253,7 @@ class PartiallyCompletedDepositListJson(BaseDatatableView):
                              </button>
                              <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px">
                                <i class="trash alternate icon"></i>
-                             </button>'''.format(item.pk, item.pk, item.pk),
+                             </button>'''.format(item.pk,item.pk, item.pk, item.pk),
 
             json_data.append([
                 escape(item.oldID),
@@ -227,8 +282,8 @@ class CompletedDepositListJson(BaseDatatableView):
         eDate = self.request.GET.get('endDate')
         startDate = datetime.strptime(sDate, '%d/%m/%Y')
         endDate = datetime.strptime(eDate, '%d/%m/%Y')
-        return Deposit.objects.filter(isDeleted__exact=False, depositDate__gte=startDate.date(),
-                                      depositDate__lte=endDate.date() + timedelta(days=1), statusID_id=3)
+        return Deposit.objects.filter(isDeleted__exact=False, clearanceDate__gte=startDate.date(),
+                                      clearanceDate__lte=endDate.date() + timedelta(days=1), statusID_id=3)
 
     def filter_queryset(self, qs):
         search = self.request.GET.get('search[value]', None)
@@ -252,7 +307,11 @@ class CompletedDepositListJson(BaseDatatableView):
             else:
                 clearDate = item.clearanceDate.strftime('%d-%m-%Y')
 
-            action = '''<a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
+            action = '''
+            <a style="font-size:10px;"href="/edit_deposit_detail/{}/" class="ui circular  icon button orange">
+                              <i class="edit icon"></i>
+                             </a>
+            <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
                                <i class="rupee sign icon"></i>
                              </a>
                              <button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green">
@@ -260,7 +319,7 @@ class CompletedDepositListJson(BaseDatatableView):
                              </button>
                              <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px">
                                <i class="trash alternate icon"></i>
-                             </button>'''.format(item.pk, item.pk, item.pk),
+                             </button>'''.format(item.pk,item.pk, item.pk, item.pk),
 
             json_data.append([
                 escape(item.oldID),
@@ -287,6 +346,9 @@ def delete_deposit(request):
         depo = Deposit.objects.get(pk=int(id))
         depo.isDeleted = True
         depo.save()
+        credit(depo.totalAmount,
+               "Credited amount Rs. {} with depositID {} for deleting the deposit.".format(depo.totalAmount,
+                                                                                           depo.depositSerialID))
 
         return JsonResponse({'message': 'success'}, safe=False)
 
@@ -383,6 +445,46 @@ def item_closing_post(request):
         depo.save()
 
     return JsonResponse({'message': 'success'}, safe=False)
+
+@csrf_exempt
+def item_closing_edit_post(request):
+    depositID = request.POST.get("depositID")
+    totalAmount = request.POST.get("totalAmount")
+    datas = request.POST.get("datas")
+
+    depo = Deposit.objects.get(pk=int(depositID))
+    # depo.depositDate = datetime.strptime(pDate, '%d/%m/%Y')
+    # depo.statusID_id = 1
+    depo.totalAmountPaid = (depo.totalAmountPaid + float(totalAmount))
+    depo.save()
+    splited_receive_item = datas.split("@")
+    for item in splited_receive_item[:-1]:
+        item_details = item.split('|')
+
+        p = DepositItem.objects.get(pk=int(item_details[0]))
+        p.withdrawalDate = datetime.strptime(item_details[1], '%d/%m/%Y')
+        p.interestPaid = float(item_details[2])
+        p.total = float(item_details[3])
+        p.month = float(item_details[4])
+        p.isWithdrawn = True
+        p.save()
+        depo.totalInterestPaid = depo.totalInterestPaid + float(item_details[2])
+        depo.save()
+        credit(p.total,
+               "Received an amount of Rs. {} with depositID {}".format(p.total, depo.depositSerialID))
+    totalItems = DepositItem.objects.filter(depositID_id=int(depositID)).count()
+    totalWithdrawn = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=True).count()
+    totalPending = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=False).count()
+    if totalItems == totalWithdrawn:
+        depo.statusID_id = 3
+        depo.clearanceDate = datetime.today().date()
+        depo.save()
+    if totalWithdrawn < totalItems and totalPending < totalItems:
+        depo.statusID_id = 2
+        depo.save()
+
+    return JsonResponse({'message': 'success'}, safe=False)
+
 
 
 @csrf_exempt
