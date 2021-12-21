@@ -44,9 +44,86 @@ def postLogin(request):
     else:
         return JsonResponse({'message': 'fail'}, safe=False)
 
+def get_customer_list(request):
+    data = []
+    q = request.GET.get('q')
+    instance = Customer.objects.filter(Q(customerName__icontains=q) |Q(phone__icontains=q) |Q(address__icontains=q)  ,isDeleted__exact=False)
+
+    for c in instance:
+        data_dic = {
+            'ID': c.pk,
+            'CustomerName': '{}'.format(c.customerName ),
+            'Phone': '{}'.format(c.phone),
+            'Address': '{}'.format( c.address)
+
+        }
+        data.append(data_dic)
+    return JsonResponse({'data': data}, safe=False)
+
+def get_customer_detail_by_name(request):
+    q = request.GET.get('q')
+    try:
+
+        instance = Customer.objects.get(pk__iexact=q, isDeleted__exact=False, )
+
+        data = {
+            'ID': instance.pk,
+            'CustomerName': instance.customerName,
+            'Phone': instance.phone,
+            'Address': instance.address,
+
+
+        }
+    except:
+        data = {
+            'ID': '',
+            'CustomerName': '',
+            'Phone': '',
+            'Address': '',
+        }
+
+    return JsonResponse({'data': data}, safe=False)
+
+
+def get_item_list(request):
+    data = []
+    q = request.GET.get('q')
+    instance = Item.objects.filter(Q(itemName__icontains=q) ,isDeleted__exact=False)
+
+    for c in instance:
+        data_dic = {
+            'ID': c.pk,
+            'ItemName': '{}'.format(c.itemName ),
+
+        }
+        data.append(data_dic)
+    return JsonResponse({'data': data}, safe=False)
+
+def get_item_detail_by_name(request):
+    q = request.GET.get('q')
+    try:
+
+        instance = Item.objects.get(pk__iexact=q, isDeleted__exact=False, )
+
+        data = {
+            'ID': instance.pk,
+            'ItemName': instance.itemName,
+
+
+
+        }
+    except:
+        data = {
+            'ID': '',
+            'ItemName': '',
+
+        }
+
+    return JsonResponse({'data': data}, safe=False)
 
 @csrf_exempt
 def deposit_post(request):
+    cusID = request.POST.get("cusID")
     customerName = request.POST.get("customerName")
     phoneNumber = request.POST.get("phoneNumber")
     address = request.POST.get("address")
@@ -56,7 +133,15 @@ def deposit_post(request):
     oldID = request.POST.get("oldID")
     totalWeight = request.POST.get("totalWeight")
     totalWeightL = request.POST.get("totalWeightL")
+    remark = request.POST.get("remark")
     de = Deposit.objects.all().count()
+
+    if cusID == 'N/A':
+        cus = Customer()
+        cus.customerName = customerName
+        cus.phone = phoneNumber
+        cus.address = address
+        cus.save()
 
     depo = Deposit()
     depo.customerName = customerName
@@ -68,6 +153,7 @@ def deposit_post(request):
     depo.statusID_id = 1
     depo.totalWeight = totalWeight
     depo.totalWeightL = totalWeightL
+    depo.remark = remark
     depo.save()
     depo.depositSerialID = 'SS' + str(de+1).zfill(5)
     depo.save()
@@ -78,6 +164,12 @@ def deposit_post(request):
         p = DepositItem()
         p.depositID_id = depo.pk
         p.itemName = item_details[1]
+        try:
+            it = Item.objects.get(itemName__iexact=item_details[1])
+        except:
+            it = Item()
+            it.itemName = item_details[1]
+            it.save()
         p.weight = float(item_details[2])
         p.itemRatePerTenGram = float(item_details[3])
         p.interestRate = float(item_details[4])

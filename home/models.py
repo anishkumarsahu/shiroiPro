@@ -14,6 +14,33 @@ class Status(models.Model):
     class Meta:
         verbose_name_plural = 'A) Status List'
 
+class Customer(models.Model):
+    customerName = models.CharField(max_length=200, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    isDeleted = models.BooleanField(default=False)
+    datetime = models.DateTimeField(auto_now_add=True, auto_now=False)
+    lastUpdatedOn = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+
+    def __str__(self):
+        return self.customerName
+
+    class Meta:
+        verbose_name_plural = 'E) Customer List'
+
+class Item(models.Model):
+    itemName = models.CharField(max_length=300, blank=True, null=True)
+    isDeleted = models.BooleanField(default=False)
+    datetime = models.DateTimeField(auto_now_add=True, auto_now=False)
+    lastUpdatedOn = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+    def __str__(self):
+        return self.itemName
+
+    class Meta:
+        verbose_name_plural = 'E) Item List'
+
 
 class Deposit(models.Model):
     depositSerialID = models.CharField(max_length=200, blank=True, null=True)
@@ -29,6 +56,7 @@ class Deposit(models.Model):
     clearanceDate = models.DateField(blank=True, null=True)
     totalWeight = models.CharField(max_length=200, blank=True, null=True)
     totalWeightL = models.CharField(max_length=200, blank=True, null=True)
+    remark = models.TextField(blank=True, null=True)
     isDeleted = models.BooleanField(default=False)
     datetime = models.DateTimeField(auto_now_add=True, auto_now=False)
     lastUpdatedOn = models.DateTimeField(auto_now_add=False, auto_now=True)
@@ -69,6 +97,9 @@ class DepositItem(models.Model):
 
 class CashBook(models.Model):
     remark = models.CharField(max_length=300, blank=True, null=True)
+    depositID = models.CharField(max_length=100, default='N/A')
+    customerName = models.CharField(max_length=100, default='N/A')
+    interest = models.FloatField(default=0.0)
     transactionType = models.CharField(max_length=300, blank=True, null=True)
     amount = models.FloatField(default=0.0)
     balanceThatTime = models.FloatField(default=0.0)

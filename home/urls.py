@@ -44,5 +44,12 @@ urlpatterns = [
     path('api/inflow_post/', inflow_post, name='inflow_post'),
     path('api/outflow_post/', outflow_post, name='outflow_post'),
 
+    path('api/get_customer_list/', get_customer_list, name='get_customer_list'),
+    path('api/GetCustomerDetailByName/', get_customer_detail_by_name, name='GetCustomerDetailByName'),
+
+
+    path('api/get_item_list/', get_item_list, name='get_item_list'),
+    path('api/get_item_detail_by_name/', get_item_detail_by_name, name='get_item_detail_by_name'),
+
 
     ]

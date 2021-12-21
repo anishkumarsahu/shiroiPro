@@ -74,6 +74,7 @@
 <div class="row">
     <p class="text-right">Deposit Date: <span style="border-bottom: 1px dotted">{{ depo.depositDate|date:"d-m-Y" }}</span></p>
     <span class="text-left"> NAME:{{ depo.customerName|upper }}</span><br>
+    <span class="text-left"> PhoneNumber:{{ depo.phone|upper }}</span><br>
     <span class="text-left"> ADDRESS: {{ depo.address|upper }}</span><br>
     <span style="margin-bottom: 5px;">Deposit No. : <b>{{ depo.depositSerialID }}</b></span><br>
     <span style="margin-bottom: 5px;">Status: <b>{{ depo.statusID.name }}</b></span>    {% if depo.clearanceDate %}  <span class="text-right" style="float: right; margin-bottom: 5px;padding-left: 20px">Closing Date: <b>{{ depo.clearanceDate|date:"d-m-Y"  }}</b></span> {% endif %} <br><br>

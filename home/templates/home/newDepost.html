@@ -65,19 +65,37 @@
                     <i class="left align icon"></i>
                     New Deposit <span style="color: green;font-weight: bold;font-size: 20px;">({{ ID }})</span>
                 </h5>
+
                 <div class="ui internally celled  grid">
 
-                    <div class="twelve wide column" style="padding-left: 0">
+                    <div class="thirteen wide column" style="padding-left: 0">
                         <div class="ui tiny form" id="depositForm">
-                            <div class="five fields">
+                            <div class="six fields">
                                 <div class="field">
                                     <label>Old ID</label>
                                     <input type="text" placeholder="Old ID" id="oldID" value="N/A">
                                 </div>
+ <form class="ui tiny form" autocomplete="off" style="width: 200px">
                                 <div class="field required">
                                     <label>Customer Name</label>
-                                    <input type="text" placeholder="Customer Name" id="customerName" autocomplete="off">
+{#                                    <input type="text" placeholder="Customer Name" id="customerName" autocomplete="off">#}
+
+                                  <div class="ui customerList search">
+                                    <div class="ui icon input">
+
+                                        <input autocomplete="new-password" type="text" class="prompt" id="customerName"
+                                               placeholder="Customer Name" onfocus="cusSearch()"/>
+
+                                       <i class="user circle icon"></i>
+
+                                        <input type="hidden" id="cusID" value="N/A">
+
+
+                                    </div>
+                                    <div class="results"></div>
                                 </div>
+                                     </div>
+ </form>
                                 <div class="field required">
                                     <label>Phone Number</label>
                                     <input type="number" placeholder="Phone Number" id="phoneNumber">
@@ -94,6 +112,10 @@
                                            autocomplete="off"
                                            id="date">
                                 </div>
+                                <div class="field">
+                                    <label>Remark</label>
+                                    <input type="text" placeholder="Remark" id="remark" autocomplete="off">
+                                </div>
 
 
                             </div>
@@ -103,10 +125,25 @@
 
                             <div class="eight fields">
                                 <input type="hidden" id="itemID">
+                                 <form class="ui tiny form" autocomplete="off" style="width: 130px">
                                 <div class="field required">
                                     <label>Item Name</label>
-                                    <input placeholder="Item Name" type="text" id="itemName">
+{#                                    <input placeholder="Item Name" type="text" id="itemName">#}
+                                         <div class="ui itemList search">
+                                    <div class="ui icon input">
+
+                                        <input autocomplete="new-password" type="text" class="prompt" id="itemName"
+                                               placeholder="Item Name" onfocus="itemSearch()"/>
+
+                                            <i class="list icon"></i>
+                                        <input type="hidden" id="itemID" value="N/A">
+
+
+                                    </div>
+                                    <div class="results"></div>
                                 </div>
+                                </div>
+                                 </form>
                                 <div class="field required" style="width: 9%">
                                     <label>Weight (g)</label>
                                     <input placeholder="Item Weight" type="number" id="itemWeight" onkeyup="ItemLocalConvert()">
@@ -190,7 +227,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="four wide column">
+                    <div class="three wide column">
                         <div class="ui vertical menu"
                              style="width: 99%;float: right;position: absolute;text-align: left;margin-bottom: 0; margin-top: 0.5em;">
                             <a class="teal item ">
@@ -363,7 +400,11 @@
 
 {% block js %}
     <script>
-
+$(document).ready(function(){
+    $(':input').live('focus',function(){
+        $(this).attr('autocomplete', 'off');
+    });
+});
         var today = new Date();
         $('#standard_calendar')
             .calendar({
@@ -581,8 +622,111 @@
             $('#phoneNumber').val('');
             $('#address').val('');
             $('#date').val('');
+            $('#remark').val('');
+            $('#cusID').val('N/A');
 
         }
+                function cusSearch() {
+            $('.ui.customerList').search({
+
+                apiSettings: {
+                    url: '/api/get_customer_list/?q={query}'
+                },
+                fields: {
+                    results: 'data',
+                    title: 'CustomerName',
+                    "price": "Phone",
+                    "description": "Address",
+                },
+                minCharacters: 1,
+                onSelect: function (result) {
+                    ClearData();
+                    $('#cusID').val(result.ID);
+                    getCustomerDetailByName();
+
+
+                },
+                cache: false,
+            });
+        }
+                function itemSearch() {
+            $('.ui.itemList').search({
+
+                apiSettings: {
+                    url: '/api/get_item_list/?q={query}'
+                },
+                fields: {
+                    results: 'data',
+                    title: 'ItemName',
+
+                },
+                minCharacters: 1,
+                onSelect: function (result) {
+                    ClearData();
+                    $('#itemID').val(result.ID);
+                    getItemDetailByName();
+
+
+                },
+                cache: false,
+            });
+        }
+         function getCustomerDetailByName() {
+            var name = $('#cusID').val();
+
+
+            $.ajax({
+                type: 'get',
+                url: '/api/GetCustomerDetailByName/?q=' + name,
+
+                success: function (response) {
+
+                        $('#cusID').val(response.data['ID']);
+                        $('#customerName').val(response.data['CustomerName']);
+                        $('#phoneNumber').val(response.data['Phone']);
+                        $('#address').val(response.data['Address']);
+
+
+                },
+
+                error: function () {
+                    $('body')
+                        .toast({
+                            class: 'error',
+                            message: 'An error occurred !'
+                        })
+                    ;
+                }
+            });
+        }
+         function getItemDetailByName() {
+            var name = $('#itemID').val();
+
+
+            $.ajax({
+                type: 'get',
+                url: '/api/get_item_detail_by_name/?q=' + name,
+
+                success: function (response) {
+
+                        $('#itemID').val(response.data['ID']);
+                        $('#itemName').val(response.data['ItemName']);
+
+
+
+                },
+
+                error: function () {
+                    $('body')
+                        .toast({
+                            class: 'error',
+                            message: 'An error occurred !'
+                        })
+                    ;
+                }
+            });
+        }
+
         //post
         function salesSave() {
             var customerName = $('#customerName').val();
@@ -593,6 +737,8 @@
             var totalWeight = $('#totalWeight').html();
             var totalWeightL = $('#totalWeightL').html();
             var oldID = $('#oldID').val();
+            var remark = $('#remark').val();
+            var cusID = $('#cusID').val();
 
             var datas = '';
             $('#itemTable tbody tr').each(function () {
@@ -631,6 +777,8 @@
                 data.append('oldID', oldID);
                 data.append('totalWeight', totalWeight);
                 data.append('totalWeightL', totalWeightL);
+                data.append('remark', remark);
+                data.append('cusID', cusID);
 
 
                 $.ajax({
