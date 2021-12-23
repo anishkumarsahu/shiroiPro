@@ -169,8 +169,8 @@ def print_billA5(request, *args, **kwargs):
     depo_list = DepositItem.objects.filter(depositID_id=int(query))
 
     context = {
-        'left': 6 - depo_list.count(),
-        'loo': str().zfill(6- depo_list.count() - 1),
+        'left': 3 - depo_list.count(),
+        'loo': str().zfill(3- depo_list.count() - 1),
         'TotalInWords': num2words(int(depo.totalAmount)),
         'depo': depo,
         'depo_list': depo_list

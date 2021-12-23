@@ -180,7 +180,8 @@ def deposit_post(request):
         p.chaning = float(item_details[9])
 
         p.save()
-    debit(depo.totalAmount, "Given for amount Rs. {} with depositID {}".format(depo.totalAmount, depo.depositSerialID))
+
+    debit(depo.totalAmount, "New Deposit".format(depo.totalAmount, depo.depositSerialID), depo.depositSerialID, depo.customerName)
     return JsonResponse({'message': 'success', 'depoID': depo.pk}, safe=False)
 
 @csrf_exempt
@@ -198,7 +199,7 @@ def edit_deposit_post(request):
 
 
     depo = Deposit.objects.get(id=int(dID))
-    credit(depo.totalAmount, "Credited amount Rs. {} with depositID {} for updating the deposit.".format(depo.totalAmount, depo.depositSerialID))
+    credit(depo.totalAmount, "New Deposit Update".format(depo.totalAmount, depo.depositSerialID), depo.depositSerialID, depo.customerName)
     depo.customerName = customerName
     depo.oldID = oldID
     depo.phone = phoneNumber
@@ -229,7 +230,7 @@ def edit_deposit_post(request):
         p.chaning = float(item_details[9])
 
         p.save()
-    debit(depo.totalAmount, "Given for amount Rs. {} with depositID {} for updating".format(depo.totalAmount, depo.depositSerialID))
+    debit(depo.totalAmount, "New Deposit Update".format(depo.totalAmount, depo.depositSerialID), depo.depositSerialID, depo.customerName)
     return JsonResponse({'message': 'success', 'depoID': depo.pk}, safe=False)
 
 
@@ -438,9 +439,7 @@ def delete_deposit(request):
         depo = Deposit.objects.get(pk=int(id))
         depo.isDeleted = True
         depo.save()
-        credit(depo.totalAmount,
-               "Credited amount Rs. {} with depositID {} for deleting the deposit.".format(depo.totalAmount,
-                                                                                           depo.depositSerialID))
+        credit(depo.totalAmount,"Deposit Deleted", depo.depositSerialID, depo.customerName)
 
         return JsonResponse({'message': 'success'}, safe=False)
 
@@ -523,8 +522,7 @@ def item_closing_post(request):
         p.save()
         depo.totalInterestPaid = depo.totalInterestPaid + float(item_details[2])
         depo.save()
-        credit(p.total,
-               "Received an amount of Rs. {} with depositID {}".format(p.total, depo.depositSerialID))
+        credit(p.total,"Deposit Payed",depo.depositSerialID, depo.customerName)
     totalItems = DepositItem.objects.filter(depositID_id=int(depositID)).count()
     totalWithdrawn = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=True).count()
     totalPending = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=False).count()
@@ -562,8 +560,7 @@ def item_closing_edit_post(request):
         p.save()
         depo.totalInterestPaid = depo.totalInterestPaid + float(item_details[2])
         depo.save()
-        credit(p.total,
-               "Received an amount of Rs. {} with depositID {}".format(p.total, depo.depositSerialID))
+        credit(p.total,"Item Deposit Payed", depo.depositSerialID, depo.customerName)
     totalItems = DepositItem.objects.filter(depositID_id=int(depositID)).count()
     totalWithdrawn = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=True).count()
     totalPending = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=False).count()
@@ -639,7 +636,7 @@ def outflow_post(request):
     return JsonResponse({'message': 'success'}, safe=False)
 
 
-def credit(amount, remark):
+def credit(amount, remark, serial='N/A', name='N/A'):
     initial = CashBook.objects.all().count()
 
     if initial == 0:
@@ -650,6 +647,8 @@ def credit(amount, remark):
         book.availableBalance = float(amount)
         book.transactionType = "Credit"
         book.totalCredit = book.totalCredit + float(amount)
+        book.depositID = serial
+        book.customerName = name
         book.save()
     else:
         last_book = CashBook.objects.last()
@@ -660,10 +659,12 @@ def credit(amount, remark):
         book.availableBalance = round((last_book.availableBalance + float(amount)),2)
         book.transactionType = "Credit"
         book.totalCredit = round((last_book.totalCredit + float(amount)),2)
+        book.depositID = serial
+        book.customerName = name
         book.save()
 
 
-def debit(amount, remark):
+def debit(amount, remark, serial='N/A', name='N/A'):
     initial = CashBook.objects.all().count()
 
     if initial == 0:
@@ -674,6 +675,8 @@ def debit(amount, remark):
         book.availableBalance = -float(amount)
         book.transactionType = "Debit"
         book.totalDebit = book.totalDebit + float(amount)
+        book.depositID = serial
+        book.customerName = name
         book.save()
     else:
         last_book = CashBook.objects.last()
@@ -684,11 +687,13 @@ def debit(amount, remark):
         book.availableBalance = round((last_book.availableBalance - float(amount)),2)
         book.transactionType = "Debit"
         book.totalDebit = round((last_book.totalDebit + float(amount)),2)
+        book.depositID = serial
+        book.customerName = name
         book.save()
 
 
 class CashBookDebitListJson(BaseDatatableView):
-    order_columns = ['amount', 'remark', 'availableBalance', 'datetime', ]
+    order_columns = ['depositID','datetime','customerName','amount', 'remark', 'availableBalance' ]
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
@@ -702,7 +707,7 @@ class CashBookDebitListJson(BaseDatatableView):
         search = self.request.GET.get('search[value]', None)
         if search:
             qs = qs.filter(
-                Q(amount__icontains=search) | Q(remark__icontains=search) | Q(transactionType__icontains=search) | Q(
+                Q(depositID__icontains=search) |   Q(customerName__icontains=search) | Q(amount__icontains=search) | Q(remark__icontains=search) | Q(transactionType__icontains=search) | Q(
                     availableBalance__icontains=search)
                 | Q(datetime__icontains=search)
             )
@@ -728,17 +733,20 @@ class CashBookDebitListJson(BaseDatatableView):
 
             json_data.append([
 
+                escape(item.depositID),
+                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
+                escape(item.customerName),
                 escape(item.amount),
                 escape(item.remark),
                 escape(item.availableBalance),
-                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
+
 
             ])
         return json_data
 
 
 class CashBookCreditListJson(BaseDatatableView):
-    order_columns = ['amount', 'remark', 'availableBalance', 'datetime', ]
+    order_columns = ['depositID','datetime','customerName','amount', 'remark', 'availableBalance']
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
@@ -753,6 +761,7 @@ class CashBookCreditListJson(BaseDatatableView):
         search = self.request.GET.get('search[value]', None)
         if search:
             qs = qs.filter(
+                Q(depositID__icontains=search) | Q(customerName__icontains=search) |
                 Q(amount__icontains=search) | Q(remark__icontains=search) | Q(transactionType__icontains=search) | Q(
                     availableBalance__icontains=search)
                 | Q(datetime__icontains=search)
@@ -779,10 +788,13 @@ class CashBookCreditListJson(BaseDatatableView):
 
             json_data.append([
 
+                escape(item.depositID),
+                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
+                escape(item.customerName),
                 escape(item.amount),
                 escape(item.remark),
                 escape(item.availableBalance),
-                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
+
 
             ])
         return json_data
