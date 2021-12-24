@@ -196,6 +196,7 @@ def edit_deposit_post(request):
     oldID = request.POST.get("oldID")
     totalWeight = request.POST.get("totalWeight")
     totalWeightL = request.POST.get("totalWeightL")
+    remark = request.POST.get("remark")
 
 
     depo = Deposit.objects.get(id=int(dID))
@@ -209,6 +210,7 @@ def edit_deposit_post(request):
     depo.statusID_id = 1
     depo.totalWeight = totalWeight
     depo.totalWeightL = totalWeightL
+    depo.remark = remark
     depo.save()
     del_items = DepositItem.objects.filter(depositID_id=depo.pk)
     del_items.delete()
@@ -238,7 +240,7 @@ def edit_deposit_post(request):
 
 class IncompleteDepositListJson(BaseDatatableView):
     order_columns = ['oldID', 'depositSerialID', 'customerName', 'phone', 'address', 'depositDate',
-                     'statusID', 'totalAmount', 'totalInterestPaid', 'clearanceDate', 'datetime', ]
+                     'statusID', 'totalAmount', 'totalInterestPaid', 'clearanceDate','remark', 'datetime', ]
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
@@ -252,7 +254,7 @@ class IncompleteDepositListJson(BaseDatatableView):
         search = self.request.GET.get('search[value]', None)
         if search:
             qs = qs.filter(
-                Q(oldID__icontains=search) | Q(depositDate__icontains=search) | Q(
+                Q(remark__icontains=search) | Q(oldID__icontains=search) | Q(depositDate__icontains=search) | Q(
                     depositSerialID__icontains=search) | Q(
                     customerName__icontains=search)
                 | Q(phone__icontains=search) | Q(address__icontains=search) | Q(clearanceDate__icontains=search)
@@ -293,6 +295,7 @@ class IncompleteDepositListJson(BaseDatatableView):
                 escape(item.totalAmount),
                 escape(item.totalInterestPaid),
                 escape(clearDate),
+                escape(item.remark),
                 escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
                 action,
 
@@ -302,7 +305,7 @@ class IncompleteDepositListJson(BaseDatatableView):
 
 class PartiallyCompletedDepositListJson(BaseDatatableView):
     order_columns = ['oldID', 'depositSerialID', 'customerName', 'phone', 'address', 'depositDate',
-                     'statusID', 'totalAmount', 'totalInterestPaid', 'clearanceDate', 'datetime', ]
+                     'statusID', 'totalAmount', 'totalInterestPaid', 'clearanceDate','remark', 'datetime', ]
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
@@ -316,7 +319,7 @@ class PartiallyCompletedDepositListJson(BaseDatatableView):
         search = self.request.GET.get('search[value]', None)
         if search:
             qs = qs.filter(
-                Q(oldID__icontains=search) | Q(depositDate__icontains=search) | Q(
+                Q(remark__icontains=search) |   Q(oldID__icontains=search) | Q(depositDate__icontains=search) | Q(
                     depositSerialID__icontains=search) | Q(
                     customerName__icontains=search)
                 | Q(phone__icontains=search) | Q(address__icontains=search) | Q(clearanceDate__icontains=search)
@@ -359,6 +362,7 @@ class PartiallyCompletedDepositListJson(BaseDatatableView):
                 escape(item.totalAmount),
                 escape(item.totalInterestPaid),
                 escape(clearDate),
+                escape(item.remark),
                 escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
                 action,
 
@@ -368,7 +372,7 @@ class PartiallyCompletedDepositListJson(BaseDatatableView):
 
 class CompletedDepositListJson(BaseDatatableView):
     order_columns = ['oldID', 'depositSerialID', 'customerName', 'phone', 'address', 'depositDate',
-                     'statusID', 'totalAmount', 'totalInterestPaid', 'clearanceDate', 'datetime', ]
+                     'statusID', 'totalAmount', 'totalInterestPaid', 'clearanceDate','remark', 'datetime', ]
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
@@ -382,7 +386,7 @@ class CompletedDepositListJson(BaseDatatableView):
         search = self.request.GET.get('search[value]', None)
         if search:
             qs = qs.filter(
-                Q(oldID__icontains=search) | Q(depositDate__icontains=search) | Q(
+                Q(remark__icontains=search) | Q(oldID__icontains=search) | Q(depositDate__icontains=search) | Q(
                     depositSerialID__icontains=search) | Q(
                     customerName__icontains=search)
                 | Q(phone__icontains=search) | Q(address__icontains=search) | Q(clearanceDate__icontains=search)
@@ -425,6 +429,7 @@ class CompletedDepositListJson(BaseDatatableView):
                 escape(item.totalAmount),
                 escape(item.totalInterestPaid),
                 escape(clearDate),
+                escape(item.remark),
                 escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
                 action,
 
@@ -522,7 +527,8 @@ def item_closing_post(request):
         p.save()
         depo.totalInterestPaid = depo.totalInterestPaid + float(item_details[2])
         depo.save()
-        credit(p.total,"Deposit Payed",depo.depositSerialID, depo.customerName)
+        credit((p.total - p.interestPaid),"Deposit Paid",depo.depositSerialID, depo.customerName)
+        credit(p.interestPaid,"Interest Paid",depo.depositSerialID, depo.customerName)
     totalItems = DepositItem.objects.filter(depositID_id=int(depositID)).count()
     totalWithdrawn = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=True).count()
     totalPending = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=False).count()
@@ -545,8 +551,7 @@ def item_closing_edit_post(request):
     depo = Deposit.objects.get(pk=int(depositID))
     # depo.depositDate = datetime.strptime(pDate, '%d/%m/%Y')
     # depo.statusID_id = 1
-    depo.totalAmountPaid = (depo.totalAmountPaid + float(totalAmount))
-    depo.save()
+
     splited_receive_item = datas.split("@")
     for item in splited_receive_item[:-1]:
         item_details = item.split('|')
@@ -561,6 +566,8 @@ def item_closing_edit_post(request):
         depo.totalInterestPaid = depo.totalInterestPaid + float(item_details[2])
         depo.save()
         credit(p.total,"Item Deposit Payed", depo.depositSerialID, depo.customerName)
+    depo.totalAmountPaid = (depo.totalAmountPaid + float(totalAmount))
+    depo.save()
     totalItems = DepositItem.objects.filter(depositID_id=int(depositID)).count()
     totalWithdrawn = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=True).count()
     totalPending = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=False).count()

@@ -67,10 +67,10 @@
                 </h5>
                 <div class="ui internally celled  grid">
 
-                    <div class="twelve wide column" style="padding-left: 0">
+                    <div class="thirteen wide column" style="padding-left: 0">
                         <div class="ui tiny form" id="depositForm">
                             <input type="hidden" id="dID" value="{{ instance.pk }}">
-                            <div class="five fields">
+                            <div class="six fields">
                                 <div class="field">
                                     <label>Old ID</label>
                                     <input type="text" placeholder="Old ID" id="oldID" value="{{ instance.oldID }}" >
@@ -94,6 +94,10 @@
                                     <input type="text" name="DepositDate" placeholder="Deposit Date"
                                            autocomplete="off"
                                            id="date" value="{{ instance.depositDate }}">
+                                </div>
+                                <div class="field required">
+                                    <label>remark</label>
+                                    <input type="text" placeholder="Remark" id="remark" autocomplete="off" value="{{ instance.remark }}">
                                 </div>
 
 
@@ -189,13 +193,13 @@
                             </thead>
                             <tbody>
                             {% for item in items %}
-                            <tr id ="{{ forloop.counter }}" ><td id ="row{{ forloop.counter }}">#</td> <td id ="itemName{{ forloop.counter }}">{{ item.itemName }}</td><td id ="itemWeight{{ forloop.counter }}">{{ item.weight }}</td><td id ="local{{ forloop.counter }}"><span id="tola{{ forloop.counter }}"> {{ item.tola }}</span> T <span id="san{{ forloop.counter }}"> {{ item.san }}</span> S<span id="chaning{{ forloop.counter }}"> {{ item.chaning }}</span> C</td><td id ="itemRate{{ forloop.counter }}">{{ item.itemRatePerTenGram }}</td><td id ="itemInterestRate{{ forloop.counter }}">{{ item.interestRate }}</td><td id ="itemDescription{{ forloop.counter }}">{{ item.description }}</td><td id ="itemTotalAmount{{ forloop.counter }}">{{ item.total }}</td><td><button style="font-size:10px;" onclick="GetItemDetail('{{ forloop.counter }}')" class="ui circular facebook icon button green"><i class="pen icon"></i></button><button style="font-size:10px;" onclick="delItem(' {{ forloop.counter }}')" class="ui circular youtube icon button"><i class="trash alternate icon"></i></button></td></tr>
+                            <tr id ="{{ forloop.counter }}" ><td id ="row{{ forloop.counter }}">#</td> <td id ="itemName{{ forloop.counter }}">{{ item.itemName }}</td><td id ="itemWeight{{ forloop.counter }}">{{ item.weight }}</td><td id ="local{{ forloop.counter }}"><span id="tola{{ forloop.counter }}"> {{ item.tola }}</span> T <span id="san{{ forloop.counter }}"> {{ item.san }}</span> S<span id="chaning{{ forloop.counter }}"> {{ item.chaning }}</span> C</td><td id ="itemRate{{ forloop.counter }}">{{ item.itemRatePerTenGram }}</td><td id ="itemInterestRate{{ forloop.counter }}">{{ item.interestRate }}</td><td id ="itemDescription{{ forloop.counter }}">{{ item.description }}</td><td id ="itemTotalAmount{{ forloop.counter }}">{{ item.itemAmount }}</td><td><button style="font-size:10px;" onclick="GetItemDetail('{{ forloop.counter }}')" class="ui circular facebook icon button green"><i class="pen icon"></i></button><button style="font-size:10px;" onclick="delItem(' {{ forloop.counter }}')" class="ui circular youtube icon button"><i class="trash alternate icon"></i></button></td></tr>
                             {% endfor %}
 
                             </tbody>
                         </table>
                     </div>
-                    <div class="four wide column">
+                    <div class="three wide column">
                         <div class="ui vertical menu"
                              style="width: 99%;float: right;position: absolute;text-align: left;margin-bottom: 0; margin-top: 0.5em;">
                             <a class="teal item ">
@@ -599,6 +603,7 @@
             var totalWeight = $('#totalWeight').html();
             var totalWeightL = $('#totalWeightL').html();
             var oldID = $('#oldID').val();
+            var remark = $('#remark').val();
 
             var datas = '';
             $('#itemTable tbody tr').each(function () {
@@ -638,6 +643,7 @@
                 data.append('oldID', oldID);
                 data.append('totalWeight', totalWeight);
                 data.append('totalWeightL', totalWeightL);
+                data.append('remark', remark);
 
 
                 $.ajax({
