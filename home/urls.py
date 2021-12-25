@@ -40,6 +40,7 @@ urlpatterns = [
     path('api/search_deposit/', search_deposit, name='search_deposit'),
     path('api/get_deposit_detail/<int:id>/', get_deposit_detail, name='get_deposit_detail'),
     path('api/item_closing_post/', item_closing_post, name='item_closing_post'),
+    path('api/item_closing_edit_post/', item_closing_edit_post, name='item_closing_edit_post'),
 
     path('api/inflow_post/', inflow_post, name='inflow_post'),
     path('api/outflow_post/', outflow_post, name='outflow_post'),

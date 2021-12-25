@@ -620,13 +620,16 @@
         var partialTab;
         var completeTab;
         function getIncomplete() {
-            var startDate = $('#startDateI').val();
-            var endDate = $('#endDateI').val();
+{#            var startDate = $('#startDateI').val();#}
+{#            var endDate = $('#endDateI').val(); #}
+            var startDate = 'All';
+            var endDate = 'All';
 
 
             incompleteTab = $('#incompleteTable').DataTable({
                 dom: 'Blfrtip',
-                "scrollY": "310px",
+                "scrollY": "450px",
+                "scrollX": true,
                 stateSave:true,
                 buttons: [{
                     extend: 'excel',
@@ -672,13 +675,16 @@
         }
 
         function getPartial() {
-            var startDate = $('#startDateP').val();
-            var endDate = $('#endDateP').val();
+{#            var startDate = $('#startDateP').val();#}
+{#            var endDate = $('#endDateP').val();#}
+            var startDate = 'All';
+            var endDate = 'All';
 
 
             partialTab = $('#partialTable').DataTable({
                 dom: 'Blfrtip',
-                "scrollY": "310px",
+                "scrollY": "450px",
+                "scrollX": true,
                 stateSave:true,
                 buttons: [{
                     extend: 'excel',
@@ -724,14 +730,17 @@
         }
 
         function getComplete() {
-            var startDate = $('#startDateC').val();
-            var endDate = $('#endDateC').val();
+{#            var startDate = $('#startDateC').val();#}
+{#            var endDate = $('#endDateC').val();#}
+            var startDate = 'All';
+            var endDate = 'All';
 
 
             completeTab = $('#completeTable').DataTable({
                 dom: 'Blfrtip',
                 stateSave:true,
-                "scrollY": "310px",
+                "scrollY": "450px",
+                "scrollX": true,
                 buttons: [{
                     extend: 'excel',
                     exportOptions: {
@@ -771,7 +780,7 @@
                 "pageLength": 8,
                 "processing": true,
                 "serverSide": true,
-                "ajax": '{% url 'homeApp:PartiallyCompletedDepositListJson' %}?startDate=' + startDate + '&endDate=' + endDate
+                "ajax": '{% url 'homeApp:CompletedDepositListJson' %}?startDate=' + startDate + '&endDate=' + endDate
             });
         }
 

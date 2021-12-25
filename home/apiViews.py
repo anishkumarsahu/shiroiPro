@@ -238,17 +238,22 @@ def edit_deposit_post(request):
 
 
 
-class IncompleteDepositListJson(BaseDatatableView):
+class  IncompleteDepositListJson(BaseDatatableView):
     order_columns = ['oldID', 'depositSerialID', 'customerName', 'phone', 'address', 'depositDate',
                      'statusID', 'totalAmount', 'totalInterestPaid', 'clearanceDate','remark', 'datetime', ]
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
         eDate = self.request.GET.get('endDate')
-        startDate = datetime.strptime(sDate, '%d/%m/%Y')
-        endDate = datetime.strptime(eDate, '%d/%m/%Y')
-        return Deposit.objects.filter(isDeleted__exact=False, depositDate__gte=startDate.date(),
-                                      depositDate__lte=endDate.date() + timedelta(days=1), statusID_id=1)
+        # startDate = datetime.strptime(sDate, '%d/%m/%Y')
+        # endDate = datetime.strptime(eDate, '%d/%m/%Y')
+        if sDate =='All' and eDate == 'All':
+            return Deposit.objects.filter(isDeleted__exact=False, statusID_id=1)
+        else:
+            startDate = datetime.strptime(sDate, '%d/%m/%Y')
+            endDate = datetime.strptime(eDate, '%d/%m/%Y')
+            return Deposit.objects.filter(isDeleted__exact=False, depositDate__gte=startDate.date(),
+                                          depositDate__lte=endDate.date() + timedelta(days=1), statusID_id=1)
 
     def filter_queryset(self, qs):
         search = self.request.GET.get('search[value]', None)
@@ -283,6 +288,13 @@ class IncompleteDepositListJson(BaseDatatableView):
                              <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px">
                                <i class="trash alternate icon"></i>
                              </button>'''.format(item.pk, item.pk, item.pk, item.pk),
+            interest = datetime.today().date() - item.depositDate
+            months = interest.days//30
+            rem = interest.days%30
+            if rem > 15:
+                cal = (months + 1) * item.totalAmount * 0.02
+            else:
+                cal = (months + 0.5) * item.totalAmount * 0.02
 
             json_data.append([
                 escape(item.oldID),
@@ -293,7 +305,7 @@ class IncompleteDepositListJson(BaseDatatableView):
                 escape(item.depositDate.strftime('%d-%m-%Y')),
                 escape(item.statusID.name),
                 escape(item.totalAmount),
-                escape(item.totalInterestPaid),
+                escape(round(cal,2)),
                 escape(clearDate),
                 escape(item.remark),
                 escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
@@ -310,9 +322,14 @@ class PartiallyCompletedDepositListJson(BaseDatatableView):
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
         eDate = self.request.GET.get('endDate')
-        startDate = datetime.strptime(sDate, '%d/%m/%Y')
-        endDate = datetime.strptime(eDate, '%d/%m/%Y')
-        return Deposit.objects.filter(isDeleted__exact=False, depositDate__gte=startDate.date(),
+        # startDate = datetime.strptime(sDate, '%d/%m/%Y')
+        # endDate = datetime.strptime(eDate, '%d/%m/%Y')
+        if sDate =='All' and eDate == 'All':
+            return Deposit.objects.filter(isDeleted__exact=False, statusID_id=2)
+        else:
+            startDate = datetime.strptime(sDate, '%d/%m/%Y')
+            endDate = datetime.strptime(eDate, '%d/%m/%Y')
+            return Deposit.objects.filter(isDeleted__exact=False, depositDate__gte=startDate.date(),
                                       depositDate__lte=endDate.date() + timedelta(days=1), statusID_id=2)
 
     def filter_queryset(self, qs):
@@ -377,10 +394,15 @@ class CompletedDepositListJson(BaseDatatableView):
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
         eDate = self.request.GET.get('endDate')
-        startDate = datetime.strptime(sDate, '%d/%m/%Y')
-        endDate = datetime.strptime(eDate, '%d/%m/%Y')
-        return Deposit.objects.filter(isDeleted__exact=False, clearanceDate__gte=startDate.date(),
-                                      clearanceDate__lte=endDate.date() + timedelta(days=1), statusID_id=3)
+        if sDate =='All' and eDate == 'All':
+            return Deposit.objects.filter(isDeleted__exact=False, statusID_id=3)
+        else:
+            startDate = datetime.strptime(sDate, '%d/%m/%Y')
+            endDate = datetime.strptime(eDate, '%d/%m/%Y')
+            return Deposit.objects.filter(isDeleted__exact=False, clearanceDate__gte=startDate.date(),
+                                          clearanceDate__lte=endDate.date() + timedelta(days=1), statusID_id=3)
+
+
 
     def filter_queryset(self, qs):
         search = self.request.GET.get('search[value]', None)
@@ -557,17 +579,33 @@ def item_closing_edit_post(request):
         item_details = item.split('|')
 
         p = DepositItem.objects.get(pk=int(item_details[0]))
-        p.withdrawalDate = datetime.strptime(item_details[1], '%d/%m/%Y')
-        p.interestPaid = float(item_details[2])
-        p.total = float(item_details[3])
-        p.month = float(item_details[4])
-        p.isWithdrawn = True
-        p.save()
-        depo.totalInterestPaid = depo.totalInterestPaid + float(item_details[2])
-        depo.save()
-        credit(p.total,"Item Deposit Payed", depo.depositSerialID, depo.customerName)
-    depo.totalAmountPaid = (depo.totalAmountPaid + float(totalAmount))
-    depo.save()
+        if p.isWithdrawn == True:
+            depo.totalInterestPaid = (depo.totalInterestPaid - p.interestPaid)
+            depo.totalAmountPaid = (depo.totalAmountPaid - (p.itemAmount + p.interestPaid))
+            depo.save()
+            debit(p.interestPaid, "Interest Update", depo.depositSerialID, depo.customerName)
+            debit(p.itemAmount, "Item Amount Update", depo.depositSerialID, depo.customerName)
+
+        if item_details[6]== 'False':
+            p.withdrawalDate = None
+            p.interestPaid = 0
+            p.total = 0
+            p.month = 0
+            p.isWithdrawn = False
+            p.save()
+        else:
+            p.withdrawalDate = datetime.strptime(item_details[1], '%d/%m/%Y')
+            p.interestPaid = float(item_details[2])
+            p.total = float(item_details[3])
+            p.month = float(item_details[4])
+            p.isWithdrawn = True
+            p.save()
+            depo.totalInterestPaid = depo.totalInterestPaid + float(item_details[2])
+            depo.save()
+            credit(p.interestPaid, "Interest Update", depo.depositSerialID, depo.customerName)
+            credit(p.itemAmount, "Item Amount Update", depo.depositSerialID, depo.customerName)
+            depo.totalAmountPaid = (depo.totalAmountPaid + float(totalAmount))
+            depo.save()
     totalItems = DepositItem.objects.filter(depositID_id=int(depositID)).count()
     totalWithdrawn = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=True).count()
     totalPending = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=False).count()
@@ -575,10 +613,14 @@ def item_closing_edit_post(request):
         depo.statusID_id = 3
         depo.clearanceDate = datetime.today().date()
         depo.save()
-    if totalWithdrawn < totalItems and totalPending < totalItems:
+    elif totalWithdrawn < totalItems and totalPending < totalItems:
         depo.statusID_id = 2
+        depo.clearanceDate = None
         depo.save()
-
+    else:
+        depo.statusID_id = 1
+        depo.clearanceDate = None
+        depo.save()
     return JsonResponse({'message': 'success'}, safe=False)
 
 
