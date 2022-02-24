@@ -115,3 +115,18 @@ class CashBook(models.Model):
 
     class Meta:
         verbose_name_plural = 'D) CashBook List'
+
+
+class Interest(models.Model):
+    remark = models.CharField(max_length=300, blank=True, null=True)
+    depositID = models.ForeignKey(Deposit, blank=True, null=True, on_delete=models.CASCADE)
+    amount = models.FloatField(default=0.0)
+    isDeleted = models.BooleanField(default=False)
+    datetime = models.DateTimeField(auto_now_add=True, auto_now=False)
+    lastUpdatedOn = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+    def __str__(self):
+        return str(self.depositID.depositSerialID)
+
+    class Meta:
+        verbose_name_plural = 'E) Interest List'
