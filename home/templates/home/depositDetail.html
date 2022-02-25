@@ -292,10 +292,11 @@
                         </div>
 
                         <div class="ui center aligned basic segment"
-                             style="margin-top: 200px;padding-top: 0;padding-bottom: 0;">
+                             style="margin-top: 200px;padding: 0">
 
+                    <button class="fluid ui mini telegram button" onclick="openInfo()">Take Interest</button>
 
-                            <div class="ui teal segment" style="padding:2rem">
+                            <div class="ui teal segment" >
                                 <div class="ui one column very relaxed grid">
                                     <div class="column">
                                         <a onclick="salesSave()" style="cursor: pointer;color: teal">
@@ -367,6 +368,33 @@
             </div>
         </div>
     </div>
+    <div class="ui modal tiny " id="BasicInfo">
+        <i class="close icon"></i>
+        <div class="header">
+            Take Interest
+        </div>
+        <div class="image content">
+            <form class="ui mini form" style="width: 100%">
+  <div class="two fields">
+    <div class="field">
+      <label>Interest Paid (₹)</label>
+      <input placeholder="Interest Paid (₹)" type="number">
+    </div>
+    <div class="field">
+      <label>Interest Remark</label>
+      <input placeholder="Interest Remark" type="text">
+    </div>
+  </div>
+  <div class="ui submit button">Submit</div>
+</form>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button">
+                Close
+            </div>
+        </div>
+    </div>
+
 
 {% endblock %}
 
@@ -707,6 +735,15 @@
         function printWithA4() {
             var id = $('#salesID').val();
             window.open('/with_print_billA4/?q=' + id, 'popUpWindow', 'height=screen.availHeight,width=screen.availWidth,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+
+        }
+
+
+        function openInfo() {
+
+            $('#BasicInfo')
+                .modal('show')
+            ;
 
         }
 
