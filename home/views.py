@@ -97,9 +97,14 @@ def deposit_detail(request, id=None):
     if request.user.is_authenticated:
         instance = get_object_or_404(Deposit, id=int(id))
         items = DepositItem.objects.filter(depositID_id=instance.pk)
+        all_in = Interest.objects.filter(depositID_id=int(id))
+        total = 0.0
+        for i in all_in:
+            total = total + i.amount
         context = {
             'instance': instance,
-            'items': items
+            'items': items,
+            'total':total
         }
 
         return render(request, 'home/depositDetail.html', context)
@@ -201,11 +206,15 @@ def with_print_billA5(request, *args, **kwargs):
 
     depo = Deposit.objects.get(pk=int(query))
     depo_list = DepositItem.objects.filter(depositID_id=int(query))
+    try:
+        a_paid = num2words(int(depo.totalAmountPaid))
+    except:
+        a_paid = 'Zero'
 
     context = {
         'left': 6 - depo_list.count(),
         'loo': str().zfill(6 - depo_list.count() - 1),
-        'TotalInWords': num2words(int(depo.totalAmountPaid)),
+        'TotalInWords': a_paid,
         'depo': depo,
         'depo_list': depo_list
 

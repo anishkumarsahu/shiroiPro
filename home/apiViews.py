@@ -847,3 +847,27 @@ class CashBookCreditListJson(BaseDatatableView):
 
             ])
         return json_data
+
+
+@csrf_exempt
+def take_interest_post(request):
+    inPaidAmount = request.POST.get("inPaidAmount")
+    inDepositID = request.POST.get("inDepositID")
+    inRemark = request.POST.get("inRemark")
+
+
+    ins = Interest()
+    ins.depositID_id  = int(inDepositID)
+    ins.amount = float(inPaidAmount)
+    ins.remark = inRemark
+    ins.save()
+    # credit(depo.totalAmount, "New Deposit Update".format(depo.totalAmount, depo.depositSerialID), depo.depositSerialID, depo.customerName)
+
+    all_in = Interest.objects.filter(depositID_id=int(inDepositID))
+    total = 0.0
+    for i in all_in:
+        total = total + i.amount
+
+
+
+    return JsonResponse({'message': 'success', 'total':total}, safe=False)

@@ -288,6 +288,10 @@
                                 <strong style="color: black;">Total(₹) :</strong>
                                 <div class="ui violet label" id="totalAmount">0.00</div>
                             </a>
+                   <a class="teal item ">
+                                                <strong style="color: black;">Int. Paid(₹) :</strong>
+                                                <div class="ui violet label" id="totalIntAmount">{{ total }}</div>
+                                            </a>
 
                         </div>
 
@@ -378,20 +382,22 @@
   <div class="two fields">
     <div class="field">
       <label>Interest Paid (₹)</label>
-      <input placeholder="Interest Paid (₹)" type="number">
+      <input placeholder="Interest Paid (₹)" type="number" id="inPaidAmount">
     </div>
     <div class="field">
       <label>Interest Remark</label>
-      <input placeholder="Interest Remark" type="text">
+      <input placeholder="Interest Remark" type="text" id="inRemark">
+      <input  type="hidden" id="inDepositID" value="{{ instance.pk }}">
     </div>
   </div>
-  <div class="ui submit button">Submit</div>
+
 </form>
         </div>
         <div class="actions">
             <div class="ui black deny button">
                 Close
             </div>
+            <div class="ui green button" onclick="takeInterest()">Submit</div>
         </div>
     </div>
 
@@ -744,6 +750,78 @@
             $('#BasicInfo')
                 .modal('show')
             ;
+
+        }
+
+
+            //post
+        function takeInterest() {
+            var inPaidAmount = $('#inPaidAmount').val();
+            var inRemark = $('#inRemark').val();
+            var inDepositID = $('#inDepositID').val();
+
+
+            if (inPaidAmount === '' || inRemark === '' ) {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: 'Please enter interest amount and remark.'
+                    })
+                ;
+            } else {
+                data = new FormData();
+                data.append('inPaidAmount', inPaidAmount);
+                data.append('inRemark', inRemark);
+                data.append('inDepositID', inDepositID);
+
+                debugger;
+                $.ajax({
+                    type: 'post',
+                    url: '{% url "homeApp:take_interest_post" %}',
+                    data: data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+
+
+                    success: function (response) {
+                        if (response.message === 'success') {
+                            $('body')
+                                .toast({
+                                    class: 'success',
+                                    message: 'Interest Taken Successfully.'
+                                });
+
+                            $('#totalIntAmount').html(''+response.total);
+                                $('#BasicInfo')
+                                    .modal('hide')
+                                ;
+
+                        }
+                        else {
+                            $('body')
+                                .toast({
+                                    class: 'error',
+                                    message: 'An error occurred !'
+                                })
+                            ;
+
+                        }
+
+                        return response;
+                    },
+                    error: function () {
+                        $('body')
+                            .toast({
+                                class: 'error',
+                                message: 'An error occurred !'
+                            })
+                        ;
+                    }
+                });
+
+
+            }
 
         }
 
