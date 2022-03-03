@@ -146,7 +146,7 @@ def download_backup(request, id=None):
 def daily_report(request):
     if request.user.is_authenticated:
         try:
-            opening = CashBook.objects.filter(datetime__lt=datetime.today().date()).last()
+            opening = CashBook.objects.filter(datetime__lt=datetime.today().date(), isDeleted__exact=False).last()
             o_balance = opening.availableBalance
         except:
             o_balance = 0.0
@@ -155,10 +155,22 @@ def daily_report(request):
             c = current.availableBalance
         except:
             c = 0.0
+
+        total_c = 0.0
+        total_d = 0.0
+
+        for cre in CashBook.objects.filter(datetime__icontains=datetime.today().date(), isDeleted__exact=False,transactionType__icontains='Credit'):
+            total_c = total_c + cre.interest + cre.amount
+
+        for d in CashBook.objects.filter(datetime__icontains=datetime.today().date(), isDeleted__exact=False,transactionType__icontains='Debit'):
+            total_d = total_d + d.interest + d.amount
+
         context = {
             'o_balance': o_balance,
             'c': c,
             'date': datetime.today().date(),
+            'credit':total_c,
+            'debit':total_d,
 
         }
 

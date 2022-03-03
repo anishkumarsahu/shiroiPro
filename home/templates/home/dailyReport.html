@@ -185,14 +185,14 @@
                             <div class="eight wide column">
                                 <h5 class="ui horizontal left aligned divider header">
                                     <i class="left align icon"></i>
-                                    CREDIT <span style="color: green;font-size: 20px">+</span>
+                                    CREDIT <span style="color: green;font-size: 20px">+</span> <a class="ui green tiny label">₹ {{ credit }}</a>
                                 </h5>
                             </div>
                             <div class="eight wide column">
 
                                 <h5 class="ui horizontal left aligned divider header">
                                     <i class="left align icon"></i>
-                                    DEBIT <span style="color: red;font-size: 20px">-</span>
+                                    DEBIT <span style="color: red;font-size: 20px">-</span> <a class="ui red tiny label">₹ {{ debit }}</a>
                                 </h5>
                             </div>
 
@@ -210,8 +210,8 @@
                           <th>EnteredOn</th>
                           <th>CustomerName</th>
                         <th>Amount(₹)</th>
+                        <th>Interest(₹)</th>
                         <th>Remark</th>
-                        <th>Balance(₹)</th>
 
 
                     </tr>
@@ -232,8 +232,8 @@
                           <th>EnteredOn</th>
                           <th>CustomerName</th>
                         <th>Amount(₹)</th>
+                         <th>Interest(₹)</th>
                         <th>Remark</th>
-                        <th>Balance(₹)</th>
 
                     </tr>
                     </thead>
@@ -464,8 +464,8 @@
                     {"name": "datetime", "targets": 1, "orderable": true},
                     {"name": "customerName", "targets": 2, "orderable": true},
                     {"name": "amount", "targets": 3, "orderable": true},
-                    {"name": "remark", "targets": 4, "orderable": true},
-                    {"name": "availableBalance", "targets": 5, "orderable": true},
+                    {"name": "interest", "targets": 4, "orderable": true},
+                    {"name": "remark", "targets": 5, "orderable": true},
 
                 ],
                 aaSorting: [[1, 'desc']],
@@ -497,8 +497,8 @@
                     {"name": "datetime", "targets": 1, "orderable": true},
                     {"name": "customerName", "targets": 2, "orderable": true},
                     {"name": "amount", "targets": 3, "orderable": true},
-                    {"name": "remark", "targets": 4, "orderable": true},
-                    {"name": "availableBalance", "targets": 5, "orderable": true},
+                    {"name": "interest", "targets": 4, "orderable": true},
+                    {"name": "remark", "targets": 5, "orderable": true},
 
                 ],
                 aaSorting: [[1, 'desc']],
