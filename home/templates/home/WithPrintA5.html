@@ -52,6 +52,7 @@
 
             p {
                 font-size: 12px;
+                margin: 0 0 5px!important;
             }
 
         }
@@ -64,18 +65,22 @@
 </div>
 <div class="row classComp">
     <div class="col-xs-12 text-center">
-        <h3 style="font-family: serif;font-weight: bold;margin-top: 5px;margin-bottom: 5px" >SHIROI STORE</h3>
+        <h3 style="font-family: serif;font-weight: bold;margin-top: 5px;margin-bottom: 5px">SHIROI STORE</h3>
         <span style="font-weight: 400">Uripok Tourangbam Leikai</span><br>
         <span style="font-weight: 400">Phone No. : +91 9362080377</span>
     </div>
 </div>
 <div class="row">
-    <p class="text-right">Deposit Date: <span style="border-bottom: 1px dotted">{{ depo.depositDate|date:"d-m-Y" }}</span></p>
+    <p class="text-right">Deposit Date: <span
+            style="border-bottom: 1px dotted">{{ depo.depositDate|date:"d-m-Y" }}</span></p>
     <span class="text-left"> NAME:{{ depo.customerName|upper }}</span><br>
     <span class="text-left"> PhoneNumber:{{ depo.phone|upper }}</span><br>
     <span class="text-left"> ADDRESS: {{ depo.address|upper }}</span><br>
     <span style="margin-bottom: 5px;">Deposit No. : <b>{{ depo.depositSerialID }}</b></span><br>
-    <span style="margin-bottom: 5px;">Status: <b>{{ depo.statusID.name }}</b></span>    {% if depo.clearanceDate %}  <span class="text-right" style="float: right; margin-bottom: 5px;padding-left: 20px">Closing Date: <b>{{ depo.clearanceDate|date:"d-m-Y"  }}</b></span> {% endif %} <br><br>
+    <span style="margin-bottom: 5px;">Status: <b>{{ depo.statusID.name }}</b></span>    {% if depo.clearanceDate %}
+    <span class="text-right"
+          style="float: right; margin-bottom: 5px;padding-left: 20px">Closing Date: <b>{{ depo.clearanceDate|date:"d-m-Y" }}</b></span> {% endif %}
+    <br><br>
 
     <table class="table table-bordered">
 
@@ -83,12 +88,12 @@
         <tr>
             <th>Sl <br> No.</th>
             <th>Item Description</th>
-            <th  style="text-align: right">Weight <br>(g)</th>
-            <th  style="text-align: right">Total <br>(Rs.)</th>
-            <th  style="text-align: right">Closing <br> Date</th>
-            <th  style="text-align: right">Month</th>
-            <th  style="text-align: right">Interest</th>
-            <th  style="text-align: right">Status</th>
+            <th style="text-align: right">Weight <br>(g)</th>
+            <th style="text-align: right">Total <br>(Rs.)</th>
+            <th style="text-align: right">Closing <br> Date</th>
+            <th style="text-align: right">Month</th>
+            <th style="text-align: right">Interest</th>
+            <th style="text-align: right">Status</th>
             <th style="text-align: right">Amount <br>(Rs.)</th>
         </tr>
 
@@ -99,21 +104,22 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ foo.itemName|capfirst }}({{ foo.description|capfirst }})</td>
-                <td  style="text-align: right">{{ foo.weight }} <span style="font-size: 10px">({{ foo.tola }} T {{ foo.san }} S {{ foo.chaning }} C )</span></td>
-                <td  style="text-align: right">{{ foo.itemAmount }}</td>
+                <td style="text-align: right">{{ foo.weight }} <span
+                        style="font-size: 10px">({{ foo.tola }} T {{ foo.san }} S {{ foo.chaning }} C )</span></td>
+                <td style="text-align: right">{{ foo.itemAmount }}</td>
                 {% if foo.isWithdrawn == False %}
-                <td>N/A</td>
-                <td style="text-align: right">N/A</td>
-                <td style="text-align: right">N/A</td>
-                <td style="text-align: right">DUE</td>
-                <td style="text-align: right">N/A</td>
+                    <td>N/A</td>
+                    <td style="text-align: right">N/A</td>
+                    <td style="text-align: right">N/A</td>
+                    <td style="text-align: right">DUE</td>
+                    <td style="text-align: right">N/A</td>
                 {% else %}
-                <td>{{ foo.withdrawalDate|date:"d-m-Y"  }}</td>
-                <td style="text-align: right">{{ foo.month }}</td>
-                <td style="text-align: right">{{ foo.interestPaid }}</td>
-                <td style="text-align: right">PAID</td>
-                <td style="text-align: right">{{ foo.total }}</td>
-             {% endif %}
+                    <td>{{ foo.withdrawalDate|date:"d-m-Y" }}</td>
+                    <td style="text-align: right">{{ foo.month }}</td>
+                    <td style="text-align: right">{{ foo.interestPaid }}</td>
+                    <td style="text-align: right">PAID</td>
+                    <td style="text-align: right">{{ foo.total }}</td>
+                {% endif %}
             </tr>
         {% endfor %}
 
@@ -158,8 +164,8 @@
         <tr>
             <td rowspan="3" colspan="9">
                 <div class="row">
-                    <div class="col-xs-12"> <b>Office Hrs. : </b>Monday to Saturday - 9:00 am to 5:00 pm
-Sunday Closed on General Holidays.
+                    <div class="col-xs-12"><b>Office Hrs. : </b>Monday to Saturday - 9:00 am to 5:00 pm
+                        Sunday Closed on General Holidays.
 
                     </div>
                 </div>
@@ -180,10 +186,12 @@ Sunday Closed on General Holidays.
                         <li>We are not responsible for any invalid item.</li>
                         <li>Validity can be extended upon payment of the whole or partial interest.</li>
                         <li>Items will be handed over on the same day after 2:00p.m. if requested
-(in person or by phone) before 11:30am, otherwise will be delivered on
-the next day.</li>
+                            (in person or by phone) before 11:30am, otherwise will be delivered on
+                            the next day.
+                        </li>
                         <li>Interest calculated every 1/2 month with a grace period of 3 days. (1/2
-month interest applies form the day 1)</li>
+                            month interest applies form the day 1)
+                        </li>
                         <li>Interest wil be calculated on the date of re-payment.</li>
                         <li>No. items will be handed over without the presentation of this receipt.</li>
                     </div>
@@ -200,6 +208,42 @@ month interest applies form the day 1)</li>
     </table>
 </div>
 <p>Remark: <b>{{ depo.remark }}</b></p>
+
+{% if int_list %}
+    <table class="table table-bordered">
+
+        <thead>
+        <tr>
+            <th>Sl No.</th>
+            <th>Remark</th>
+            <th style="text-align: right">Interest (Rs.)</th>
+            <th style="text-align: right">Interest Date</th>
+        </tr>
+
+        </thead>
+        <tbody> {% for i in int_list %}
+
+        <tr>
+
+                <td>{{ forloop.counter }}</td>
+                <td >{{ i.remark }}</td>
+                <td style="text-align: right">{{ i.amount }}</td>
+                <td  style="text-align: right">{{ i.datetime|date:"d-m-Y" }}</td>
+
+
+
+        </tr>
+          {% endfor %}
+                <tr>
+            <td rowspan="1" colspan="2">
+                <b>In words:</b> <span style="border-bottom: 1px dotted"> {{ a_paid_interest }}</span>
+            </td>
+            <td class="text-right" colspan="1" rowspan="2"><b>Total</b></td>
+            <td class="text-right" rowspan="1"><b>{{ int_total }}</b></td>
+        </tr>
+        </tbody>
+    </table>
+{% endif %}
 <div class="row text-right" style="margin-top: 30px;">
     <p style="padding-right: 60px;margin: 0">For,</p>
     <p style="padding-right: 25px;"><b>SHIROI STORE</b></p></div>

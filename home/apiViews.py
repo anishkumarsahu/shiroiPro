@@ -277,7 +277,7 @@ class  IncompleteDepositListJson(BaseDatatableView):
             else:
                 clearDate = item.clearanceDate
 
-            action = '''<a style="font-size:10px;"href="/edit_deposit/{}/" class="ui circular  icon button orange">
+            action = ''' <span style="display:flex">   <a style="font-size:10px;"href="/edit_deposit/{}/" class="ui circular  icon button orange">
                               <i class="edit icon"></i>
                              </a>
                              <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
@@ -287,7 +287,7 @@ class  IncompleteDepositListJson(BaseDatatableView):
                              </button>
                              <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px">
                                <i class="trash alternate icon"></i>
-                             </button>'''.format(item.pk, item.pk, item.pk, item.pk),
+                             </button> </span>'''.format(item.pk, item.pk, item.pk, item.pk),
             interest = datetime.today().date() - item.depositDate
             months = interest.days//30
             rem = interest.days%30
@@ -354,7 +354,7 @@ class PartiallyCompletedDepositListJson(BaseDatatableView):
             else:
                 clearDate = item.clearanceDate
 
-            action = '''
+            action = '''<span style="display:flex">  
             <a style="font-size:10px;"href="/edit_deposit_detail/{}/" class="ui circular  icon button orange">
                               <i class="edit icon"></i>
                              </a>
@@ -366,7 +366,7 @@ class PartiallyCompletedDepositListJson(BaseDatatableView):
                              </button>
                              <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px">
                                <i class="trash alternate icon"></i>
-                             </button>'''.format(item.pk,item.pk, item.pk, item.pk),
+                             </button> </span>'''.format(item.pk,item.pk, item.pk, item.pk),
 
             json_data.append([
                 escape(item.oldID),
@@ -426,7 +426,7 @@ class CompletedDepositListJson(BaseDatatableView):
             else:
                 clearDate = item.clearanceDate.strftime('%d-%m-%Y')
 
-            action = '''
+            action = '''<span style="display:flex">  
             <a style="font-size:10px;"href="/edit_deposit_detail/{}/" class="ui circular  icon button orange">
                               <i class="edit icon"></i>
                              </a>
@@ -438,7 +438,7 @@ class CompletedDepositListJson(BaseDatatableView):
                              </button>
                              <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px">
                                <i class="trash alternate icon"></i>
-                             </button>'''.format(item.pk,item.pk, item.pk, item.pk),
+                             </button> </span>'''.format(item.pk,item.pk, item.pk, item.pk),
 
             json_data.append([
                 escape(item.oldID),

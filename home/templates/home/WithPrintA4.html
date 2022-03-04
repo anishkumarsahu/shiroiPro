@@ -202,6 +202,42 @@ month interest applies form the day 1)</li>
     </table>
 </div>
 <p>Remark: <b>{{ depo.remark }}</b></p>
+
+{% if int_list %}
+    <table class="table table-bordered">
+
+        <thead>
+        <tr>
+            <th>Sl No.</th>
+            <th>Remark</th>
+            <th style="text-align: right">Interest (Rs.)</th>
+            <th style="text-align: right">Interest Date</th>
+        </tr>
+
+        </thead>
+        <tbody> {% for i in int_list %}
+
+        <tr>
+
+                <td>{{ forloop.counter }}</td>
+                <td >{{ i.remark }}</td>
+                <td style="text-align: right">{{ i.amount }}</td>
+                <td  style="text-align: right">{{ i.datetime|date:"d-m-Y" }}</td>
+
+
+
+        </tr>
+          {% endfor %}
+                <tr>
+            <td rowspan="1" colspan="2">
+                <b>In words:</b> <span style="border-bottom: 1px dotted"> {{ a_paid_interest }}</span>
+            </td>
+            <td class="text-right" colspan="1" rowspan="2"><b>Total</b></td>
+            <td class="text-right" rowspan="1"><b>{{ int_total }}</b></td>
+        </tr>
+        </tbody>
+    </table>
+{% endif %}
 <div class="row text-right" style="margin-top: 30px;">
     <p style="padding-right: 60px;margin: 0">For,</p>
     <p style="padding-right: 25px;"><b>SHIROI STORE</b></p></div>

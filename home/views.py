@@ -217,18 +217,33 @@ def with_print_billA5(request, *args, **kwargs):
     query = request.GET.get('q')
 
     depo = Deposit.objects.get(pk=int(query))
-    depo_list = DepositItem.objects.filter(depositID_id=int(query))
+    depo_list = DepositItem.objects.filter(depositID_id=int(query), isDeleted__exact=False)
+    int_list = Interest.objects.filter(depositID_id=int(query), isDeleted__exact=False)
+    int_total = 0.0
+    for i in int_list:
+        int_total = int_total + i.amount
+
     try:
         a_paid = num2words(int(depo.totalAmountPaid))
     except:
         a_paid = 'Zero'
 
+    try:
+        a_paid_interest = num2words(int(int_total))
+    except:
+        a_paid_interest = 'Zero'
+
     context = {
-        'left': 6 - depo_list.count(),
-        'loo': str().zfill(6 - depo_list.count() - 1),
+        'left': 2 - depo_list.count(),
+        'loo': str().zfill(2 - depo_list.count() - 1),
         'TotalInWords': a_paid,
         'depo': depo,
-        'depo_list': depo_list
+        'depo_list': depo_list,
+        'a_paid_interest':a_paid_interest,
+        'int_total':int_total,
+        'int_list':int_list
+
+
 
     }
     return render(request, 'home/WithPrintA5.html', context)
@@ -238,14 +253,32 @@ def with_print_billA4(request, *args, **kwargs):
     query = request.GET.get('q')
 
     depo = Deposit.objects.get(pk=int(query))
-    depo_list = DepositItem.objects.filter(depositID_id=int(query))
+    depo_list = DepositItem.objects.filter(depositID_id=int(query), isDeleted__exact=False)
+    int_list = Interest.objects.filter(depositID_id=int(query), isDeleted__exact=False)
+    int_total = 0.0
+    for i in int_list:
+        int_total = int_total + i.amount
+    try:
+        a_paid = num2words(int(depo.totalAmountPaid))
+    except:
+        a_paid = 'Zero'
+
+    try:
+        a_paid_interest = num2words(int(int_total))
+    except:
+        a_paid_interest = 'Zero'
 
     context = {
-        'left': 8 - depo_list.count(),
-        'loo': str().zfill(8 - depo_list.count() - 1),
-        'TotalInWords': num2words(int(depo.totalAmountPaid)),
+        'left': 2 - depo_list.count(),
+        'loo': str().zfill(2 - depo_list.count() - 1),
+        'TotalInWords': a_paid,
         'depo': depo,
-        'depo_list': depo_list
+        'depo_list': depo_list,
+        'a_paid_interest':a_paid_interest,
+        'int_total':int_total,
+        'int_list':int_list
+
+
 
     }
     return render(request, 'home/WithPrintA4.html', context)
