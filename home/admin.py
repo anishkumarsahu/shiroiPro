@@ -29,3 +29,11 @@ class CashBookAdmin(admin.ModelAdmin):
     list_display = ['remark','transactionType','amount', 'totalCredit', 'totalDebit','balanceThatTime','availableBalance', 'isDeleted','datetime','lastUpdatedOn']
 
 admin.site.register(CashBook, CashBookAdmin)
+
+
+
+class InterestAdmin(admin.ModelAdmin):
+    search_fields = ['remark','amount']
+    list_display = ['depositID','remark','amount', 'isDeleted','datetime','lastUpdatedOn']
+
+admin.site.register(Interest, InterestAdmin)

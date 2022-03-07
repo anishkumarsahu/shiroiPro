@@ -463,6 +463,26 @@
                         </div>
 
                     </div>
+
+
+                     <h4 style="text-align: left">INTEREST</h4>
+                    <div class="row" style="padding-bottom: 0!important;padding-top: 0!important;">
+                        <div class="twelve wide column" style="padding-top: 0!important;padding-bottom: 0;">
+                            <table class="ui very compact table" id="itemTableReportInterest">
+                                <thead>
+                                <tr>
+                                    <th>Sl No.</th>
+                                    <th>Remark</th>
+                                    <th>Amount</th>
+                                    <th>InterestDate</th>
+                                </tr>
+                                </thead>
+                                <tbody id="my_body_interest">
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
@@ -872,6 +892,7 @@
 
 
                     $('#itemTableReport tbody tr').remove();
+                    $('#itemTableReportInterest tbody tr').remove();
                     $('#DepositSerialID').html(response.data.Basic['DepositSerialID']);
                     $('#Name').html(response.data.Basic['Name']);
                     $('#Phone').html(response.data.Basic['Phone']);
@@ -887,6 +908,11 @@
                     var i;
                     for (i = 0; i < response.data.Items.length; i++) {
                         $('#itemTableReport tbody').append('<tr ><td>#</td> <td>' + response.data.Items[i]['ItemName'] + '</td><td >' + response.data.Items[i]['Weight'] + '</td><td >' + response.data.Items[i]['WeightLocal'] + '</td><td >' + response.data.Items[i]['ItemRatePerTenGram'] + '</td><td >' + response.data.Items[i]['InterestRate'] + '</td><td >' + response.data.Items[i]['Description'] + '</td><td>' + response.data.Items[i]['ItemAmount'] + '</td><td >' + response.data.Items[i]['IsWithdrawn'] + '</td><td >' + response.data.Items[i]['WithdrawalDate'] + '</td><td >' + response.data.Items[i]['InterestPaid'] + '</td></tr>');
+
+                    }
+                       var j;
+                    for (j = 0; j < response.data.Interest.length; j++) {
+                        $('#itemTableReportInterest tbody').append('<tr ><td>#</td> <td>' + response.data.Interest[j]['Remark'] + '</td><td >' + response.data.Interest[j]['Amount'] + '</td><td >' + response.data.Interest[j]['Datetime'] +  '</td></tr>');
 
                     }
 

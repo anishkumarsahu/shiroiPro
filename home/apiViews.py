@@ -505,10 +505,20 @@ def get_deposit_detail(request, id=None):
 
         }
         item_list.append(item_dic)
-
+    interests = Interest.objects.filter(depositID_id=instance.pk, isDeleted__exact=False)
+    int_list = []
+    for j in interests:
+        int_dic = {
+            'InterestID':j.pk,
+            'Remark':j.remark,
+            'Amount':j.amount,
+            'Datetime':j.datetime.strftime('%d-%m-%Y %I:%M %p')
+        }
+        int_list.append(int_dic)
     data = {
         'Basic': basic,
-        'Items': item_list
+        'Items': item_list,
+        'Interest':int_list,
 
     }
     return JsonResponse({'data': data}, safe=False)
