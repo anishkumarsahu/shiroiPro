@@ -12,8 +12,14 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/semantic.min.css' %}">
     <script src="{% static 'js/semantic.min.js' %}"></script>
     <script src="{% static 'sw/app.js' %}"></script>
+    <style>
+        .bg-custom {
+            background: rgb(255, 255, 255);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 1) 60%, rgba(241, 255, 0, 1) 100%, rgba(0, 212, 255, 1) 100%);
+        }
+    </style>
 </head>
-<body>
+<body class="bg-custom">
 
 <div class="ui vertically divided grid inverted" style="text-align: center">
     <div class="one column row">
@@ -28,7 +34,7 @@
     text-shadow: 2px 8px 6px rgba(0,0,0,0.2),
                  0px -5px 35px rgba(255,255,255,0.3);
     margin-bottom: 0;"
-            >A Management Software<span style="font-size: 12px">  (V 1.0.0) </span></p>
+            >A Management Software<span style="font-size: 12px">  (V 1.1.0) </span></p>
             <img src="{% static 'logo/512.png' %}" alt="" width="80" height="80">
 
             <p style="color:grey;font-family: serif;font-style: italic;">"By Ziva Infotech"</p>
@@ -36,7 +42,7 @@
     </div>
     <div class="three column row">
 
-        <div class="column">
+        <div class="column ">
             <a href="{% url 'homeApp:new_deposit' %}">
                 <p><i class="download icon" style="font-size: 5rem;"></i><br>NEW DEPOSIT </p>
             </a>

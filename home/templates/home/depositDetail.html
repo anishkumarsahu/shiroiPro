@@ -22,6 +22,10 @@
     </style>
 
     <div class="ui padded grid">
+        <h5 class="ui horizontal left aligned divider header">
+            <i class="left align icon"></i>
+            Deposit Detail - <span class="ui text green"> {{ instance.depositSerialID }} ({{ instance.oldID }})</span>
+        </h5>
         <div class="row" style="padding-bottom: 5px!important;padding-top: 5px!important;">
             <div class="five wide column">
 
@@ -685,7 +689,7 @@
                 if (day_age > 18 && day_age <= 29) {
                     mon = month_age + 1;
 
-                } else if (day_age >= 0 && day_age <= 18) {
+                } else if (day_age >= 4 && day_age <= 18) {
                     mon = month_age + 0.5;
                 } else {
                     mon = month_age;

@@ -77,13 +77,13 @@ input[type=number] {
     border-color: #000!important;
 {#    -webkit-box-shadow: 0 2px 3px 0 rgb(34 36 38 / 15%);#}
 {#    box-shadow: 0 2px 3px 0 rgb(34 36 38 / 15%);#}
-}
+        }
     </style>
 
 </head>
 <body>
 
-<div class="ui blue six item inverted menu topNav">
+<div class="ui blue eight item inverted menu topNav">
     <a class="item" href="{% url 'homeApp:dashboard' %}">
         <i class="home icon"></i>
         Home
@@ -96,6 +96,17 @@ input[type=number] {
     <a class="item" href="{% url 'homeApp:deposit_history' %}">
         <i class="history icon"></i>
         Deposit History
+    </a>
+    <a class="item " style="width: 25%" href="#">
+        <div class="ui action tiny input">
+            <input type="text" id="search" placeholder="Search..." autofocus>
+            <div class="ui mini buttons">
+                <button onclick="SearchDeposit()" class="ui green button">Search</button>
+                <div class="or"></div>
+                <button class="ui red button" onclick="clearBtn()">Clear</button>
+            </div>
+        </div>
+
     </a>
 
     <a class="item" href="{% url 'homeApp:daily_report' %}">
@@ -171,14 +182,77 @@ input[type=number] {
     ;
 
 
-$('.mypopup')
-  .popup()
-;
-
-
+    $('.mypopup')
+        .popup()
+    ;
 
 
 </script>
 
+<script>
+
+    function SearchDeposit() {
+        var search = $('#search').val();
+        var formdata = new FormData();
+        formdata.append('Search', search);
+        $.ajax({
+            url: "{% url 'homeApp:search_deposit' %}",
+            type: "post",
+            data: formdata,
+            contentType: false,
+            cache: false,
+            processData: false,
+
+            success: function (response) {
+                if (response.message === 'success') {
+                    $('body')
+                        .toast({
+                            class: 'success',
+                            message: 'Deposit Detail Found.'
+                        })
+                    ;
+                    window.location.href = "/deposit_detail/" + response.id + "/";
+
+                } else {
+                    $('body')
+                        .toast({
+                            class: 'warning',
+                            message: 'No Deposit Detail Found ! Please try again.'
+                        })
+                    ;
+
+                }
+
+                return response;
+            },
+            error: function () {
+                $('body')
+                    .toast({
+                        class: 'error',
+                        message: 'An error occurred !'
+                    })
+                ;
+            }
+        });
+
+    }
+
+    function clearBtn() {
+        $('#search').val('');
+
+    }
+
+    $(document).ready(function () {
+
+        $('#search').keydown(function (event) {
+            // enter has keyCode = 13, change it if you want to use another button
+            if (event.keyCode == 13) {
+                SearchDeposit();
+                return false;
+            }
+        });
+
+    });
+</script>
 </body>
 </html>
