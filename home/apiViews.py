@@ -756,7 +756,7 @@ def debit(interest, amount, remark, serial='N/A', name='N/A'):
 
 
 class CashBookDebitListJson(BaseDatatableView):
-    order_columns = ['depositID','datetime','customerName','amount','interest', 'remark' ]
+    order_columns = ['depositID', 'datetime', 'customerName', 'amount', 'interest', 'totalDebit', 'remark']
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
@@ -770,9 +770,10 @@ class CashBookDebitListJson(BaseDatatableView):
         search = self.request.GET.get('search[value]', None)
         if search:
             qs = qs.filter(
-                Q(depositID__icontains=search) |   Q(customerName__icontains=search) | Q(amount__icontains=search) | Q(remark__icontains=search) | Q(transactionType__icontains=search) | Q(
+                Q(depositID__icontains=search) | Q(customerName__icontains=search) | Q(amount__icontains=search) | Q(
+                    remark__icontains=search) | Q(transactionType__icontains=search) | Q(
                     availableBalance__icontains=search)
-                | Q(datetime__icontains=search)
+                | Q(datetime__icontains=search) | Q(totalDebit__icontains=search)
             )
 
         return qs
@@ -801,6 +802,7 @@ class CashBookDebitListJson(BaseDatatableView):
                 escape(item.customerName),
                 escape(item.amount),
                 escape(item.interest),
+                escape(round(item.amount + item.interest, 2)),
                 escape(item.remark),
 
             ])
@@ -808,7 +810,7 @@ class CashBookDebitListJson(BaseDatatableView):
 
 
 class CashBookCreditListJson(BaseDatatableView):
-    order_columns = ['depositID','datetime','customerName','amount','interest', 'remark']
+    order_columns = ['depositID', 'datetime', 'customerName', 'amount', 'interest', 'totalCredit', 'remark']
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
@@ -826,7 +828,7 @@ class CashBookCreditListJson(BaseDatatableView):
                 Q(depositID__icontains=search) | Q(customerName__icontains=search) |
                 Q(amount__icontains=search) | Q(remark__icontains=search) | Q(transactionType__icontains=search) | Q(
                     availableBalance__icontains=search)
-                | Q(datetime__icontains=search)
+                | Q(datetime__icontains=search) | Q(totalCredit__icontains=search)
             )
 
         return qs
@@ -855,8 +857,8 @@ class CashBookCreditListJson(BaseDatatableView):
                 escape(item.customerName),
                 escape(item.amount),
                 escape(item.interest),
+                escape(round(item.amount + item.interest, 2)),
                 escape(item.remark),
-
 
             ])
         return json_data
