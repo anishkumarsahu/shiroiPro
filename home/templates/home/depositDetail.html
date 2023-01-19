@@ -696,11 +696,10 @@
                 }
 
                 $('#time').html('' + year_age + ' Y ' + month_age + ' M ' + day_age + ' D');
-                $('#month').val("" + mon);
+                $('#month').val("" + (year_age * 12 + mon));
                 interestCal();
                 totalAmount();
-            }
-            else {
+            } else {
                 $("#month").val('');
                 $("#ICalculate").val('');
                 $("#amountWithInterest").val('0.0');
