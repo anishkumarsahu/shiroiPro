@@ -662,52 +662,74 @@
             }
 
         }
+
         function calMonth() {
             var isWithdrawn = $('#isWithdrawn').val();
             if (isWithdrawn === "True") {
                 var Ddate = $("#Ddate").val().toString();
                 var withdrawalDate = $("#withdrawalDate").val().toString();
+
+                // Parse the deposit date
                 var yearThen = parseInt(Ddate.substring(6, 10), 10);
                 var monthThen = parseInt(Ddate.substring(3, 5), 10);
                 var dayThen = parseInt(Ddate.substring(0, 2), 10);
+
+                // Parse the withdrawal date
                 var yearThenW = parseInt(withdrawalDate.substring(6, 10), 10);
                 var monthThenW = parseInt(withdrawalDate.substring(3, 5), 10);
                 var dayThenW = parseInt(withdrawalDate.substring(0, 2), 10);
-                var today = new Date(yearThenW, monthThenW - 1, dayThenW);
-                var birthday = new Date(yearThen, monthThen - 1, dayThen);
 
-                var differenceInMilisecond = today.valueOf() - birthday.valueOf();
+                // Create Date objects
+                var depositDate = new Date(yearThen, monthThen - 1, dayThen);
+                var withdrawalDateObj = new Date(yearThenW, monthThenW - 1, dayThenW);
 
-                var year_age = Math.floor(differenceInMilisecond / 31536000000);
-                var day_age = Math.floor((differenceInMilisecond % 31536000000) / 86400000);
+                // Calculate the difference in years, months, and days
+                var yearDiff = withdrawalDateObj.getFullYear() - depositDate.getFullYear();
+                var monthDiff = withdrawalDateObj.getMonth() - depositDate.getMonth();
+                var dayDiff = withdrawalDateObj.getDate() - depositDate.getDate();
 
-
-                var month_age = Math.floor(day_age / 30);
-
-                day_age = day_age % 30;
-                var mon;
-                if (day_age > 18 && day_age <= 29) {
-                    mon = month_age + 1;
-
-                } else if (day_age >= 4 && day_age <= 18) {
-                    mon = month_age + 0.5;
-                } else {
-                    mon = month_age;
+                // Adjust for negative month or day differences
+                if (dayDiff < 0) {
+                    monthDiff--;
+                    var daysInLastMonth = new Date(withdrawalDateObj.getFullYear(), withdrawalDateObj.getMonth(), 0).getDate();
+                    dayDiff += daysInLastMonth;
+                }
+                if (monthDiff < 0) {
+                    yearDiff--;
+                    monthDiff += 12;
                 }
 
-                $('#time').html('' + year_age + ' Y ' + month_age + ' M ' + day_age + ' D');
-                $('#month').val("" + (year_age * 12 + mon));
+                // Calculate total months
+                var totalMonths = yearDiff * 12 + monthDiff;
+
+                // Handle partial months based on days
+                var partialMonth = 0;
+                if (dayDiff > 18 && dayDiff <= 29) {
+                    partialMonth = 1; // More than 18 days counts as a full month
+                } else if (dayDiff >= 4 && dayDiff <= 18) {
+                    partialMonth = 0.5; // Between 4 and 18 days counts as half a month
+                } else {
+                    partialMonth = 0; // Less than 4 days is ignored
+                }
+
+                // Calculate the final month count
+                var finalMonths = totalMonths + partialMonth;
+
+                // Display the result
+                $('#time').html('' + yearDiff + ' Y ' + monthDiff + ' M ' + dayDiff + ' D');
+                $('#month').val("" + finalMonths);
+
+                // Call other functions
                 interestCal();
                 totalAmount();
             } else {
+                // Clear fields if not withdrawn
                 $("#month").val('');
                 $("#ICalculate").val('');
                 $("#amountWithInterest").val('0.0');
                 $("#interestPaid").val('0.0');
-
             }
         }
-
         function interestCal() {
             var time = $("#month").val();
             var itemTotalAmount = $("#itemTotalAmount").val();
@@ -757,7 +779,7 @@
         }
 
 
-            //post
+        //post
         function takeInterest() {
             var inPaidAmount = $('#inPaidAmount').val();
             var inRemark = $('#inRemark').val();
@@ -777,7 +799,6 @@
                 data.append('inRemark', inRemark);
                 data.append('inDepositID', inDepositID);
 
-                debugger;
                 $.ajax({
                     type: 'post',
                     url: '{% url "homeApp:take_interest_post" %}',

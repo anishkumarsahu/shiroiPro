@@ -53,6 +53,8 @@ urlpatterns = [
     path('api/get_item_detail_by_name/', get_item_detail_by_name, name='get_item_detail_by_name'),
 
     path('api/take_interest_post/', take_interest_post, name='take_interest_post'),
+    path('api/edit_interest_post/', edit_interest_post, name='edit_interest_post'),
+    path('api/delete_interest_post/', delete_interest_post, name='delete_interest_post'),
 
 
     ]

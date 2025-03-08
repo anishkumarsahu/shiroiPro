@@ -1,7 +1,6 @@
 import sys
 from datetime import datetime
 
-from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core import management
@@ -65,10 +64,12 @@ def edit_deposit(request, id=None):
     if request.user.is_authenticated:
         instance = get_object_or_404(Deposit, pk = int(id))
         items = DepositItem.objects.filter(depositID_id = instance.pk)
+        interests = Interest.objects.filter(depositID_id=instance.pk, isDeleted=False)
 
         context = {
             'instance': instance,
-            'items':items
+            'items': items,
+            'interests': interests
         }
         return render(request, 'home/editDepost.html', context)
     else:
@@ -118,9 +119,11 @@ def edit_deposit_detail(request, id=None):
     if request.user.is_authenticated:
         instance = get_object_or_404(Deposit, id=int(id))
         items = DepositItem.objects.filter(depositID_id=instance.pk)
+        interests = Interest.objects.filter(depositID_id=instance.pk, isDeleted=False)
         context = {
             'instance': instance,
-            'items': items
+            'items': items,
+            'interests': interests
         }
 
         return render(request, 'home/editDepositDetail.html', context)
@@ -171,6 +174,7 @@ def daily_report(request):
             'date': datetime.today().date(),
             'credit':total_c,
             'debit':total_d,
+            'available_balance': total_c - total_d
 
         }
 

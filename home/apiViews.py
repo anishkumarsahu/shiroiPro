@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from django.contrib.auth import authenticate, login, logout
-from django.db.models import Q
+from django.db.models import Q, Sum, OuterRef, Subquery, F
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.html import escape
@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from .models import *
+from django.db import transaction
 
 
 def convertGold(x):
@@ -121,6 +122,8 @@ def get_item_detail_by_name(request):
 
     return JsonResponse({'data': data}, safe=False)
 
+
+@transaction.atomic
 @csrf_exempt
 def deposit_post(request):
     cusID = request.POST.get("cusID")
@@ -184,6 +187,8 @@ def deposit_post(request):
     debit(0.0, depo.totalAmount, "New Deposit".format(depo.totalAmount, depo.depositSerialID), depo.depositSerialID, depo.customerName)
     return JsonResponse({'message': 'success', 'depoID': depo.pk}, safe=False)
 
+
+@transaction.atomic
 @csrf_exempt
 def edit_deposit_post(request):
     dID = request.POST.get("dID")
@@ -277,15 +282,15 @@ class  IncompleteDepositListJson(BaseDatatableView):
             else:
                 clearDate = item.clearanceDate
 
-            action = ''' <span style="display:flex">   <a style="font-size:10px;"href="/edit_deposit/{}/" class="ui circular  icon button orange">
+            action = ''' <span style="display:flex">   <a style="font-size:10px;"href="/edit_deposit/{}/" class="ui circular  icon button orange" data-tooltip="Edit" data-position="bottom right" data-inverted="">
                               <i class="edit icon"></i>
                              </a>
-                             <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
+                             <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue" data-tooltip="Take Interest" data-position="bottom right" data-inverted="">
                                <i class="rupee sign icon"></i>
-                             </a><button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green">
+                             </a><button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green" data-tooltip="Detail" data-position="bottom right" data-inverted="">
                                <i class="receipt icon"></i>
                              </button>
-                             <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px">
+                             <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px" data-tooltip="Delete" data-position="bottom right" data-inverted="">
                                <i class="trash alternate icon"></i>
                              </button> </span>'''.format(item.pk, item.pk, item.pk, item.pk),
             interest = datetime.today().date() - item.depositDate
@@ -355,16 +360,16 @@ class PartiallyCompletedDepositListJson(BaseDatatableView):
                 clearDate = item.clearanceDate
 
             action = '''<span style="display:flex">  
-            <a style="font-size:10px;"href="/edit_deposit_detail/{}/" class="ui circular  icon button orange">
+            <a style="font-size:10px;"href="/edit_deposit_detail/{}/" class="ui circular  icon button orange" data-tooltip="Edit" data-position="bottom right" data-inverted="">
                               <i class="edit icon"></i>
                              </a>
-            <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
+            <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue" data-tooltip="Take Interest" data-position="bottom right" data-inverted="">
                                <i class="rupee sign icon"></i>
                              </a>
-            <button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green">
+            <button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green" data-tooltip="Detail" data-position="bottom right" data-inverted="">
                                <i class="receipt icon"></i>
                              </button>
-                             <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px">
+                             <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px" data-tooltip="Delete" data-position="bottom right" data-inverted="">
                                <i class="trash alternate icon"></i>
                              </button> </span>'''.format(item.pk,item.pk, item.pk, item.pk),
 
@@ -427,16 +432,16 @@ class CompletedDepositListJson(BaseDatatableView):
                 clearDate = item.clearanceDate.strftime('%d-%m-%Y')
 
             action = '''<span style="display:flex">  
-            <a style="font-size:10px;"href="/edit_deposit_detail/{}/" class="ui circular  icon button orange">
+            <a style="font-size:10px;"href="/edit_deposit_detail/{}/" class="ui circular  icon button orange" data-tooltip="Edit" data-position="bottom right" data-inverted="">
                               <i class="edit icon"></i>
                              </a>
-            <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
+            <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue" data-tooltip="Take Interest" data-position="bottom right" data-inverted="">
                                <i class="rupee sign icon"></i>
                              </a>
-                             <button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green">
+                             <button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green" data-tooltip="Detail" data-position="bottom right" data-inverted="">
                                <i class="receipt icon"></i>
                              </button>
-                             <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px">
+                             <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px" data-tooltip="Delete" data-position="bottom right" data-inverted="">
                                <i class="trash alternate icon"></i>
                              </button> </span>'''.format(item.pk,item.pk, item.pk, item.pk),
 
@@ -459,6 +464,7 @@ class CompletedDepositListJson(BaseDatatableView):
         return json_data
 
 
+@transaction.atomic
 @csrf_exempt
 def delete_deposit(request):
     if request.method == 'POST':
@@ -535,6 +541,7 @@ def search_deposit(request):
             return JsonResponse({'message': 'fail'}, safe=False)
 
 
+@transaction.atomic
 @csrf_exempt
 def item_closing_post(request):
     depositID = request.POST.get("depositID")
@@ -574,6 +581,8 @@ def item_closing_post(request):
 
     return JsonResponse({'message': 'success'}, safe=False)
 
+
+@transaction.atomic
 @csrf_exempt
 def item_closing_edit_post(request):
     depositID = request.POST.get("depositID")
@@ -634,7 +643,7 @@ def item_closing_edit_post(request):
     return JsonResponse({'message': 'success'}, safe=False)
 
 
-
+@transaction.atomic
 @csrf_exempt
 def inflow_post(request):
     remark = request.POST.get("Remark")
@@ -665,6 +674,7 @@ def inflow_post(request):
     return JsonResponse({'message': 'success'}, safe=False)
 
 
+@transaction.atomic
 @csrf_exempt
 def outflow_post(request):
     remark = request.POST.get("Remark")
@@ -756,114 +766,151 @@ def debit(interest, amount, remark, serial='N/A', name='N/A'):
 
 
 class CashBookDebitListJson(BaseDatatableView):
-    order_columns = ['depositID', 'datetime', 'customerName', 'amount', 'interest', 'totalDebit', 'remark']
+    order_columns = ['depositID', 'datetime', 'customerName', 'loanDate', 'amount', 'remark']
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
         eDate = self.request.GET.get('endDate')
         startDate = datetime.strptime(sDate, '%d/%m/%Y')
         endDate = datetime.strptime(eDate, '%d/%m/%Y')
-        return CashBook.objects.filter(isDeleted__exact=False, datetime__gte=startDate.date(),
-                                       datetime__lte=endDate.date() + timedelta(days=1), transactionType__exact='Debit')
 
-    def filter_queryset(self, qs):
-        search = self.request.GET.get('search[value]', None)
-        if search:
-            qs = qs.filter(
-                Q(depositID__icontains=search) | Q(customerName__icontains=search) | Q(amount__icontains=search) | Q(
-                    remark__icontains=search) | Q(transactionType__icontains=search) | Q(
-                    availableBalance__icontains=search)
-                | Q(datetime__icontains=search) | Q(totalDebit__icontains=search)
-            )
+        # Subquery to get loanDate from Deposit model
+        loan_date_subquery = Deposit.objects.filter(
+            depositSerialID=OuterRef('depositID')
+        ).values('depositDate')[:1]
+
+        # Annotate the queryset with loanDate
+        qs = CashBook.objects.annotate(
+            loanDate=Subquery(loan_date_subquery)
+        ).filter(
+            isDeleted=False,
+            datetime__gte=startDate.date(),
+            datetime__lte=endDate.date() + timedelta(days=1),
+            transactionType='Debit'
+        )
 
         return qs
-
-    def prepare_results(self, qs):
-        json_data = []
-        for item in qs:
-            # if item.transactionType == "Credit":
-            #     t = '<button class="mini ui green button">Credit</button>'
-            # else:
-            #     t = '<button class="mini ui red button">Debit</button>'
-            # action = '''<a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
-            #                    <i class="rupee sign icon"></i>
-            #                  </a>
-            #                  <button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green">
-            #                    <i class="receipt icon"></i>
-            #                  </button>
-            #                  <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px">
-            #                    <i class="trash alternate icon"></i>
-            #                  </button>'''.format(item.pk, item.pk, item.pk),
-
-            json_data.append([
-
-                escape(item.depositID),
-                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
-                escape(item.customerName),
-                escape(item.amount),
-                escape(item.interest),
-                escape(round(item.amount + item.interest, 2)),
-                escape(item.remark),
-
-            ])
-        return json_data
-
-
-class CashBookCreditListJson(BaseDatatableView):
-    order_columns = ['depositID', 'datetime', 'customerName', 'amount', 'interest', 'totalCredit', 'remark']
-
-    def get_initial_queryset(self):
-        sDate = self.request.GET.get('startDate')
-        eDate = self.request.GET.get('endDate')
-        startDate = datetime.strptime(sDate, '%d/%m/%Y')
-        endDate = datetime.strptime(eDate, '%d/%m/%Y')
-        return CashBook.objects.filter(isDeleted__exact=False, datetime__gte=startDate.date(),
-                                       datetime__lte=endDate.date() + timedelta(days=1),
-                                       transactionType__exact='Credit')
-
     def filter_queryset(self, qs):
+        # Apply search filtering
         search = self.request.GET.get('search[value]', None)
         if search:
             qs = qs.filter(
                 Q(depositID__icontains=search) | Q(customerName__icontains=search) |
-                Q(amount__icontains=search) | Q(remark__icontains=search) | Q(transactionType__icontains=search) | Q(
-                    availableBalance__icontains=search)
-                | Q(datetime__icontains=search) | Q(totalCredit__icontains=search)
+                Q(amount__icontains=search) | Q(remark__icontains=search) |
+                Q(transactionType__icontains=search) | Q(availableBalance__icontains=search) |
+                Q(datetime__icontains=search) | Q(totalCredit__icontains=search) |
+                Q(loanDate__icontains=search)  # Add loanDate to the search
             )
+
+        # Apply sorting
+        order_column_index = self.request.GET.get('order[0][column]', '0')
+        order_dir = self.request.GET.get('order[0][dir]', 'asc')
+        order_column_name = self.order_columns[int(order_column_index)]
+
+        if order_dir == 'asc':
+            qs = qs.order_by(F(order_column_name).asc(nulls_last=True))
+        else:
+            qs = qs.order_by(F(order_column_name).desc(nulls_last=True))
 
         return qs
 
     def prepare_results(self, qs):
         json_data = []
+        total_amount = qs.aggregate(Sum('amount'))['amount__sum'] or 0
+
         for item in qs:
-            # if item.transactionType == "Credit":
-            #     t = '<button class="mini ui green button">Credit</button>'
-            # else:
-            #     t = '<button class="mini ui red button">Debit</button>'
-            # action = '''<a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue">
-            #                    <i class="rupee sign icon"></i>
-            #                  </a>
-            #                  <button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green">
-            #                    <i class="receipt icon"></i>
-            #                  </button>
-            #                  <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px">
-            #                    <i class="trash alternate icon"></i>
-            #                  </button>'''.format(item.pk, item.pk, item.pk),
-
             json_data.append([
-
                 escape(item.depositID),
                 escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
                 escape(item.customerName),
+                escape(item.loanDate.strftime('%d-%m-%Y') if item.loanDate else 'N/A'),
+                escape(item.amount),
+                escape(item.remark),
+            ])
+
+        # Return data with total amounts
+        return {
+            "data": json_data,
+            "totalAmount": total_amount,
+        }
+
+
+class CashBookCreditListJson(BaseDatatableView):
+    order_columns = ['depositID', 'datetime', 'customerName', 'loanDate', 'amount', 'interest', 'totalCredit', 'remark']
+
+    def get_initial_queryset(self):
+        sDate = self.request.GET.get('startDate')
+        eDate = self.request.GET.get('endDate')
+        startDate = datetime.strptime(sDate, '%d/%m/%Y')
+        endDate = datetime.strptime(eDate, '%d/%m/%Y')
+
+        # Subquery to get loanDate from Deposit model
+        loan_date_subquery = Deposit.objects.filter(
+            depositSerialID=OuterRef('depositID')
+        ).values('depositDate')[:1]
+
+        # Annotate the queryset with loanDate
+        qs = CashBook.objects.annotate(
+            loanDate=Subquery(loan_date_subquery)
+        ).filter(
+            isDeleted=False,
+            datetime__gte=startDate.date(),
+            datetime__lte=endDate.date() + timedelta(days=1),
+            transactionType='Credit'
+        )
+
+        return qs
+
+    def filter_queryset(self, qs):
+        # Apply search filtering
+        search = self.request.GET.get('search[value]', None)
+        if search:
+            qs = qs.filter(
+                Q(depositID__icontains=search) | Q(customerName__icontains=search) |
+                Q(amount__icontains=search) | Q(remark__icontains=search) |
+                Q(transactionType__icontains=search) | Q(availableBalance__icontains=search) |
+                Q(datetime__icontains=search) | Q(totalCredit__icontains=search) |
+                Q(loanDate__icontains=search)  # Add loanDate to the search
+            )
+
+        # Apply sorting
+        order_column_index = self.request.GET.get('order[0][column]', '0')
+        order_dir = self.request.GET.get('order[0][dir]', 'asc')
+        order_column_name = self.order_columns[int(order_column_index)]
+
+        if order_dir == 'asc':
+            qs = qs.order_by(F(order_column_name).asc(nulls_last=True))
+        else:
+            qs = qs.order_by(F(order_column_name).desc(nulls_last=True))
+
+        return qs
+
+    def prepare_results(self, qs):
+        json_data = []
+        total_amount = qs.aggregate(Sum('amount'))['amount__sum'] or 0
+        total_interest = qs.aggregate(Sum('interest'))['interest__sum'] or 0
+
+        for item in qs:
+            json_data.append([
+                escape(item.depositID),
+                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
+                escape(item.customerName),
+                escape(item.loanDate.strftime('%d-%m-%Y') if item.loanDate else 'N/A'),
                 escape(item.amount),
                 escape(item.interest),
                 escape(round(item.amount + item.interest, 2)),
                 escape(item.remark),
-
             ])
-        return json_data
+
+        # Return data with total amounts
+        return {
+            "data": json_data,
+            "totalAmount": total_amount,
+            "totalInterest": total_interest
+        }
 
 
+@transaction.atomic
 @csrf_exempt
 def take_interest_post(request):
     inPaidAmount = request.POST.get("inPaidAmount")
@@ -878,11 +925,68 @@ def take_interest_post(request):
     ins.save()
     credit(inPaidAmount, 0.0, "Interest Received", ins.depositID.depositSerialID, ins.depositID.customerName)
 
-    all_in = Interest.objects.filter(depositID_id=int(inDepositID))
+    all_in = Interest.objects.filter(depositID_id=int(inDepositID), isDeleted=False)
     total = 0.0
     for i in all_in:
         total = total + i.amount
 
+    deposit = Deposit.objects.get(pk=ins.depositID)
+    deposit.totalInterestPaid = total
+    deposit.save()
+
 
 
     return JsonResponse({'message': 'success', 'total':total}, safe=False)
+
+
+@transaction.atomic
+@csrf_exempt
+def edit_interest_post(request):
+    inPaidAmount = request.POST.get("inPaidAmount")
+    inDepositID = request.POST.get("inDepositID")
+    inRemark = request.POST.get("inRemark")
+    try:
+        ins = Interest.objects.get(pk=int(inDepositID))
+        initial_interest = ins.amount
+        ins.amount = float(inPaidAmount)
+        ins.remark = inRemark
+        ins.save()
+        credit(inPaidAmount, 0.0, f"Interest Updated from {initial_interest} to {inPaidAmount}",
+               ins.depositID.depositSerialID, ins.depositID.customerName)
+        debit(initial_interest, 0.0, f"Interest Updated from {initial_interest} to {inPaidAmount}",
+              ins.depositID.depositSerialID, ins.depositID.customerName)
+
+        all_in = Interest.objects.filter(depositID_id=int(ins.depositID.pk), isDeleted=False)
+        total = 0.0
+        for i in all_in:
+            total = total + i.amount
+
+        deposit = Deposit.objects.get(pk=ins.depositID.pk)
+        deposit.totalInterestPaid = total
+        deposit.save()
+        return JsonResponse({'message': 'success', 'total': total}, safe=False)
+    except:
+        return JsonResponse({'message': 'error'}, safe=False)
+
+
+@transaction.atomic
+@csrf_exempt
+def delete_interest_post(request):
+    interestID = request.POST.get("interestID")
+    try:
+        ins = Interest.objects.get(pk=int(interestID))
+        ins.isDeleted = True
+        ins.save()
+        debit(ins.amount, 0.0, f"Interest detail Deleted", ins.depositID.depositSerialID, ins.depositID.customerName)
+
+        all_in = Interest.objects.filter(depositID_id=int(ins.depositID.pk), isDeleted=False)
+        total = 0.0
+        for i in all_in:
+            total = total + i.amount
+
+        deposit = Deposit.objects.get(pk=ins.depositID.pk)
+        deposit.totalInterestPaid = total
+        deposit.save()
+        return JsonResponse({'message': 'success', 'total': total}, safe=False)
+    except:
+        return JsonResponse({'message': 'error'}, safe=False)

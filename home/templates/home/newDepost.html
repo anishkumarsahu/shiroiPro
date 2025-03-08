@@ -252,7 +252,7 @@
                             <div class="ui teal segment" style="padding:2rem">
                                 <div class="ui one column very relaxed grid">
                                     <div class="column">
-                                        <a onclick="salesSave()" style="cursor: pointer;color: teal">
+                                        <a id="saveButton" onclick="salesSave()" style="cursor: pointer;color: teal">
                                             <i class="save icon" style="font-size: 3rem"></i>
                                             <p>Save Now</p>
                                         </a>
@@ -729,6 +729,8 @@ $(document).ready(function(){
 
         //post
         function salesSave() {
+            $('#saveButton').addClass('disabled').css('pointer-events', 'none');
+            
             var customerName = $('#customerName').val();
             var phoneNumber = $('#phoneNumber').val();
             var address = $('#address').val();
@@ -766,6 +768,7 @@ $(document).ready(function(){
                         message: 'Customer Name, Deposit Date, Items, total are required !'
                     })
                 ;
+                $('#saveButton').removeClass('disabled').css('pointer-events', 'auto');
             } else {
                 data = new FormData();
                 data.append('customerName', customerName);
@@ -837,6 +840,7 @@ $(document).ready(function(){
                             ;
 
                         }
+                        $('#saveButton').removeClass('disabled').css('pointer-events', 'auto');
 
                         return response;
                     },
@@ -847,6 +851,7 @@ $(document).ready(function(){
                                 message: 'An error occurred !'
                             })
                         ;
+                        $('#saveButton').removeClass('disabled').css('pointer-events', 'auto');
                     }
                 });
 

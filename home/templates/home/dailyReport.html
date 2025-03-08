@@ -5,35 +5,35 @@
 {% endblock %}
 
 {% block css %}
-     <style>
-         .cwide {
-             width: 75% !important;
-         }
+    <style>
+        .cwide {
+            width: 75% !important;
+        }
 
-         #dTable_filter {
-             position: absolute;
-             right: 10px;
-             top: 10px;
+        #dTable_filter {
+            position: absolute;
+            right: 10px;
+            top: 10px;
 
-         }
+        }
 
-         #cTable_filter {
-             position: absolute;
-             right: 10px;
-             top: 10px;
+        #cTable_filter {
+            position: absolute;
+            right: 10px;
+            top: 10px;
 
-         }
+        }
 
 
-         .dt-buttons {
-             position: absolute;
-             left: 200px;
-         }
+        .dt-buttons {
+            position: absolute;
+            left: 200px;
+        }
 
-         table .dataTables_scrollHeadInner {
-             width: 100% !important;
-         }
-     </style>
+        table .dataTables_scrollHeadInner {
+            width: 100% !important;
+        }
+    </style>
 {% endblock %}
 {% block body %}
 
@@ -46,31 +46,31 @@
                             <i class="left align icon"></i>
                             IN FLOW <span style="color: green;font-size: 20px">+</span>
                         </h5>
-                            <div class="three fields">
+                        <div class="three fields">
 
-                                <div class="field" >
-                                    <label>Remark</label>
-                                    <input type="text" name="inRemark" id="inRemark" placeholder="Remark">
-                                    {% csrf_token %}
-                                </div>
-                                  <div class="field"  >
-                                    <label>Amount</label>
-                                    <input type="number" name="inAmount" id="inAmount" placeholder="Amount">
-                                </div>
-
-
-                                <div class="field" style="padding-top: 2.2em;">
-                                    <button type="button" id="addCategoryBtn" class="ui green mini button"
-                                            onclick="inflowAdd()">
-                                        <i class="icon plus square"></i>
-                                        Add
-                                    </button>
-                                    <button class="ui red mini button" type="button" onclick="clearCategoryForm()">
-                                        <i class="icon times circle"></i>
-                                        Clear
-                                    </button>
-                                </div>
+                            <div class="field">
+                                <label>Remark</label>
+                                <input type="text" name="inRemark" id="inRemark" placeholder="Remark">
+                                {% csrf_token %}
                             </div>
+                            <div class="field">
+                                <label>Amount</label>
+                                <input type="number" name="inAmount" id="inAmount" placeholder="Amount">
+                            </div>
+
+
+                            <div class="field" style="padding-top: 2.2em;">
+                                <button type="button" id="addCategoryBtn" class="ui green mini button"
+                                        onclick="inflowAdd()">
+                                    <i class="icon plus square"></i>
+                                    Add
+                                </button>
+                                <button class="ui red mini button" type="button" onclick="clearCategoryForm()">
+                                    <i class="icon times circle"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
 
                     </form>
                 </div>
@@ -83,176 +83,210 @@
                             OUT-FLOW <span style="color: red;font-size: 20px">-</span>
                         </h5>
 
-                            <div class="three fields">
+                        <div class="three fields">
 
 
-                                <div class="field">
-                                    <label>Remark</label>
-                                    <input type="text" name="outRemark" placeholder="Remark" id="outRemark">
-                                    {% csrf_token %}
-                                </div>
-
-                                <div class="field">
-                                    <label>Amount</label>
-                                    <input type="number" name="outAmount" placeholder="Amount" id="outAmount">
-                                </div>
-                                <div class="field" style="padding-top: 2.2em;">
-                                    <button id="addHSNBtn" class="ui green mini button" type="button" onclick="outflowAdd()">
-                                        <i class="icon plus square"></i>
-                                        Add
-                                    </button>
-                                    <button class="ui red mini button" type="button" onclick="clearHSNForm()">
-                                        <i class="icon times circle"></i>
-                                        Clear
-                                    </button>
-                                </div>
+                            <div class="field">
+                                <label>Remark</label>
+                                <input type="text" name="outRemark" placeholder="Remark" id="outRemark">
+                                {% csrf_token %}
                             </div>
+
+                            <div class="field">
+                                <label>Amount</label>
+                                <input type="number" name="outAmount" placeholder="Amount" id="outAmount">
+                            </div>
+                            <div class="field" style="padding-top: 2.2em;">
+                                <button id="addHSNBtn" class="ui green mini button" type="button"
+                                        onclick="outflowAdd()">
+                                    <i class="icon plus square"></i>
+                                    Add
+                                </button>
+                                <button class="ui red mini button" type="button" onclick="clearHSNForm()">
+                                    <i class="icon times circle"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
 
                     </form>
                 </div>
-           </div>
+            </div>
         </div>
-        <div class="ui  vertical divider" >
+        <div class="ui  vertical divider">
             &
         </div>
     </div>
 
 
-<div class="row">
+    <div class="row">
 
-                    <div class="ui internally padded grid">
-                        <div class="row" style="padding-bottom: 0!important;padding-top: 5px!important;">
+        <div class="ui internally padded grid">
+            <div class="row" style="padding-bottom: 0!important;padding-top: 5px!important;">
 
-                            <div class="eight wide column">
-                                <div class="ui form">
+                <div class="eight wide column">
+                    <div class="ui form">
 
 
-                                    <form class="ui tiny form">
+                        <form class="ui tiny form">
 
-                                        <div class="field inline" id="custom_date">
+                            <div class="field inline" id="custom_date">
                             <span style="float: left;padding: 7px;">
                             <i class="calendar alternate icon"></i>
                             <label>Filter By Date Range</label>
                             </span>
-                                            <div class="three fields">
-                                                <div class="field">
-                                                    <div class="ui calendar" id="rangestartP">
-                                                        <div class="ui input left icon">
-                                                            <input class="" type="text" placeholder="Start Date"
-                                                                   style="width:100%;"
-                                                                   id="startDateP">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="field">
-                                                    <div class="ui calendar" id="rangeendP">
-                                                        <div class="ui input left icon">
-                                                            <input class="" type="text" placeholder="End Date"
-                                                                   style="width:100%;"
-                                                                   id="endDateP">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="field">
-                                                    <div class="ui calendar">
-                                                        <div class="ui input left icon">
-                                                            <button class="ui tiny active button" type="button"
-                                                                    onclick="pDetails()">
-                                                                <i class="funnel dollar icon"></i>
-                                                                Search
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                <div class="three fields">
+                                    <div class="field">
+                                        <div class="ui calendar" id="rangestartP">
+                                            <div class="ui input left icon">
+                                                <input class="" type="text" placeholder="Start Date"
+                                                       style="width:100%;"
+                                                       id="startDateP">
                                             </div>
                                         </div>
-                                    </form>
+                                    </div>
+                                    <div class="field">
+                                        <div class="ui calendar" id="rangeendP">
+                                            <div class="ui input left icon">
+                                                <input class="" type="text" placeholder="End Date"
+                                                       style="width:100%;"
+                                                       id="endDateP">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <div class="ui calendar">
+                                            <div class="ui input left icon">
+                                                <button class="ui tiny active button" type="button"
+                                                        onclick="pDetails()">
+                                                    <i class="funnel dollar icon"></i>
+                                                    Search
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-
                             </div>
-                            <div class="eight wide column">
-                                <div class="ui teal label">
-                                    <i class="rupee icon"></i>
-                                    {{ o_balance|floatformat:2 }}
-                                    <a class="detail">Opening Balance</a>
-                                </div>
-                                <div class="ui purple label">
-                                    <i class="rupee icon"></i>
-                                    {{ c|floatformat:2 }}
-                                    <a class="detail">Available Balance</a>
-                                </div>
-                            </div>
-                            <div class="eight wide column">
-                                <h5 class="ui horizontal left aligned divider header">
-                                    <i class="left align icon"></i>
-                                    CREDIT <span style="color: green;font-size: 20px">+</span> <a
-                                        class="ui green tiny label">₹ {{ credit|floatformat:2 }}</a>
-                                </h5>
-                            </div>
-                            <div class="eight wide column">
-
-                                <h5 class="ui horizontal left aligned divider header">
-                                    <i class="left align icon"></i>
-                                    DEBIT <span style="color: red;font-size: 20px">-</span> <a
-                                        class="ui red tiny label">₹ {{ debit|floatformat:2 }}</a>
-                                </h5>
-                            </div>
-
-                        </div>
+                        </form>
                     </div>
 
-    <div class="ui internally celled grid">
-        <div class="row">
-            <div class="eight wide column">
-                <table id="cTable" class="ui sortable tiny celled very compact table"
-                       style="margin-top: 5px;width: 100%">
-                    <thead>
-                    <tr>
-                        <th>SerialNo.</th>
-                        <th>EnteredOn</th>
-                        <th>CustomerName</th>
-                        <th>Amount(₹)</th>
-                        <th>Interest(₹)</th>
-                        <th>Total(₹)</th>
-                        <th>Remark</th>
+                </div>
+                <div class="eight wide column">
+                    <div class="ui teal label">
+                        <i class="rupee icon"></i>
+                        {{ credit|floatformat:2 }}
+                        <a class="detail">Opening Balance</a>
+                    </div>
+                    {#                                <div class="ui teal label">#}
+                    {#                                    <i class="rupee icon"></i>#}
+                    {#                                    {{ o_balance|floatformat:2 }}#}
+                    {#                                    <a class="detail">Opening Balance</a>#}
+                    {#                                </div>#}
+                    {#                                #}
+                    {#                                <div class="ui purple label">#}
+                    {#                                    <i class="rupee icon"></i>#}
+                    {#                                    {{ c|floatformat:2 }}#}
+                    {#                                    <a class="detail">Available Balance</a>#}
+                    {#                                </div>#}
+                    <div class="ui purple label">
+                        <i class="rupee icon"></i>
+                        {{ available_balance|floatformat:2 }}
+                        <a class="detail">Available Balance</a>
+                    </div>
+                </div>
+                <div class="eight wide column">
+                    <h5 class="ui horizontal left aligned divider header">
+                        <i class="left align icon"></i>
+                        CREDIT <span style="color: green;font-size: 20px">+</span> <a
+                            class="ui green tiny label">₹ {{ credit|floatformat:2 }}</a>
+                    </h5>
+                </div>
+                <div class="eight wide column">
 
+                    <h5 class="ui horizontal left aligned divider header">
+                        <i class="left align icon"></i>
+                        DEBIT <span style="color: red;font-size: 20px">-</span> <a
+                            class="ui red tiny label">₹ {{ debit|floatformat:2 }}</a>
+                    </h5>
+                </div>
 
-                    </tr>
-                    </thead>
-                    <tbody>
-
-
-                    </tbody>
-                </table>
             </div>
-            <div class="eight wide column">
-
-                <table id="dTable" class="ui sortable tiny celled very compact table"
-                       style="margin-top: 5px;width: 100%">
-                    <thead>
-                    <tr>
-                        <th>SerialNo.</th>
-                        <th>EnteredOn</th>
-                        <th>CustomerName</th>
-                        <th>Amount(₹)</th>
-                        <th>Interest(₹)</th>
-                        <th>Total(₹)</th>
-                        <th>Remark</th>
-
-                    </tr>
-                    </thead>
-                    <tbody>
-
-
-                    </tbody>
-                </table>
-            </div>
-
         </div>
+
+        <div class="ui internally celled grid">
+            <div class="row">
+                <div class="eight wide column">
+                    <table id="cTable" class="ui sortable tiny celled very compact table"
+                           style="margin-top: 5px;width: 100%">
+                        <thead>
+                        <tr>
+                            <th>SerialNo.</th>
+                            <th>EnteredOn</th>
+                            <th>CustomerName</th>
+                            <th>LoanDate</th>
+                            <th>Amount(₹)</th>
+                            <th>Interest(₹)</th>
+                            <th>Total(₹)</th>
+                            <th>Remark</th>
+
+
+                        </tr>
+                        </thead>
+                        <tbody>
+
+
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th> <!-- Footer for Amount -->
+                            <th></th> <!-- Footer for Interest -->
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="eight wide column">
+
+                    <table id="dTable" class="ui sortable tiny celled very compact table"
+                           style="margin-top: 5px;width: 100%">
+                        <thead>
+                        <tr>
+                            <th>SerialNo.</th>
+                            <th>EnteredOn</th>
+                            <th>CustomerName</th>
+                            <th>LoanDate</th>
+                            <th>Amount(₹)</th>
+                            <th>Remark</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+
+
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th> <!-- Footer for Amount -->
+                            <th></th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+
     </div>
-
-
-</div>
 
 {% endblock %}
 
@@ -269,8 +303,7 @@
                         message: 'Remark and Amount required !'
                     })
                 ;
-            }
-            else {
+            } else {
 
                 var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']").val();
                 data = new FormData();
@@ -335,8 +368,7 @@
                         message: 'Remark and Amount required !'
                     })
                 ;
-            }
-            else {
+            } else {
 
                 var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']").val();
                 data = new FormData();
@@ -407,7 +439,7 @@
         }
 
 
-    var today = new Date();
+        var today = new Date();
         $('#rangestartP').calendar({
             initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
             monthFirst: false,
@@ -454,7 +486,7 @@
                 buttons: [{
                     extend: 'excel',
                     exportOptions: {
-                        columns: [0, 1, 2, 3,4,5]
+                        columns: [0, 1, 2, 3, 4, 5]
                     }
                 }, {
                     extend: 'print',
@@ -467,10 +499,9 @@
                     {"name": "depositID", "targets": 0, "orderable": true},
                     {"name": "datetime", "targets": 1, "orderable": true},
                     {"name": "customerName", "targets": 2, "orderable": true},
-                    {"name": "amount", "targets": 3, "orderable": true},
-                    {"name": "interest", "targets": 4, "orderable": true},
-                    {"name": "totalDebit", "targets": 5, "orderable": true},
-                    {"name": "remark", "targets": 6, "orderable": true},
+                    {"name": "loanDate", "targets": 3, "orderable": true},
+                    {"name": "amount", "targets": 4, "orderable": true},
+                    {"name": "remark", "targets": 5, "orderable": true},
 
                 ],
                 aaSorting: [[1, 'desc']],
@@ -478,7 +509,34 @@
                 "pageLength": 8,
                 "processing": true,
                 "serverSide": true,
-                "ajax": '{% url 'homeApp:CashBookDebitListJson' %}?startDate=' + startDate + '&endDate=' + endDate
+                "ajax": {
+                    url: '{% url 'homeApp:CashBookDebitListJson' %}?startDate=' + startDate + '&endDate=' + endDate,
+                    dataSrc: function (json) {
+                        // Extract totals from the last row of the JSON response
+                        var totals = json.data;
+
+                        // Update the <span> elements with the totals
+                        $('#totalAmount').text(totals.totalAmount.toFixed(2));
+
+                        // Return the data without the totals for rendering in the table
+                        return json.data.data;
+                    }
+                },
+                "footerCallback": function (row, data, start, end, display) {
+                    var api = this.api();
+
+                    // Calculate the total amount for the visible rows
+                    var totalAmount = api
+                        .column(4, {page: 'current'}) // Column index for 'amount'
+                        .data()
+                        .reduce(function (a, b) {
+                            return a + parseFloat(b);
+                        }, 0);
+
+
+                    // Update the footer cells with the totals
+                    $(api.column(4).footer()).html('Total: ' + totalAmount.toFixed(2));
+                }
             });
 
             cTab = $('#cTable').DataTable({
@@ -488,7 +546,7 @@
                 buttons: [{
                     extend: 'excel',
                     exportOptions: {
-                        columns: [0, 1, 2, 3,4,5]
+                        columns: [0, 1, 2, 3, 4, 5]
                     }
                 }, {
                     extend: 'print',
@@ -501,10 +559,11 @@
                     {"name": "depositID", "targets": 0, "orderable": true},
                     {"name": "datetime", "targets": 1, "orderable": true},
                     {"name": "customerName", "targets": 2, "orderable": true},
-                    {"name": "amount", "targets": 3, "orderable": true},
-                    {"name": "interest", "targets": 4, "orderable": true},
-                    {"name": "totalCredit", "targets": 5, "orderable": true},
-                    {"name": "remark", "targets": 6, "orderable": true},
+                    {"name": "loanDate", "targets": 3, "orderable": true},
+                    {"name": "amount", "targets": 4, "orderable": true},
+                    {"name": "interest", "targets": 5, "orderable": true},
+                    {"name": "totalCredit", "targets": 6, "orderable": true},
+                    {"name": "remark", "targets": 7, "orderable": true},
 
                 ],
                 aaSorting: [[1, 'desc']],
@@ -512,9 +571,47 @@
                 "pageLength": 8,
                 "processing": true,
                 "serverSide": true,
-                "ajax": '{% url 'homeApp:CashBookCreditListJson' %}?startDate=' + startDate + '&endDate=' + endDate
+                "ajax": {
+                    url: '{% url 'homeApp:CashBookCreditListJson' %}?startDate=' + startDate + '&endDate=' + endDate,
+                    dataSrc: function (json) {
+                        // Extract totals from the last row of the JSON response
+                        var totals = json.data;
+
+                        // Update the <span> elements with the totals
+                        $('#totalAmount').text(totals.totalAmount.toFixed(2));
+                        $('#totalInterest').text(totals.totalInterest.toFixed(2));
+
+                        // Return the data without the totals for rendering in the table
+                        return json.data.data;
+                    }
+                },
+                "footerCallback": function (row, data, start, end, display) {
+                    var api = this.api();
+
+                    // Calculate the total amount for the visible rows
+                    var totalAmount = api
+                        .column(4, {page: 'current'}) // Column index for 'amount'
+                        .data()
+                        .reduce(function (a, b) {
+                            return a + parseFloat(b);
+                        }, 0);
+
+                    // Calculate the total interest for the visible rows
+                    var totalInterest = api
+                        .column(5, {page: 'current'}) // Column index for 'interest'
+                        .data()
+                        .reduce(function (a, b) {
+                            return a + parseFloat(b);
+                        }, 0);
+
+                    // Update the footer cells with the totals
+                    $(api.column(4).footer()).html('Total: ' + totalAmount.toFixed(2));
+                    $(api.column(5).footer()).html('Total: ' + totalInterest.toFixed(2));
+                }
             });
+
         }
+
 
         function pDetails() {
             var startDate = $('#startDateP').val();

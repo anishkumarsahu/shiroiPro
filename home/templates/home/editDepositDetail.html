@@ -296,6 +296,12 @@
                              style="margin-top: 200px;padding-top: 0;padding-bottom: 0;">
 
 
+                            <button class="fluid ui mini orange button padded" onclick="openInterestHistory()"> Interest
+                                History
+                            </button>
+                            <hr>
+
+
                             <div class="ui teal segment" style="padding:2rem">
                                 <div class="ui one column very relaxed grid">
                                     <div class="column">
@@ -365,6 +371,79 @@
         <div class="actions">
             <div class="ui black deny button">
                 Close
+            </div>
+        </div>
+    </div>
+
+
+    <div class="ui modal tiny " id="HistoryInfo">
+        <i class="close icon"></i>
+        <div class="header">
+            Interest History
+        </div>
+        <div class="image content">
+            <form class="ui mini form" style="width: 100%">
+
+
+                {% for interest in interests %}
+                    <div class="three fields">
+                        <div class="field">
+                            <label>#{{ forloop.counter }} Interest Paid (₹)</label>
+
+
+                            <input readonly placeholder="Interest Paid (₹)" type="number" class="inPaidAmount"
+                                   id="inPaidAmount{{ interest.pk }}" value="{{ interest.amount }}">
+                        </div>
+                        <div class="field">
+                            <label>#{{ forloop.counter }} Interest Remark</label>
+                            <input readonly placeholder="Interest Remark" type="text" class="inRemark"
+                                   id="inRemark{{ interest.pk }}" value="{{ interest.remark }}">
+                            <input type="hidden" class="inDepositID" id="inDepositID{{ interest.pk }}"
+                                   value="{{ interest.pk }}">
+                        </div>
+                        <div class="field" style="padding-top: 1.5rem; text-align: center">
+                            <button type="button" class="ui orange mini button" id="editInterestBtn{{ interest.pk }}"
+                                    onclick="editInterest({{ interest.pk }})">Edit
+                            </button>
+                            <button style="display: None" type="button" class="ui teal mini button"
+                                    id="updateInterestBtn{{ interest.pk }}" onclick="updateInterest({{ interest.pk }})">
+                                Save
+                            </button>
+                            <button type="button" class="ui red mini button" id="deleteInterestBtn{{ interest.pk }}"
+                                    onclick="deleteInterest({{ interest.pk }})">Delete
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+                <!-- Add more rows dynamically as needed -->
+            </form>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button">
+                Close
+            </div>
+        </div>
+    </div>
+
+
+    <div class="ui basic modal" id="deleteModal">
+        <div class="ui icon header">
+            <i class="archive icon"></i>
+            Delete Interest Detail
+        </div>
+        <div class="content">
+            <p>Are you sure you want to delete this interest detail?</p>
+
+            <input type="hidden" id="deleteInterestID">
+        </div>
+        <div class="actions">
+            <div class="ui red basic cancel inverted button">
+                <i class="remove icon"></i>
+                No
+            </div>
+            <div class="ui green ok inverted button" onclick="deleteInterestDetail()">
+                <i class="checkmark icon"></i>
+                Yes
             </div>
         </div>
     </div>
@@ -628,53 +707,74 @@
             }
 
         }
+
         function calMonth() {
             var isWithdrawn = $('#isWithdrawn').val();
             if (isWithdrawn === "True") {
                 var Ddate = $("#Ddate").val().toString();
                 var withdrawalDate = $("#withdrawalDate").val().toString();
+
+                // Parse the deposit date
                 var yearThen = parseInt(Ddate.substring(6, 10), 10);
                 var monthThen = parseInt(Ddate.substring(3, 5), 10);
                 var dayThen = parseInt(Ddate.substring(0, 2), 10);
+
+                // Parse the withdrawal date
                 var yearThenW = parseInt(withdrawalDate.substring(6, 10), 10);
                 var monthThenW = parseInt(withdrawalDate.substring(3, 5), 10);
                 var dayThenW = parseInt(withdrawalDate.substring(0, 2), 10);
-                var today = new Date(yearThenW, monthThenW - 1, dayThenW);
-                var birthday = new Date(yearThen, monthThen - 1, dayThen);
 
-                var differenceInMilisecond = today.valueOf() - birthday.valueOf();
+                // Create Date objects
+                var depositDate = new Date(yearThen, monthThen - 1, dayThen);
+                var withdrawalDateObj = new Date(yearThenW, monthThenW - 1, dayThenW);
 
-                var year_age = Math.floor(differenceInMilisecond / 31536000000);
-                var day_age = Math.floor((differenceInMilisecond % 31536000000) / 86400000);
+                // Calculate the difference in years, months, and days
+                var yearDiff = withdrawalDateObj.getFullYear() - depositDate.getFullYear();
+                var monthDiff = withdrawalDateObj.getMonth() - depositDate.getMonth();
+                var dayDiff = withdrawalDateObj.getDate() - depositDate.getDate();
 
-
-                var month_age = Math.floor(day_age / 30);
-
-                day_age = day_age % 30;
-                var mon;
-                if (day_age > 18 && day_age <= 29) {
-                    mon = month_age + 1;
-
-                } else if (day_age >= 0 && day_age <= 18) {
-                    mon = month_age + 0.5;
-                } else {
-                    mon = month_age;
+                // Adjust for negative month or day differences
+                if (dayDiff < 0) {
+                    monthDiff--;
+                    var daysInLastMonth = new Date(withdrawalDateObj.getFullYear(), withdrawalDateObj.getMonth(), 0).getDate();
+                    dayDiff += daysInLastMonth;
+                }
+                if (monthDiff < 0) {
+                    yearDiff--;
+                    monthDiff += 12;
                 }
 
-                $('#time').html('' + year_age + ' Y ' + month_age + ' M ' + day_age + ' D');
-                $('#month').val("" + mon);
+                // Calculate total months
+                var totalMonths = yearDiff * 12 + monthDiff;
+
+                // Handle partial months based on days
+                var partialMonth = 0;
+                if (dayDiff > 18 && dayDiff <= 29) {
+                    partialMonth = 1; // More than 18 days counts as a full month
+                } else if (dayDiff >= 4 && dayDiff <= 18) {
+                    partialMonth = 0.5; // Between 4 and 18 days counts as half a month
+                } else {
+                    partialMonth = 0; // Less than 4 days is ignored
+                }
+
+                // Calculate the final month count
+                var finalMonths = totalMonths + partialMonth;
+
+                // Display the result
+                $('#time').html('' + yearDiff + ' Y ' + monthDiff + ' M ' + dayDiff + ' D');
+                $('#month').val("" + finalMonths);
+
+                // Call other functions
                 interestCal();
                 totalAmount();
-            }
-            else {
+            } else {
+                // Clear fields if not withdrawn
                 $("#month").val('');
                 $("#ICalculate").val('');
                 $("#amountWithInterest").val('0.0');
                 $("#interestPaid").val('0.0');
-
             }
         }
-
         function interestCal() {
             var time = $("#month").val();
             var itemTotalAmount = $("#itemTotalAmount").val();
@@ -713,6 +813,165 @@
             window.open('/with_print_billA4/?q=' + id, 'popUpWindow', 'height=screen.availHeight,width=screen.availWidth,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
 
         }
+
+        function openInterestHistory() {
+
+            $('#HistoryInfo')
+                .modal('show')
+            ;
+
+        }
+
+        function editInterest(interestID) {
+            $("#inPaidAmount" + interestID).prop("readonly", false);
+            $("#inRemark" + interestID).prop("readonly", false);
+            $("#editInterestBtn" + interestID).css('display', 'None')
+            $("#updateInterestBtn" + interestID).css('display', '')
+
+
+        }
+
+        function updateInterest(interestID) {
+            let amount = $("#inPaidAmount" + interestID).val();
+            let remark = $("#inRemark" + interestID).val();
+            let id = $("#inDepositID" + interestID).val();
+
+
+            if (amount === '' || remark === '' || id === '') {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: 'Please enter interest amount and remark.'
+                    })
+                ;
+            } else {
+                data = new FormData();
+                data.append('inPaidAmount', amount);
+                data.append('inRemark', remark);
+                data.append('inDepositID', id);
+
+                $.ajax({
+                    type: 'post',
+                    url: '{% url "homeApp:edit_interest_post" %}',
+                    data: data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+
+
+                    success: function (response) {
+                        if (response.message === 'success') {
+                            $('body')
+                                .toast({
+                                    class: 'success',
+                                    message: 'Interest Updated Successfully.'
+                                });
+
+                            {#$('#totalIntAmount').html(''+response.total);#}
+                            {#    $('#BasicInfo')#}
+                            {#        .modal('hide')#}
+                            {#    ;#}
+                            location.reload();
+
+                        } else {
+                            $('body')
+                                .toast({
+                                    class: 'error',
+                                    message: 'An error occurred !'
+                                })
+                            ;
+
+                        }
+
+                        return response;
+                    },
+                    error: function () {
+                        $('body')
+                            .toast({
+                                class: 'error',
+                                message: 'An error occurred !'
+                            })
+                        ;
+                    }
+                });
+
+
+            }
+
+        }
+
+
+        function deleteInterest(id) {
+            $('#deleteModal')
+                .modal('show')
+            ;
+
+            $("#deleteInterestID").val(id);
+        }
+
+
+        function deleteInterestDetail() {
+
+            let id = $("#deleteInterestID").val();
+            debugger;
+
+
+            if (id === '') {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: 'Please select interest item.'
+                    })
+                ;
+            } else {
+                data = new FormData();
+                data.append('interestID', id);
+
+                $.ajax({
+                    type: 'post',
+                    url: '{% url "homeApp:delete_interest_post" %}',
+                    data: data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+
+
+                    success: function (response) {
+                        if (response.message === 'success') {
+                            $('body')
+                                .toast({
+                                    class: 'success',
+                                    message: 'Interest Deleted Successfully.'
+                                });
+                            location.reload();
+
+                        } else {
+                            $('body')
+                                .toast({
+                                    class: 'error',
+                                    message: 'An error occurred !'
+                                })
+                            ;
+
+                        }
+
+                        return response;
+                    },
+                    error: function () {
+                        $('body')
+                            .toast({
+                                class: 'error',
+                                message: 'An error occurred !'
+                            })
+                        ;
+                    }
+                });
+
+
+            }
+
+        }
+
 
     </script>
 {% endblock %}
