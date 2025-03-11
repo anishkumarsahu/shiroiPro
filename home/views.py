@@ -286,4 +286,3 @@ def with_print_billA4(request, *args, **kwargs):
 
     }
     return render(request, 'home/WithPrintA4.html', context)
-

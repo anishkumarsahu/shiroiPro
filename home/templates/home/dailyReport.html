@@ -197,7 +197,7 @@
                 <div class="eight wide column">
                     <h5 class="ui horizontal left aligned divider header">
                         <i class="left align icon"></i>
-                        CREDIT <span style="color: green;font-size: 20px">+</span> <a
+                        REPAYMENT <span style="color: green;font-size: 20px">+</span> <a
                             class="ui green tiny label">₹ {{ credit|floatformat:2 }}</a>
                     </h5>
                 </div>
@@ -205,7 +205,7 @@
 
                     <h5 class="ui horizontal left aligned divider header">
                         <i class="left align icon"></i>
-                        DEBIT <span style="color: red;font-size: 20px">-</span> <a
+                        PAYMENT <span style="color: red;font-size: 20px">-</span> <a
                             class="ui red tiny label">₹ {{ debit|floatformat:2 }}</a>
                     </h5>
                 </div>
@@ -217,19 +217,17 @@
             <div class="row">
                 <div class="eight wide column">
                     <table id="cTable" class="ui sortable tiny celled very compact table"
-                           style="margin-top: 5px;width: 100%">
+                           style="margin-top: 5px;width: 100%;overflow-x: scroll">
                         <thead>
                         <tr>
                             <th>SerialNo.</th>
-                            <th>EnteredOn</th>
-                            <th>CustomerName</th>
                             <th>LoanDate</th>
+                            <th>CustomerName</th>
                             <th>Amount(₹)</th>
                             <th>Interest(₹)</th>
                             <th>Total(₹)</th>
                             <th>Remark</th>
-
-
+                            <th>EnteredOn</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -257,11 +255,11 @@
                         <thead>
                         <tr>
                             <th>SerialNo.</th>
-                            <th>EnteredOn</th>
-                            <th>CustomerName</th>
                             <th>LoanDate</th>
+                            <th>CustomerName</th>
                             <th>Amount(₹)</th>
                             <th>Remark</th>
+                            <th>EnteredOn</th>
 
                         </tr>
                         </thead>
@@ -497,14 +495,14 @@
                 ],
                 "columnDefs": [
                     {"name": "depositID", "targets": 0, "orderable": true},
-                    {"name": "datetime", "targets": 1, "orderable": true},
+                    {"name": "loanDate", "targets": 1, "orderable": true},
                     {"name": "customerName", "targets": 2, "orderable": true},
-                    {"name": "loanDate", "targets": 3, "orderable": true},
-                    {"name": "amount", "targets": 4, "orderable": true},
-                    {"name": "remark", "targets": 5, "orderable": true},
+                    {"name": "amount", "targets": 3, "orderable": true},
+                    {"name": "remark", "targets": 4, "orderable": true},
+                    {"name": "datetime", "targets": 5, "orderable": true},
 
                 ],
-                aaSorting: [[1, 'desc']],
+                aaSorting: [[5, 'desc']],
                 "lengthMenu": [[8, 25, 50, 100, -1], [8, 25, 50, 100, "All"]],
                 "pageLength": 8,
                 "processing": true,
@@ -527,7 +525,7 @@
 
                     // Calculate the total amount for the visible rows
                     var totalAmount = api
-                        .column(4, {page: 'current'}) // Column index for 'amount'
+                        .column(3, {page: 'current'}) // Column index for 'amount'
                         .data()
                         .reduce(function (a, b) {
                             return a + parseFloat(b);
@@ -535,7 +533,7 @@
 
 
                     // Update the footer cells with the totals
-                    $(api.column(4).footer()).html('Total: ' + totalAmount.toFixed(2));
+                    $(api.column(3).footer()).html('Total: ' + totalAmount.toFixed(2));
                 }
             });
 
@@ -557,16 +555,16 @@
                 ],
                 "columnDefs": [
                     {"name": "depositID", "targets": 0, "orderable": true},
-                    {"name": "datetime", "targets": 1, "orderable": true},
+                    {"name": "loanDate", "targets": 1, "orderable": true},
                     {"name": "customerName", "targets": 2, "orderable": true},
-                    {"name": "loanDate", "targets": 3, "orderable": true},
-                    {"name": "amount", "targets": 4, "orderable": true},
-                    {"name": "interest", "targets": 5, "orderable": true},
-                    {"name": "totalCredit", "targets": 6, "orderable": true},
-                    {"name": "remark", "targets": 7, "orderable": true},
+                    {"name": "amount", "targets": 3, "orderable": true},
+                    {"name": "interest", "targets": 4, "orderable": true},
+                    {"name": "totalCredit", "targets": 5, "orderable": true},
+                    {"name": "remark", "targets": 6, "orderable": true},
+                    {"name": "datetime", "targets": 7, "orderable": true},
 
                 ],
-                aaSorting: [[1, 'desc']],
+                aaSorting: [[7, 'desc']],
                 "lengthMenu": [[8, 25, 50, 100, -1], [8, 25, 50, 100, "All"]],
                 "pageLength": 8,
                 "processing": true,

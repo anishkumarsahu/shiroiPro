@@ -766,7 +766,7 @@ def debit(interest, amount, remark, serial='N/A', name='N/A'):
 
 
 class CashBookDebitListJson(BaseDatatableView):
-    order_columns = ['depositID', 'datetime', 'customerName', 'loanDate', 'amount', 'remark']
+    order_columns = ['depositID', 'loanDate', 'customerName', 'amount', 'remark', 'datetime']
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
@@ -793,6 +793,10 @@ class CashBookDebitListJson(BaseDatatableView):
     def filter_queryset(self, qs):
         # Apply search filtering
         search = self.request.GET.get('search[value]', None)
+        try:
+            search = datetime.strptime(search, "%d-%m-%Y").strftime("%Y-%m-%d")
+        except:
+            search = search
         if search:
             qs = qs.filter(
                 Q(depositID__icontains=search) | Q(customerName__icontains=search) |
@@ -821,11 +825,11 @@ class CashBookDebitListJson(BaseDatatableView):
         for item in qs:
             json_data.append([
                 escape(item.depositID),
-                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
-                escape(item.customerName),
                 escape(item.loanDate.strftime('%d-%m-%Y') if item.loanDate else 'N/A'),
+                escape(item.customerName),
                 escape(item.amount),
                 escape(item.remark),
+                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
             ])
 
         # Return data with total amounts
@@ -836,7 +840,7 @@ class CashBookDebitListJson(BaseDatatableView):
 
 
 class CashBookCreditListJson(BaseDatatableView):
-    order_columns = ['depositID', 'datetime', 'customerName', 'loanDate', 'amount', 'interest', 'totalCredit', 'remark']
+    order_columns = ['depositID', 'loanDate', 'customerName', 'amount', 'interest', 'totalCredit', 'remark', 'datetime']
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
@@ -864,6 +868,11 @@ class CashBookCreditListJson(BaseDatatableView):
     def filter_queryset(self, qs):
         # Apply search filtering
         search = self.request.GET.get('search[value]', None)
+        try:
+            search = datetime.strptime(search, "%d-%m-%Y").strftime("%Y-%m-%d")
+        except:
+            search = search
+
         if search:
             qs = qs.filter(
                 Q(depositID__icontains=search) | Q(customerName__icontains=search) |
@@ -893,13 +902,14 @@ class CashBookCreditListJson(BaseDatatableView):
         for item in qs:
             json_data.append([
                 escape(item.depositID),
-                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
-                escape(item.customerName),
                 escape(item.loanDate.strftime('%d-%m-%Y') if item.loanDate else 'N/A'),
+                escape(item.customerName),
                 escape(item.amount),
                 escape(item.interest),
                 escape(round(item.amount + item.interest, 2)),
                 escape(item.remark),
+                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
+
             ])
 
         # Return data with total amounts
@@ -930,7 +940,7 @@ def take_interest_post(request):
     for i in all_in:
         total = total + i.amount
 
-    deposit = Deposit.objects.get(pk=ins.depositID)
+    deposit = Deposit.objects.get(pk=ins.depositID.pk)
     deposit.totalInterestPaid = total
     deposit.save()
 
