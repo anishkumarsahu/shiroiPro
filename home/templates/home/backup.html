@@ -312,7 +312,7 @@
 
                 // Handle partial months based on days
                 var partialMonth = 0;
-                if (dayDiff > 18 && dayDiff <= 29) {
+                if (dayDiff > 18) {
                     partialMonth = 1; // More than 18 days counts as a full month
                 } else if (dayDiff >= 4 && dayDiff <= 18) {
                     partialMonth = 0.5; // Between 4 and 18 days counts as half a month
