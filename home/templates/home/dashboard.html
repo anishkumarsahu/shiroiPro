@@ -70,8 +70,10 @@
         <div class="column">
             <div class="ui blue raised segment">
                 <h4>Quick Search By Serial No.</h4>
-                <div class="ui action input">
-                    <input type="text" id="search" placeholder="Search..." autofocus>
+                <div class="ui fluid short search action input" id="highlightexample">
+                    <input autocomplete="false" autofocus class="prompt" id="search" placeholder="Search..."
+                           type="text">
+                    <div class="results"></div>
                     <div class="ui buttons">
                         <button onclick="SearchDeposit()" class="ui green button">Search</button>
                         <div class="or"></div>
@@ -182,6 +184,44 @@
         });
 
     });
+</script>
+<script>
+
+
+    $('#highlightexample').search({
+    type: 'standard',
+    minCharacters: 3,
+    apiSettings: {
+        url: '/api/get_deposits_search/',
+        beforeSend: function(settings) {
+            settings.data.query = settings.urlData.query;
+            return settings;
+        },
+        onResponse: function(apiResponse) {
+            var response = {
+                results: []
+            };
+
+            // Transform API response to Fomantic UI format
+            $.each(apiResponse, function(index, item) {
+                response.results.push({
+                    title: item.depositID,  // Adjust based on your API response
+                    description: item.name + ' - ' + item.statusID+ ' - ' + item.depositDate // Optional: if you want to show additional info
+                });
+            });
+            return response;
+        }
+    },
+    fields: {
+        results: 'results',
+        title: 'title',
+        description: 'description'  // Optional
+    },
+    onSelect: function(result, response) {
+        // Handle selection
+        console.log('Selected:', result.title);
+    }
+});
 </script>
 </body>
 </html>

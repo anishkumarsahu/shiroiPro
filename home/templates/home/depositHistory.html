@@ -341,7 +341,41 @@
                 </button>
             </div>
         </div>
+
+
         <div class="content" style="padding-top: 0!important;">
+
+
+            <div class="sixteen wide column" id="displayGreen" style="display: none">
+                <table class="ui celled inverted green table">
+                    <thead>
+                    <tr>
+                        <th>Action Type</th>
+                        <th>Closing Remark</th>
+                        <th>Total Amount</th>
+                        <th>New SerialNumber</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td data-label="Name"><span class="ui large black text" id="ActionType">{{ instance.actionType|capfirst }}</span>
+                        </td>
+                        <td data-label="Age"><span class="ui large black text" id="ClearanceRemark">{{ instance.clearanceRemark }}</span>
+                        </td>
+                        <td data-label="Age"><span class="ui large black text" id="TotalAmountPaid">{{ instance.totalAmountPaid }}</span>
+                        </td>
+                        <td data-label="Job">
+                            <a href="/deposit_detail/"> <span class="ui large black text" id="NewSerial">{{ instance.newDepositSerialID }}</span></a>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+                <hr>
+
+            </div>
+
+
             <div class="description">
                 <div class="ui right aligned basic segment">
 
@@ -904,6 +938,10 @@
                     $('#ClearanceDate').html(response.data.Basic['ClearanceDate']);
                     $('#totalWeight').html(response.data.Basic['TotalWeight']);
                     $('#totalWeightL').html(response.data.Basic['TotalWeightL']);
+                    $('#ClearanceRemark').html(response.data.Basic['ClearanceRemark']);
+                    $('#ActionType').html(response.data.Basic['ActionType']);
+                    $('#TotalAmountPaid').html(response.data.Basic['TotalAmountPaid']);
+                    $('#NewSerial').html(response.data.Basic['NewSerial']);
 
                     var i;
                     for (i = 0; i < response.data.Items.length; i++) {
@@ -915,6 +953,13 @@
                         $('#itemTableReportInterest tbody').append('<tr ><td>#</td> <td>' + response.data.Interest[j]['Remark'] + '</td><td >' + response.data.Interest[j]['Amount'] + '</td><td >' + response.data.Interest[j]['Datetime'] +  '</td></tr>');
 
                     }
+                    if(response.data.Basic['ActionType']==='repayment' || response.data.Basic['ActionType']==='interest'){
+                        $("#displayGreen").css('display','block');
+                    }
+                    else{
+                         $("#displayGreen").css('display','none');
+                    }
+
 
 
                 },

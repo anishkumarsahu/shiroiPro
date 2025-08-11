@@ -1,505 +1,714 @@
 {% extends 'home/index.html' %}
 {% load static %}
 {% block title %}
-    <title>Cash Book</title>
+<title>Cash Book</title>
 {% endblock %}
 
 {% block css %}
-    <style>
-        .cwide {
-            width: 75% !important;
-        }
+<style>
+    .cwide {
+        width: 75% !important;
+    }
 
-        #dTable_filter {
-            position: absolute;
-            right: 10px;
-            top: 10px;
+    #dTable_filter {
+        position: absolute;
+        right: 10px;
+        top: 10px;
 
-        }
+    }
 
-        #cTable_filter {
-            position: absolute;
-            right: 10px;
-            top: 10px;
+    #cTable_filter {
+        position: absolute;
+        right: 10px;
+        top: 10px;
 
-        }
+    }
 
 
-        .dt-buttons {
-            position: absolute;
-            left: 200px;
-        }
+    .dt-buttons {
+        position: absolute;
+        left: 200px;
+    }
 
-        table .dataTables_scrollHeadInner {
-            width: 100% !important;
-        }
-    </style>
+    table .dataTables_scrollHeadInner {
+        width: 100% !important;
+    }
+</style>
 {% endblock %}
 {% block body %}
 
-    <div class="ui left aligned segment">
-        <div class="ui grid">
-            <div class="eight wide column">
-                <div class="ui bottom attached segment">
-                    <form class="ui tiny form" id="categoryForm">
-                        <h5 class="ui horizontal left aligned divider header">
-                            <i class="left align icon"></i>
-                            IN FLOW <span style="color: green;font-size: 20px">+</span>
-                        </h5>
-                        <div class="three fields">
+<div class="ui left aligned segment">
+    <div class="ui grid">
+        <div class="eight wide column">
+            <div class="ui bottom attached segment">
+                <form class="ui tiny form" id="categoryForm">
+                    <h5 class="ui horizontal left aligned divider header">
+                        <i class="left align icon"></i>
+                        IN FLOW <span style="color: green;font-size: 20px">+</span>
+                    </h5>
+                    <div class="three fields">
 
-                            <div class="field">
-                                <label>Remark</label>
-                                <input type="text" name="inRemark" id="inRemark" placeholder="Remark">
-                                {% csrf_token %}
-                            </div>
-                            <div class="field">
-                                <label>Amount</label>
-                                <input type="number" name="inAmount" id="inAmount" placeholder="Amount">
-                            </div>
-
-
-                            <div class="field" style="padding-top: 2.2em;">
-                                <button type="button" id="addCategoryBtn" class="ui green mini button"
-                                        onclick="inflowAdd()">
-                                    <i class="icon plus square"></i>
-                                    Add
-                                </button>
-                                <button class="ui red mini button" type="button" onclick="clearCategoryForm()">
-                                    <i class="icon times circle"></i>
-                                    Clear
-                                </button>
-                            </div>
+                        <div class="field">
+                            <label>Remark</label>
+                            <input id="inRemark" name="inRemark" placeholder="Remark" type="text">
+                            {% csrf_token %}
+                        </div>
+                        <div class="field">
+                            <label>Amount</label>
+                            <input id="inAmount" name="inAmount" placeholder="Amount" type="number">
                         </div>
 
-                    </form>
-                </div>
-            </div>
-            <div class="eight wide column">
-                <div class="ui bottom attached segment">
-                    <form class="ui tiny form" id="outForm">
-                        <h5 class="ui horizontal left aligned divider header">
-                            <i class="left align icon"></i>
-                            OUT-FLOW <span style="color: red;font-size: 20px">-</span>
-                        </h5>
 
-                        <div class="three fields">
-
-
-                            <div class="field">
-                                <label>Remark</label>
-                                <input type="text" name="outRemark" placeholder="Remark" id="outRemark">
-                                {% csrf_token %}
-                            </div>
-
-                            <div class="field">
-                                <label>Amount</label>
-                                <input type="number" name="outAmount" placeholder="Amount" id="outAmount">
-                            </div>
-                            <div class="field" style="padding-top: 2.2em;">
-                                <button id="addHSNBtn" class="ui green mini button" type="button"
-                                        onclick="outflowAdd()">
-                                    <i class="icon plus square"></i>
-                                    Add
-                                </button>
-                                <button class="ui red mini button" type="button" onclick="clearHSNForm()">
-                                    <i class="icon times circle"></i>
-                                    Clear
-                                </button>
-                            </div>
+                        <div class="field" style="padding-top: 2.2em;">
+                            <button class="ui green mini button" id="addCategoryBtn" onclick="inflowAdd()"
+                                    type="button">
+                                <i class="icon plus square"></i>
+                                Add
+                            </button>
+                            <button class="ui red mini button" onclick="clearCategoryForm()" type="button">
+                                <i class="icon times circle"></i>
+                                Clear
+                            </button>
                         </div>
+                    </div>
 
-                    </form>
-                </div>
+                </form>
             </div>
         </div>
-        <div class="ui  vertical divider">
-            &
+        <div class="eight wide column">
+            <div class="ui bottom attached segment">
+                <form class="ui tiny form" id="outForm">
+                    <h5 class="ui horizontal left aligned divider header">
+                        <i class="left align icon"></i>
+                        OUT-FLOW <span style="color: red;font-size: 20px">-</span>
+                    </h5>
+
+                    <div class="three fields">
+
+
+                        <div class="field">
+                            <label>Remark</label>
+                            <input id="outRemark" name="outRemark" placeholder="Remark" type="text">
+                            {% csrf_token %}
+                        </div>
+
+                        <div class="field">
+                            <label>Amount</label>
+                            <input id="outAmount" name="outAmount" placeholder="Amount" type="number">
+                        </div>
+                        <div class="field" style="padding-top: 2.2em;">
+                            <button class="ui green mini button" id="addHSNBtn" onclick="outflowAdd()"
+                                    type="button">
+                                <i class="icon plus square"></i>
+                                Add
+                            </button>
+                            <button class="ui red mini button" onclick="clearHSNForm()" type="button">
+                                <i class="icon times circle"></i>
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
         </div>
     </div>
+    <div class="ui  vertical divider">
+        &
+    </div>
+</div>
 
 
-    <div class="row">
+<div class="row">
 
-        <div class="ui internally padded grid">
-            <div class="row" style="padding-bottom: 0!important;padding-top: 5px!important;">
+    <div class="ui internally padded grid">
+        <div class="row" style="padding-bottom: 0!important;padding-top: 5px!important;">
 
-                <div class="eight wide column">
-                    <div class="ui form">
+            <div class="eight wide column">
+                <div class="ui form">
 
 
-                        <form class="ui tiny form">
+                    <form class="ui tiny form">
 
-                            <div class="field inline" id="custom_date">
+                        <div class="field inline" id="custom_date">
                             <span style="float: left;padding: 7px;">
                             <i class="calendar alternate icon"></i>
                             <label>Filter By Date Range</label>
                             </span>
-                                <div class="three fields">
-                                    <div class="field">
-                                        <div class="ui calendar" id="rangestartP">
-                                            <div class="ui input left icon">
-                                                <input class="" type="text" placeholder="Start Date"
-                                                       style="width:100%;"
-                                                       id="startDateP">
-                                            </div>
+                            <div class="three fields">
+                                <div class="field">
+                                    <div class="ui calendar" id="rangestartP">
+                                        <div class="ui input left icon">
+                                            <input class="" id="startDateP" placeholder="Start Date"
+                                                   style="width:100%;"
+                                                   type="text">
                                         </div>
                                     </div>
-                                    <div class="field">
-                                        <div class="ui calendar" id="rangeendP">
-                                            <div class="ui input left icon">
-                                                <input class="" type="text" placeholder="End Date"
-                                                       style="width:100%;"
-                                                       id="endDateP">
-                                            </div>
+                                </div>
+                                <div class="field">
+                                    <div class="ui calendar" id="rangeendP">
+                                        <div class="ui input left icon">
+                                            <input class="" id="endDateP" placeholder="End Date"
+                                                   style="width:100%;"
+                                                   type="text">
                                         </div>
                                     </div>
-                                    <div class="field">
-                                        <div class="ui calendar">
-                                            <div class="ui input left icon">
-                                                <button class="ui tiny active button" type="button"
-                                                        onclick="pDetails()">
-                                                    <i class="funnel dollar icon"></i>
-                                                    Search
-                                                </button>
-                                            </div>
+                                </div>
+                                <div class="field">
+                                    <div class="ui calendar">
+                                        <div class="ui input left icon">
+                                            <button class="ui tiny active button" onclick="pDetails()"
+                                                    type="button">
+                                                <i class="funnel dollar icon"></i>
+                                                Search
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
-
-                </div>
-                <div class="eight wide column">
-                    <div class="ui teal label">
-                        <i class="rupee icon"></i>
-                        {{ credit|floatformat:2 }}
-                        <a class="detail">Opening Balance</a>
-                    </div>
-                    {#                                <div class="ui teal label">#}
-                    {#                                    <i class="rupee icon"></i>#}
-                    {#                                    {{ o_balance|floatformat:2 }}#}
-                    {#                                    <a class="detail">Opening Balance</a>#}
-                    {#                                </div>#}
-                    {#                                #}
-                    {#                                <div class="ui purple label">#}
-                    {#                                    <i class="rupee icon"></i>#}
-                    {#                                    {{ c|floatformat:2 }}#}
-                    {#                                    <a class="detail">Available Balance</a>#}
-                    {#                                </div>#}
-                    <div class="ui purple label">
-                        <i class="rupee icon"></i>
-                        {{ available_balance|floatformat:2 }}
-                        <a class="detail">Available Balance</a>
-                    </div>
-                </div>
-                <div class="eight wide column">
-                    <h5 class="ui horizontal left aligned divider header">
-                        <i class="left align icon"></i>
-                        REPAYMENT <span style="color: green;font-size: 20px">+</span> <a
-                            class="ui green tiny label">₹ {{ credit|floatformat:2 }}</a>
-                    </h5>
-                </div>
-                <div class="eight wide column">
-
-                    <h5 class="ui horizontal left aligned divider header">
-                        <i class="left align icon"></i>
-                        PAYMENT <span style="color: red;font-size: 20px">-</span> <a
-                            class="ui red tiny label">₹ {{ debit|floatformat:2 }}</a>
-                    </h5>
+                        </div>
+                    </form>
                 </div>
 
             </div>
-        </div>
-
-        <div class="ui internally celled grid">
-            <div class="row">
-                <div class="eight wide column">
-                    <table id="cTable" class="ui sortable tiny celled very compact table"
-                           style="margin-top: 5px;width: 100%;overflow-x: scroll">
-                        <thead>
-                        <tr>
-                            <th>SerialNo.</th>
-                            <th>LoanDate</th>
-                            <th>CustomerName</th>
-                            <th>Amount(₹)</th>
-                            <th>Interest(₹)</th>
-                            <th>Total(₹)</th>
-                            <th>Remark</th>
-                            <th>EnteredOn</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-
-
-                        </tbody>
-                        <tfoot>
-                        <tr>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th> <!-- Footer for Amount -->
-                            <th></th> <!-- Footer for Interest -->
-                            <th></th>
-                            <th></th>
-                        </tr>
-                        </tfoot>
-                    </table>
+            <div class="eight wide column">
+                <!--                <div class="ui teal label">-->
+                <!--                    <i class="rupee icon"></i>-->
+                <!--                    {{ credit|floatformat:2 }}-->
+                <!--                    <a class="detail">Opening Balance</a>-->
+                <!--                </div>-->
+                <!--                <div class="ui purple label">-->
+                <!--                    <i class="rupee icon"></i>-->
+                <!--                    {{ available_balance|floatformat:2 }}-->
+                <!--                    <a class="detail">Available Balance</a>-->
+                <!--                </div>-->
+                <div class="ui tiny steps">
+                    <div class="step">
+                        <i class="calendar alternate icon"></i>
+                        <div class="content">
+                            <div class="title" id="cDate"></div>
+                            <div class="description">Date</div>
+                        </div>
+                    </div>
+                    <div class="active step">
+                        <i class="rupee sign green icon"></i>
+                        <div class="content">
+                            <div class="title" id="cCredit"></div>
+                            <div class="description">Credit</div>
+                        </div>
+                    </div>
+                    <div class=" step">
+                        <i class="rupee sign red icon"></i>
+                        <div class="content">
+                            <div class="title" id="cDebit"></div>
+                            <div class="description">Debit</div>
+                        </div>
+                    </div>
+                    <div class=" step">
+                        <i class="rupee sign purple icon"></i>
+                        <div class="content">
+                            <div class="title" id="cBalance"></div>
+                            <div class="description">Balance</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="eight wide column">
-
-                    <table id="dTable" class="ui sortable tiny celled very compact table"
-                           style="margin-top: 5px;width: 100%">
-                        <thead>
-                        <tr>
-                            <th>SerialNo.</th>
-                            <th>LoanDate</th>
-                            <th>CustomerName</th>
-                            <th>Amount(₹)</th>
-                            <th>Remark</th>
-                            <th>EnteredOn</th>
-
-                        </tr>
-                        </thead>
-                        <tbody>
-
-
-                        </tbody>
-                        <tfoot>
-                        <tr>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th> <!-- Footer for Amount -->
-                            <th></th>
-                        </tr>
-                        </tfoot>
-                    </table>
-                </div>
+                <p></p>
 
             </div>
+            <div class="eight wide column">
+                <h5 class="ui horizontal left aligned divider header">
+                    <i class="left align icon"></i>
+                    REPAYMENT <span style="color: green;font-size: 20px">+</span> <a
+                        class="ui green tiny label">₹ {{ credit|floatformat:2 }}</a>
+                </h5>
+            </div>
+            <div class="eight wide column">
+
+                <h5 class="ui horizontal left aligned divider header">
+                    <i class="left align icon"></i>
+                    PAYMENT <span style="color: red;font-size: 20px">-</span> <a
+                        class="ui red tiny label">₹ {{ debit|floatformat:2 }}</a>
+                </h5>
+            </div>
+
         </div>
-
-
     </div>
 
+    <div class="ui internally celled grid">
+        <div class="row">
+            <div class="eight wide column">
+                <table class="ui sortable tiny celled very compact table" id="cTable"
+                       style="margin-top: 5px;width: 100%;overflow-x: scroll">
+                    <thead>
+                    <tr>
+                        <th>SerialNo.</th>
+                        <th>LoanDate</th>
+                        <th>CustomerName</th>
+                        <th>Amount(₹)</th>
+                        <th>Interest(₹)</th>
+                        <th>Total(₹)</th>
+                        <th>Remark</th>
+                        <th>EnteredOn</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th> <!-- Footer for Amount -->
+                        <th></th> <!-- Footer for Interest -->
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="eight wide column">
+
+                <table class="ui sortable tiny celled very compact table" id="dTable"
+                       style="margin-top: 5px;width: 100%">
+                    <thead>
+                    <tr>
+                        <th>SerialNo.</th>
+                        <th>LoanDate</th>
+                        <th>CustomerName</th>
+                        <th>Amount(₹)</th>
+                        <th>Remark</th>
+                        <th>EnteredOn</th>
+                        <th>Action</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+
+
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th> <!-- Footer for Amount -->
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+<div class="ui basic modal custom" id="delSaleModal">
+    <div class="ui icon header">
+        <i class="archive icon"></i>
+        Cashbook entry will be Deleted.
+    </div>
+    <div class="content">
+        <p style="text-align: center">The cashbook detail will be deleted, are you sure to delete
+            this detail?</p>
+    </div>
+    <div class="actions">
+        <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            No
+        </div>
+        <input id="DepositID" type="hidden">
+        <div class="ui green ok inverted button" onclick="deleteDetail()">
+            <i class="checkmark icon"></i>
+            Yes
+        </div>
+    </div>
+</div>
+
+
+<div class="ui tiny modal " id="editCashbook" role="dialog">
+    <div class="header" id="_ab2ae4a7title">Edit Cashbook Detail</div>
+    <div class="content" id="_ab2ae4a7desc">
+        <div class="ui form small" id="editForm">
+            <input id="editID" type="hidden">
+            <div class="two fields">
+                <div class="field">
+                    <label>Interest</label>
+                    <input id="editInterest" placeholder="Interest" type="number">
+                </div>
+                <div class="field">
+                    <label>Amount</label>
+                    <input id="editAmount" placeholder="Amount" type="number">
+                </div>
+            </div>
+            <div class="field ">
+                <label>Remark</label>
+                <textarea id="editRemark" name="remark" rows="3"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <button aria-label="Save" class="ui button green" onclick="editCashbookDetail()">Save</button>
+        <button aria-label="Cancel" class="ui button negative">Cancel</button>
+    </div>
+</div>
 {% endblock %}
 
 
 {% block js %}
-    <script>
-        function inflowAdd() {
-            var inRemark = $('#inRemark').val();
-            var inAmount = $('#inAmount').val();
-            if (inRemark === '' || inAmount === '') {
+<script>
+
+    function delSale(id) {
+        $('#delSaleModal')
+            .modal('show')
+        ;
+        $('#DepositID').val(id)
+    }
+    function editCashbook(id, interest, amount, remark) {
+        $('#editInterest').val(interest);
+        $('#editAmount').val(amount);
+        $('#editRemark').val(remark);
+        $('#editID').val(id);
+        $('#editCashbook')
+            .modal('show')
+        ;
+        // $('#DepositID').val(id)
+    }
+
+
+    function deleteDetail() {
+        var id = $('#DepositID').val();
+        var formdata = new FormData();
+        formdata.append('ID', id);
+        $.ajax({
+            url: "{% url 'homeApp:delete_cashbook_entry' %}",
+            type: "post",
+            data: formdata,
+            contentType: false,
+            cache: false,
+            processData: false,
+
+            success: function (response) {
+                if (response.message === 'success') {
+                    $('body')
+                        .toast({
+                            class: 'success',
+                            message: 'Cashbook Entry Deleted Successfully.'
+                        })
+                    ;
+
+
+                    location.reload()
+                } else {
+                    $('body')
+                        .toast({
+                            class: 'error',
+                            message: 'An error occurred !'
+                        })
+                    ;
+
+                }
+
+                return response;
+            },
+            error: function () {
                 $('body')
                     .toast({
-                        class: 'orange',
-                        message: 'Remark and Amount required !'
+                        class: 'error',
+                        message: 'An error occurred !'
                     })
                 ;
-            } else {
-
-                var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']").val();
-                data = new FormData();
-                data.append('Remark', inRemark);
-                data.append('Amount', inAmount);
-                data.append('tType', 'Credit');
-                data.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
-                $.ajax({
-                    type: 'post',
-                    url: '{% url "homeApp:inflow_post" %}',
-                    data: data,
-                    contentType: false,
-                    cache: false,
-                    processData: false,
-
-
-                    success: function (response) {
-                        if (response.message === 'success') {
-                            $('body')
-                                .toast({
-                                    class: 'success',
-                                    message: 'InFlow Added Successfully.'
-                                })
-                            ;
-
-                            cTab.ajax.reload();
-                            $('#categoryForm').trigger('reset')
-                        } else {
-                            $('body')
-                                .toast({
-                                    class: 'warning',
-                                    message: '' + response.message
-                                })
-                            ;
-
-                        }
-
-                        return response;
-                    },
-                    error: function () {
-                        $('body')
-                            .toast({
-                                class: 'error',
-                                message: 'An error occurred !'
-                            })
-                        ;
-                    }
-                });
-
-
-            }
-
-        }
-
-        function outflowAdd() {
-            var outRemark = $('#outRemark').val();
-            var outAmount = $('#outAmount').val();
-            if (outRemark === '' || outAmount === '') {
-                $('body')
-                    .toast({
-                        class: 'orange',
-                        message: 'Remark and Amount required !'
-                    })
-                ;
-            } else {
-
-                var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']").val();
-                data = new FormData();
-                data.append('Remark', outRemark);
-                data.append('Amount', outAmount);
-                data.append('tType', 'Debit');
-                data.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
-                $.ajax({
-                    type: 'post',
-                    url: '{% url "homeApp:outflow_post" %}',
-                    data: data,
-                    contentType: false,
-                    cache: false,
-                    processData: false,
-
-
-                    success: function (response) {
-                        if (response.message === 'success') {
-                            $('body')
-                                .toast({
-                                    class: 'success',
-                                    message: 'OutFlow Added Successfully.'
-                                })
-                            ;
-
-                            dTab.ajax.reload();
-                            $('#outForm').trigger('reset')
-                        } else {
-                            $('body')
-                                .toast({
-                                    class: 'warning',
-                                    message: '' + response.message
-                                })
-                            ;
-
-                        }
-
-                        return response;
-                    },
-                    error: function () {
-                        $('body')
-                            .toast({
-                                class: 'error',
-                                message: 'An error occurred !'
-                            })
-                        ;
-                    }
-                });
-
-
-            }
-
-        }
-
-        function clearHSNForm() {
-            $('#hsnForm').trigger('reset');
-            $('#addHSNBtn').css('display', '');
-            $('#updateHSNBtn').css('display', 'none');
-
-        }
-
-        //Category
-        function clearCategoryForm() {
-            $('#categoryForm').trigger('reset')
-            $('#addCategoryBtn').css('display', '');
-            $('#updateCategoryBtn').css('display', 'none');
-
-        }
-
-
-        var today = new Date();
-        $('#rangestartP').calendar({
-            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
-            monthFirst: false,
-            type: 'date',
-            endCalendar: $('#rangeendP'),
-            formatter: {
-                date: function (date, settings) {
-                    if (!date) return '';
-                    var day = date.getDate();
-                    var month = date.getMonth() + 1;
-                    var year = date.getFullYear();
-                    return day + '/' + month + '/' + year;
-                }
             }
         });
-        $('#rangeendP').calendar({
-            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
-            monthFirst: false,
-            type: 'date',
-            startCalendar: $('#rangestartP'),
-            formatter: {
-                date: function (date, settings) {
-                    if (!date) return '';
-                    var day = date.getDate();
-                    var month = date.getMonth() + 1;
-                    var year = date.getFullYear();
-                    return day + '/' + month + '/' + year;
+
+    }
+
+
+
+    function editCashbookDetail() {
+        var editRemark = $('#editRemark').val();
+        var editInterest = $('#editInterest').val();
+        var editAmount = $('#editAmount').val();
+        var editID = $('#editID').val();
+        if (editAmount ==='' && editInterest ==='') {
+            $('body')
+                .toast({
+                    class: 'orange',
+                    message: 'Interest or Amount required !'
+                })
+            ;
+        } else {
+
+            var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']").val();
+            data = new FormData();
+            data.append('editRemark', editRemark);
+            data.append('editAmount', editAmount);
+            data.append('editID', editID);
+            data.append('editInterest', editInterest);
+            data.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
+            $.ajax({
+                type: 'post',
+                url: '{% url "homeApp:edit_cashbook_post" %}',
+                data: data,
+                contentType: false,
+                cache: false,
+                processData: false,
+
+
+                success: function (response) {
+                    if (response.message === 'success') {
+                        $('body')
+                            .toast({
+                                class: 'success',
+                                message: 'Updated Successfully.'
+                            })
+                        ;
+
+                        cTab.ajax.reload();
+                        $('#editForm').trigger('reset')
+                        location.reload()
+                    } else {
+                        $('body')
+                            .toast({
+                                class: 'warning',
+                                message: '' + response.message
+                            })
+                        ;
+
+                    }
+
+                    return response;
+                },
+                error: function () {
+                    $('body')
+                        .toast({
+                            class: 'error',
+                            message: 'An error occurred !'
+                        })
+                    ;
+                }
+            });
+
+
+        }
+
+    }
+    function inflowAdd() {
+        var inRemark = $('#inRemark').val();
+        var inAmount = $('#inAmount').val();
+        if (inRemark === '' || inAmount === '') {
+            $('body')
+                .toast({
+                    class: 'orange',
+                    message: 'Remark and Amount required !'
+                })
+            ;
+        } else {
+
+            var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']").val();
+            data = new FormData();
+            data.append('Remark', inRemark);
+            data.append('Amount', inAmount);
+            data.append('tType', 'Credit');
+            data.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
+            $.ajax({
+                type: 'post',
+                url: '{% url "homeApp:inflow_post" %}',
+                data: data,
+                contentType: false,
+                cache: false,
+                processData: false,
+
+
+                success: function (response) {
+                    if (response.message === 'success') {
+                        $('body')
+                            .toast({
+                                class: 'success',
+                                message: 'InFlow Added Successfully.'
+                            })
+                        ;
+
+                        cTab.ajax.reload();
+                        $('#categoryForm').trigger('reset')
+                    } else {
+                        $('body')
+                            .toast({
+                                class: 'warning',
+                                message: '' + response.message
+                            })
+                        ;
+
+                    }
+
+                    return response;
+                },
+                error: function () {
+                    $('body')
+                        .toast({
+                            class: 'error',
+                            message: 'An error occurred !'
+                        })
+                    ;
+                }
+            });
+
+
+        }
+
+    }
+
+    function outflowAdd() {
+        var outRemark = $('#outRemark').val();
+        var outAmount = $('#outAmount').val();
+        if (outRemark === '' || outAmount === '') {
+            $('body')
+                .toast({
+                    class: 'orange',
+                    message: 'Remark and Amount required !'
+                })
+            ;
+        } else {
+
+            var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']").val();
+            data = new FormData();
+            data.append('Remark', outRemark);
+            data.append('Amount', outAmount);
+            data.append('tType', 'Debit');
+            data.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
+            $.ajax({
+                type: 'post',
+                url: '{% url "homeApp:outflow_post" %}',
+                data: data,
+                contentType: false,
+                cache: false,
+                processData: false,
+
+
+                success: function (response) {
+                    if (response.message === 'success') {
+                        $('body')
+                            .toast({
+                                class: 'success',
+                                message: 'OutFlow Added Successfully.'
+                            })
+                        ;
+
+                        dTab.ajax.reload();
+                        $('#outForm').trigger('reset')
+                    } else {
+                        $('body')
+                            .toast({
+                                class: 'warning',
+                                message: '' + response.message
+                            })
+                        ;
+
+                    }
+
+                    return response;
+                },
+                error: function () {
+                    $('body')
+                        .toast({
+                            class: 'error',
+                            message: 'An error occurred !'
+                        })
+                    ;
+                }
+            });
+
+
+        }
+
+    }
+
+    function clearHSNForm() {
+        $('#hsnForm').trigger('reset');
+        $('#addHSNBtn').css('display', '');
+        $('#updateHSNBtn').css('display', 'none');
+
+    }
+
+    //Category
+    function clearCategoryForm() {
+        $('#categoryForm').trigger('reset')
+        $('#addCategoryBtn').css('display', '');
+        $('#updateCategoryBtn').css('display', 'none');
+
+    }
+
+
+    var today = new Date();
+    $('#rangestartP').calendar({
+        initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+        monthFirst: false,
+        type: 'date',
+        endCalendar: $('#rangeendP'),
+        formatter: {
+            date: function (date, settings) {
+                if (!date) return '';
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear();
+                return day + '/' + month + '/' + year;
+            }
+        }
+    });
+    $('#rangeendP').calendar({
+        initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+        monthFirst: false,
+        type: 'date',
+        startCalendar: $('#rangestartP'),
+        formatter: {
+            date: function (date, settings) {
+                if (!date) return '';
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear();
+                return day + '/' + month + '/' + year;
+            }
+        }
+    });
+    $(cashbook());
+    var cTab;
+    var dTab;
+
+    function cashbook() {
+        var startDate = $('#startDateP').val();
+        var endDate = $('#endDateP').val();
+
+
+        dTab = $('#dTable').DataTable({
+            dom: 'Blfrtip',
+            "scrollY": "310px",
+            "scrollX": true,
+            buttons: [{
+                extend: 'excel',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5]
+                }
+            }, {
+                extend: 'print',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5]
                 }
             }
-        });
-        $(cashbook());
-        var cTab;
-        var dTab;
-
-        function cashbook() {
-            var startDate = $('#startDateP').val();
-            var endDate = $('#endDateP').val();
-
-
-            dTab = $('#dTable').DataTable({
-                dom: 'Blfrtip',
-                "scrollY": "310px",
-                "scrollX": true,
-                buttons: [{
-                    extend: 'excel',
-                    exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5]
-                    }
-                }, {
-                    extend: 'print',
-                    exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5]
-                    }
-                }
-                ],
-                "columnDefs": [
-                    {"name": "depositID", "targets": 0, "orderable": true},
-                    {"name": "loanDate", "targets": 1, "orderable": true},
-                    {"name": "customerName", "targets": 2, "orderable": true},
-                    {"name": "amount", "targets": 3, "orderable": true},
-                    {"name": "remark", "targets": 4, "orderable": true},
-                    {"name": "datetime", "targets": 5, "orderable": true},
+            ],
+            "columnDefs": [
+                {"name": "depositID", "targets": 0, "orderable": true},
+                {"name": "loanDate", "targets": 1, "orderable": true},
+                {"name": "customerName", "targets": 2, "orderable": true},
+                {"name": "amount", "targets": 3, "orderable": true},
+                {"name": "remark", "targets": 4, "orderable": true},
+                {"name": "datetime", "targets": 5, "orderable": true},
 
                 ],
                 aaSorting: [[5, 'desc']],
@@ -513,55 +722,55 @@
                         // Extract totals from the last row of the JSON response
                         var totals = json.data;
 
-                        // Update the <span> elements with the totals
-                        $('#totalAmount').text(totals.totalAmount.toFixed(2));
+                    // Update the <span> elements with the totals
+                    $('#totalAmount').text(totals.totalAmount.toFixed(2));
 
-                        // Return the data without the totals for rendering in the table
-                        return json.data.data;
-                    }
-                },
-                "footerCallback": function (row, data, start, end, display) {
-                    var api = this.api();
-
-                    // Calculate the total amount for the visible rows
-                    var totalAmount = api
-                        .column(3, {page: 'current'}) // Column index for 'amount'
-                        .data()
-                        .reduce(function (a, b) {
-                            return a + parseFloat(b);
-                        }, 0);
-
-
-                    // Update the footer cells with the totals
-                    $(api.column(3).footer()).html('Total: ' + totalAmount.toFixed(2));
+                    // Return the data without the totals for rendering in the table
+                    return json.data.data;
                 }
-            });
+            },
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api();
 
-            cTab = $('#cTable').DataTable({
-                dom: 'Blfrtip',
-                "scrollY": "310px",
-                "scrollX": true,
-                buttons: [{
-                    extend: 'excel',
-                    exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5]
-                    }
-                }, {
-                    extend: 'print',
-                    exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5]
-                    }
+                // Calculate the total amount for the visible rows
+                var totalAmount = api
+                    .column(3, {page: 'current'}) // Column index for 'amount'
+                    .data()
+                    .reduce(function (a, b) {
+                        return a + parseFloat(b);
+                    }, 0);
+
+
+                // Update the footer cells with the totals
+                $(api.column(3).footer()).html('Total: ' + totalAmount.toFixed(2));
+            }
+        });
+
+        cTab = $('#cTable').DataTable({
+            dom: 'Blfrtip',
+            "scrollY": "310px",
+            "scrollX": true,
+            buttons: [{
+                extend: 'excel',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5]
                 }
-                ],
-                "columnDefs": [
-                    {"name": "depositID", "targets": 0, "orderable": true},
-                    {"name": "loanDate", "targets": 1, "orderable": true},
-                    {"name": "customerName", "targets": 2, "orderable": true},
-                    {"name": "amount", "targets": 3, "orderable": true},
-                    {"name": "interest", "targets": 4, "orderable": true},
-                    {"name": "totalCredit", "targets": 5, "orderable": true},
-                    {"name": "remark", "targets": 6, "orderable": true},
-                    {"name": "datetime", "targets": 7, "orderable": true},
+            }, {
+                extend: 'print',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5]
+                }
+            }
+            ],
+            "columnDefs": [
+                {"name": "depositID", "targets": 0, "orderable": true},
+                {"name": "loanDate", "targets": 1, "orderable": true},
+                {"name": "customerName", "targets": 2, "orderable": true},
+                {"name": "amount", "targets": 3, "orderable": true},
+                {"name": "interest", "targets": 4, "orderable": true},
+                {"name": "totalCredit", "targets": 5, "orderable": true},
+                {"name": "remark", "targets": 6, "orderable": true},
+                {"name": "datetime", "targets": 7, "orderable": true},
 
                 ],
                 aaSorting: [[7, 'desc']],
@@ -575,40 +784,40 @@
                         // Extract totals from the last row of the JSON response
                         var totals = json.data;
 
-                        // Update the <span> elements with the totals
-                        $('#totalAmount').text(totals.totalAmount.toFixed(2));
-                        $('#totalInterest').text(totals.totalInterest.toFixed(2));
+                    // Update the <span> elements with the totals
+                    $('#totalAmount').text(totals.totalAmount.toFixed(2));
+                    $('#totalInterest').text(totals.totalInterest.toFixed(2));
 
-                        // Return the data without the totals for rendering in the table
-                        return json.data.data;
-                    }
-                },
-                "footerCallback": function (row, data, start, end, display) {
-                    var api = this.api();
-
-                    // Calculate the total amount for the visible rows
-                    var totalAmount = api
-                        .column(4, {page: 'current'}) // Column index for 'amount'
-                        .data()
-                        .reduce(function (a, b) {
-                            return a + parseFloat(b);
-                        }, 0);
-
-                    // Calculate the total interest for the visible rows
-                    var totalInterest = api
-                        .column(5, {page: 'current'}) // Column index for 'interest'
-                        .data()
-                        .reduce(function (a, b) {
-                            return a + parseFloat(b);
-                        }, 0);
-
-                    // Update the footer cells with the totals
-                    $(api.column(4).footer()).html('Total: ' + totalAmount.toFixed(2));
-                    $(api.column(5).footer()).html('Total: ' + totalInterest.toFixed(2));
+                    // Return the data without the totals for rendering in the table
+                    return json.data.data;
                 }
-            });
+            },
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api();
 
-        }
+                // Calculate the total amount for the visible rows
+                var totalAmount = api
+                    .column(4, {page: 'current'}) // Column index for 'amount'
+                    .data()
+                    .reduce(function (a, b) {
+                        return a + parseFloat(b);
+                    }, 0);
+
+                // Calculate the total interest for the visible rows
+                var totalInterest = api
+                    .column(5, {page: 'current'}) // Column index for 'interest'
+                    .data()
+                    .reduce(function (a, b) {
+                        return a + parseFloat(b);
+                    }, 0);
+
+                // Update the footer cells with the totals
+                $(api.column(4).footer()).html('Total: ' + totalAmount.toFixed(2));
+                $(api.column(5).footer()).html('Total: ' + totalInterest.toFixed(2));
+            }
+        });
+
+    }
 
 
         function pDetails() {
@@ -616,8 +825,25 @@
             var endDate = $('#endDateP').val();
             dTab.ajax.url('{% url 'homeApp:CashBookDebitListJson' %}?startDate=' + startDate + '&endDate=' + endDate).load();
             cTab.ajax.url('{% url 'homeApp:CashBookCreditListJson' %}?startDate=' + startDate + '&endDate=' + endDate).load();
+            getTodayBalance();
 
-        }
-    </script>
+
+    }
+onload = getTodayBalance();
+    function getTodayBalance() {
+        var startDate = $('#startDateP').val();
+        $.ajax({
+            type: 'GET',
+            url: '{% url 'homeApp:get_today_cashbook_balance' %}?startDate=' + startDate,
+            success: function (data) {
+                $('#cCredit').html(data["credit"]);
+                $('#cDebit').html(data["debit"]);
+                $('#cBalance').html(data["balance"]);
+                $('#cDate').html(data["date"]);
+            }
+
+        });
+    }
+</script>
 
 {% endblock %}

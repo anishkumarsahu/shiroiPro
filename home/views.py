@@ -99,13 +99,19 @@ def deposit_detail(request, id=None):
         instance = get_object_or_404(Deposit, id=int(id))
         items = DepositItem.objects.filter(depositID_id=instance.pk)
         all_in = Interest.objects.filter(depositID_id=int(id))
+        if instance.actionType == 'interest':
+            instance_new = get_object_or_404(Deposit, depositSerialID=instance.newDepositSerialID)
+        else:
+            instance_new = ''
+
         total = 0.0
         for i in all_in:
             total = total + i.amount
         context = {
             'instance': instance,
             'items': items,
-            'total':total
+            'total': total,
+            'instance_new': instance_new
         }
 
         return render(request, 'home/depositDetail.html', context)

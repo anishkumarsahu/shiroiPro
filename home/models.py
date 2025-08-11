@@ -27,7 +27,7 @@ class Customer(models.Model):
         return self.customerName
 
     class Meta:
-        verbose_name_plural = 'E) Customer List'
+        verbose_name_plural = 'B) Customer List'
 
 class Item(models.Model):
     itemName = models.CharField(max_length=300, blank=True, null=True)
@@ -39,7 +39,7 @@ class Item(models.Model):
         return self.itemName
 
     class Meta:
-        verbose_name_plural = 'E) Item List'
+        verbose_name_plural = 'C) Item List'
 
 
 class Deposit(models.Model):
@@ -60,12 +60,15 @@ class Deposit(models.Model):
     isDeleted = models.BooleanField(default=False)
     datetime = models.DateTimeField(auto_now_add=True, auto_now=False)
     lastUpdatedOn = models.DateTimeField(auto_now_add=False, auto_now=True)
+    newDepositSerialID = models.CharField(max_length=200, blank=True, null=True)
+    clearanceRemark = models.TextField(blank=True, null=True)
+    actionType = models.CharField(max_length=200, blank=True, null=True, default='N/A')
 
     def __str__(self):
         return self.depositSerialID
 
     class Meta:
-        verbose_name_plural = 'B) Deposit List'
+        verbose_name_plural = 'D) Deposit List'
 
 
 class DepositItem(models.Model):
@@ -92,7 +95,7 @@ class DepositItem(models.Model):
         return str(self.depositID_id)
 
     class Meta:
-        verbose_name_plural = 'C) Deposit Item List'
+        verbose_name_plural = 'E) Deposit Item List'
 
 
 class CashBook(models.Model):
@@ -114,7 +117,7 @@ class CashBook(models.Model):
         return str(self.remark)
 
     class Meta:
-        verbose_name_plural = 'D) CashBook List'
+        verbose_name_plural = 'F) CashBook List'
 
 
 class Interest(models.Model):
@@ -129,4 +132,20 @@ class Interest(models.Model):
         return str(self.depositID.depositSerialID)
 
     class Meta:
-        verbose_name_plural = 'E) Interest List'
+        verbose_name_plural = 'G) Interest List'
+
+
+class CashbookDailyCounter(models.Model):
+    date = models.DateField(blank=True, null=True)
+    openingAmount = models.FloatField(default=0.0)
+    closingAmount = models.FloatField(default=0.0)
+    dailyBalance = models.FloatField(default=0.0)
+    isDeleted = models.BooleanField(default=False)
+    datetime = models.DateTimeField(auto_now_add=True, auto_now=False)
+    lastUpdatedOn = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+    def __str__(self):
+        return str(self.date)
+
+    class Meta:
+        verbose_name_plural = 'H) Interest List'

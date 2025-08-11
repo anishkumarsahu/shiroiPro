@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.html import escape
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from .models import *
@@ -205,7 +206,10 @@ def edit_deposit_post(request):
 
 
     depo = Deposit.objects.get(id=int(dID))
-    credit(0.0, depo.totalAmount, "New Deposit Update".format(depo.totalAmount, depo.depositSerialID), depo.depositSerialID, depo.customerName)
+    initial_amount = depo.totalAmount
+    if initial_amount != float(totalAmount):
+        credit(0.0, depo.totalAmount, "New Deposit Update".format(depo.totalAmount, depo.depositSerialID),
+               depo.depositSerialID, depo.customerName)
     depo.customerName = customerName
     depo.oldID = oldID
     depo.phone = phoneNumber
@@ -237,7 +241,9 @@ def edit_deposit_post(request):
         p.chaning = float(item_details[9])
 
         p.save()
-    debit(0.0, depo.totalAmount, "New Deposit Update".format(depo.totalAmount, depo.depositSerialID), depo.depositSerialID, depo.customerName)
+    if initial_amount != float(totalAmount):
+        debit(0.0, depo.totalAmount, "New Deposit Update".format(depo.totalAmount, depo.depositSerialID),
+              depo.depositSerialID, depo.customerName)
     return JsonResponse({'message': 'success', 'depoID': depo.pk}, safe=False)
 
 
@@ -285,8 +291,8 @@ class  IncompleteDepositListJson(BaseDatatableView):
             action = ''' <span style="display:flex">   <a style="font-size:10px;"href="/edit_deposit/{}/" class="ui circular  icon button orange" data-tooltip="Edit" data-position="bottom right" data-inverted="">
                               <i class="edit icon"></i>
                              </a>
-                             <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue" data-tooltip="Take Interest" data-position="bottom right" data-inverted="">
-                               <i class="rupee sign icon"></i>
+                             <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue" data-tooltip="Receive Payment" data-position="bottom right" data-inverted="">
+                               <i class="hand holding usd icon"></i>
                              </a><button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green" data-tooltip="Detail" data-position="bottom right" data-inverted="">
                                <i class="receipt icon"></i>
                              </button>
@@ -363,8 +369,8 @@ class PartiallyCompletedDepositListJson(BaseDatatableView):
             <a style="font-size:10px;"href="/edit_deposit_detail/{}/" class="ui circular  icon button orange" data-tooltip="Edit" data-position="bottom right" data-inverted="">
                               <i class="edit icon"></i>
                              </a>
-            <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue" data-tooltip="Take Interest" data-position="bottom right" data-inverted="">
-                               <i class="rupee sign icon"></i>
+            <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue" data-tooltip="Receive Payment" data-position="bottom right" data-inverted="">
+                              <i class="hand holding usd icon"></i>
                              </a>
             <button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green" data-tooltip="Detail" data-position="bottom right" data-inverted="">
                                <i class="receipt icon"></i>
@@ -435,15 +441,16 @@ class CompletedDepositListJson(BaseDatatableView):
             <a style="font-size:10px;"href="/edit_deposit_detail/{}/" class="ui circular  icon button orange" data-tooltip="Edit" data-position="bottom right" data-inverted="">
                               <i class="edit icon"></i>
                              </a>
-            <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue" data-tooltip="Take Interest" data-position="bottom right" data-inverted="">
-                               <i class="rupee sign icon"></i>
-                             </a>
+          
                              <button style="font-size:10px;" onclick = "GetSaleDetail('{}')" class="ui circular  icon button green" data-tooltip="Detail" data-position="bottom right" data-inverted="">
                                <i class="receipt icon"></i>
                              </button>
                              <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px" data-tooltip="Delete" data-position="bottom right" data-inverted="">
                                <i class="trash alternate icon"></i>
                              </button> </span>'''.format(item.pk,item.pk, item.pk, item.pk),
+            '''  <a style="font-size:10px;"href="/deposit_detail/{}/" class="ui circular  icon button blue" data-tooltip="Take Interest" data-position="bottom right" data-inverted="">
+                               <i class="rupee sign icon"></i>
+                             </a>'''
 
             json_data.append([
                 escape(item.oldID),
@@ -491,6 +498,10 @@ def get_deposit_detail(request, id=None):
         'ClearanceDate': instance.clearanceDate,
         'TotalWeight': instance.totalWeight,
         'TotalWeightL': instance.totalWeightL,
+        'ClearanceRemark': instance.clearanceRemark if instance.clearanceRemark else "",
+        'ActionType': instance.actionType if instance.actionType else "N/A",
+        'TotalAmountPaid': instance.totalAmountPaid,
+        "NewSerial": instance.newDepositSerialID if instance.newDepositSerialID else 'N/A',
 
     }
     items = DepositItem.objects.filter(depositID_id=instance.pk)
@@ -546,38 +557,101 @@ def search_deposit(request):
 def item_closing_post(request):
     depositID = request.POST.get("depositID")
     totalAmount = request.POST.get("totalAmount")
-    datas = request.POST.get("datas")
-
+    actionType = request.POST.get("actionType")
+    month = request.POST.get("month")
+    withdrawalDate = request.POST.get("withdrawalDate")
+    itemInterestRate = request.POST.get("itemInterestRate")
+    ICalculate = request.POST.get("ICalculate")
+    interestPaid = request.POST.get("interestPaid")
+    amountWithInterest = request.POST.get("amountWithInterest")
+    InterestRemark = request.POST.get("InterestRemark")
     depo = Deposit.objects.get(pk=int(depositID))
-    # depo.depositDate = datetime.strptime(pDate, '%d/%m/%Y')
-    # depo.statusID_id = 1
-    depo.totalAmountPaid = (depo.totalAmountPaid + float(totalAmount))
-    depo.save()
-    splited_receive_item = datas.split("@")
-    for item in splited_receive_item[:-1]:
-        item_details = item.split('|')
-
-        p = DepositItem.objects.get(pk=int(item_details[0]))
-        p.withdrawalDate = datetime.strptime(item_details[1], '%d/%m/%Y')
-        p.interestPaid = float(item_details[2])
-        p.total = float(item_details[3])
-        p.month = float(item_details[4])
-        p.isWithdrawn = True
-        p.save()
-        depo.totalInterestPaid = depo.totalInterestPaid + float(item_details[2])
-        depo.save()
-        credit(p.interestPaid, (p.total - p.interestPaid),"Deposit Paid",depo.depositSerialID, depo.customerName)
-        # credit(p.interestPaid,"Interest Paid",depo.depositSerialID, depo.customerName)
-    totalItems = DepositItem.objects.filter(depositID_id=int(depositID)).count()
-    totalWithdrawn = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=True).count()
-    totalPending = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=False).count()
-    if totalItems == totalWithdrawn:
+    if actionType == "interest":
+        depo.totalInterestPaid = depo.totalInterestPaid + float(interestPaid)
         depo.statusID_id = 3
-        depo.clearanceDate = datetime.today().date()
+        depo.totalAmountPaid = (depo.totalAmountPaid + float(amountWithInterest))
+        depo.clearanceRemark = InterestRemark
+        depo.clearanceDate = datetime.strptime(withdrawalDate, '%d/%m/%Y')
+        depo.actionType = actionType
         depo.save()
-    if totalWithdrawn < totalItems and totalPending < totalItems:
-        depo.statusID_id = 2
+        de = Deposit.objects.all().count()
+        new_depo = Deposit()
+        new_depo.customerName = depo.customerName
+        new_depo.oldID = depo.oldID
+        new_depo.phone = depo.phone
+        new_depo.address = depo.address
+        new_depo.depositDate = datetime.strptime(withdrawalDate, '%d/%m/%Y')
+        new_depo.statusID_id = 1
+        new_depo.totalAmount = depo.totalAmount
+        new_depo.totalAmountPaid = 0
+        new_depo.totalInterestPaid = 0
+        new_depo.totalWeight = depo.totalWeight
+        new_depo.totalWeightL = depo.totalWeightL
+        new_depo.save()
+        new_depo.depositSerialID = 'SS' + str(de + 1).zfill(5)
+        new_depo.save()
+        depo.newDepositSerialID = new_depo.depositSerialID
         depo.save()
+        deposit_items = DepositItem.objects.filter(depositID_id=int(depositID))
+        for i in deposit_items:
+            p = DepositItem()
+            p.depositID_id = new_depo.pk
+            p.itemName = i.itemName
+            p.weight = i.weight
+            p.itemRatePerTenGram = i.itemRatePerTenGram
+            p.interestRate = i.interestRate
+            p.description = i.description
+            p.itemAmount = i.itemAmount
+            p.tola = i.tola
+            p.san = i.san
+            p.chaning = i.chaning
+            p.save()
+            i.month = float(month)
+            i.save()
+        credit(interestPaid, 0, "Interest Paid", depo.depositSerialID, depo.customerName)
+
+    elif actionType == "repayment":
+        depo.totalInterestPaid = depo.totalInterestPaid + float(interestPaid)
+        depo.statusID_id = 3
+        depo.totalAmountPaid = (depo.totalAmountPaid + float(amountWithInterest))
+        depo.clearanceRemark = InterestRemark
+        depo.clearanceDate = datetime.strptime(withdrawalDate, '%d/%m/%Y')
+        depo.actionType = actionType
+        depo.save()
+        deposit_items = DepositItem.objects.filter(depositID_id=int(depositID))
+        for i in deposit_items:
+            i.isWithdrawn = True
+            i.amount = float(month)
+            i.withdrawalDate = datetime.strptime(withdrawalDate, '%d/%m/%Y')
+            i.save()
+        credit(interestPaid, (float(amountWithInterest) - float(interestPaid)), "Interest Paid", depo.depositSerialID,
+               depo.customerName)
+
+    # splited_receive_item = datas.split("@")
+    # for item in splited_receive_item[:-1]:
+    #     item_details = item.split('|')
+    #
+    #     p = DepositItem.objects.get(pk=int(item_details[0]))
+    #     p.withdrawalDate = datetime.strptime(item_details[1], '%d/%m/%Y')
+    #     p.interestPaid = float(item_details[2])
+    #     p.total = float(item_details[3])
+    #     p.month = float(item_details[4])
+    #     p.isWithdrawn = True
+    #     p.save()
+    #     depo.totalInterestPaid = depo.totalInterestPaid + float(item_details[2])
+    #     depo.save()
+    #     credit(p.interestPaid, (p.total - p.interestPaid),"Deposit Paid",depo.depositSerialID, depo.customerName)
+    #     # credit(p.interestPaid,"Interest Paid",depo.depositSerialID, depo.customerName)
+    # totalItems = DepositItem.objects.filter(depositID_id=int(depositID)).count()
+    # totalWithdrawn = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=True).count()
+    # totalPending = DepositItem.objects.filter(depositID_id=int(depositID), isWithdrawn__exact=False).count()
+    # if totalItems == totalWithdrawn:
+    #     depo.statusID_id = 3
+    #     depo.clearanceDate = datetime.today().date()
+    #     depo.save()
+    # if totalWithdrawn < totalItems and totalPending < totalItems:
+    #     depo.statusID_id = 2
+    #     depo.save()
 
     return JsonResponse({'message': 'success'}, safe=False)
 
@@ -823,6 +897,14 @@ class CashBookDebitListJson(BaseDatatableView):
         total_amount = qs.aggregate(Sum('amount'))['amount__sum'] or 0
 
         for item in qs:
+            action = '''<span style="display:flex">  
+             <button style="font-size:10px;" class="ui circular icon button orange" onclick = "editCashbook('{}', '{}', '{}', '{}')" data-tooltip="Edit" data-position="bottom right" data-inverted="">
+                               <i class="edit icon"></i>
+                              </button>
+                              <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px" data-tooltip="Delete" data-position="bottom right" data-inverted="">
+                                <i class="trash alternate icon"></i>
+                              </button> </span>'''.format(item.pk, 0.0, item.amount, item.remark, item.pk),
+
             json_data.append([
                 escape(item.depositID),
                 escape(item.loanDate.strftime('%d-%m-%Y') if item.loanDate else 'N/A'),
@@ -830,6 +912,7 @@ class CashBookDebitListJson(BaseDatatableView):
                 escape(item.amount),
                 escape(item.remark),
                 escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
+                action
             ])
 
         # Return data with total amounts
@@ -900,6 +983,14 @@ class CashBookCreditListJson(BaseDatatableView):
         total_interest = qs.aggregate(Sum('interest'))['interest__sum'] or 0
 
         for item in qs:
+            action = '''<span style="display:flex">  
+             <button style="font-size:10px;" class="ui circular icon button orange" onclick = "editCashbook('{}','{}','{}','{}')" data-tooltip="Edit" data-position="bottom right" data-inverted="">
+                               <i class="edit icon"></i>
+                              </button>
+                              <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px" data-tooltip="Delete" data-position="bottom right" data-inverted="">
+                                <i class="trash alternate icon"></i>
+                              </button> </span>'''.format(item.pk, item.interest, item.amount, item.remark, item.pk),
+
             json_data.append([
                 escape(item.depositID),
                 escape(item.loanDate.strftime('%d-%m-%Y') if item.loanDate else 'N/A'),
@@ -909,6 +1000,7 @@ class CashBookCreditListJson(BaseDatatableView):
                 escape(round(item.amount + item.interest, 2)),
                 escape(item.remark),
                 escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
+                action
 
             ])
 
@@ -1000,3 +1092,96 @@ def delete_interest_post(request):
         return JsonResponse({'message': 'success', 'total': total}, safe=False)
     except:
         return JsonResponse({'message': 'error'}, safe=False)
+
+
+@require_GET
+def get_deposits_search(request):
+    query = request.GET.get('query', '').strip().lower()
+    deposits = (
+        Deposit.objects
+        .filter(Q(depositSerialID__icontains=query) | Q(customerName__icontains=query), isDeleted=False)
+        .select_related('statusID')
+        .values(
+            'pk', 'depositSerialID', 'customerName', 'statusID__name', 'depositDate'
+        )
+    )
+
+    data = [
+        {
+            'id': d['pk'],
+            'depositID': d['depositSerialID'],
+            'name': d['customerName'],
+            'statusID': d['statusID__name'],
+            'depositDate': d['depositDate'].strftime('%d-%m-%Y'),
+        }
+        for d in deposits
+    ]
+
+    return JsonResponse(data, safe=False)
+
+
+@transaction.atomic
+@csrf_exempt
+def delete_cashbook_entry(request):
+    if request.method == 'POST':
+        id = request.POST.get("ID")
+        depo = CashBook.objects.get(pk=int(id))
+        depo.isDeleted = True
+        depo.save()
+        # credit(0.0, depo.totalAmount,"Deposit Deleted", depo.depositSerialID, depo.customerName)
+
+        return JsonResponse({'message': 'success'}, safe=False)
+
+
+@transaction.atomic
+@csrf_exempt
+def edit_cashbook_post(request):
+    remark = request.POST.get("editRemark")
+    id = request.POST.get("editID")
+    amount = request.POST.get("editAmount")
+    interest = request.POST.get("editInterest")
+    try:
+        book = CashBook.objects.get(pk=int(id))
+        book.amount = float(amount) if amount else 0.0
+        book.interest = float(interest) if interest else 0.0
+        book.remark = remark
+        book.save()
+
+        return JsonResponse({'message': 'success'}, safe=False)
+    except:
+        return JsonResponse({'message': 'error'}, safe=False)
+
+
+@require_GET
+def get_today_cashbook_balance(request):
+    startDate = request.GET.get('startDate', '').strip()
+
+    # Try different date formats
+    date_formats = ['%d-%m-%Y', '%d/%m/%Y', '%Y-%m-%d', '%Y/%m/%d', '%m/%d/%Y']
+    convertedDate = None
+
+    for date_format in date_formats:
+        try:
+            convertedDate = datetime.strptime(startDate, date_format).strftime('%Y-%m-%d')
+            break
+        except ValueError:
+            continue
+
+    if not convertedDate:
+        return JsonResponse({'error': 'Invalid date format'}, status=400)
+
+    data = CashBook.objects.filter(datetime__date=convertedDate, isDeleted=False)
+    credit = 0.0
+    debit = 0.0
+    for i in data:
+        if i.transactionType == 'Credit':
+            credit = credit + i.amount + i.interest
+        else:
+            debit = debit + i.amount + i.interest
+    context = {
+        'credit': credit,
+        'debit': debit,
+        'balance': credit - debit,
+        'date': startDate  # For debugging
+    }
+    return JsonResponse(context, safe=False)

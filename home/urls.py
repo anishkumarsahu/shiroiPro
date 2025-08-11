@@ -54,7 +54,11 @@ urlpatterns = [
 
     path('api/take_interest_post/', take_interest_post, name='take_interest_post'),
     path('api/edit_interest_post/', edit_interest_post, name='edit_interest_post'),
+    path('api/get_deposits_search/', get_deposits_search, name='get_deposits_search'),
     path('api/delete_interest_post/', delete_interest_post, name='delete_interest_post'),
+    path('api/delete_cashbook_entry/', delete_cashbook_entry, name='delete_cashbook_entry'),
+    path('api/edit_cashbook_post/', edit_cashbook_post, name='edit_cashbook_post'),
+    path('api/get_today_cashbook_balance/', get_today_cashbook_balance, name='get_today_cashbook_balance'),
 
 
     ]
