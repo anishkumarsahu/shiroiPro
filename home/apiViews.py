@@ -589,6 +589,7 @@ def item_closing_post(request):
         new_depo.totalWeightL = depo.totalWeightL
         new_depo.save()
         new_depo.depositSerialID = 'SS' + str(de + 1).zfill(5)
+        new_depo.remark = depo.depositSerialID
         new_depo.save()
         depo.newDepositSerialID = new_depo.depositSerialID
         depo.save()
@@ -621,7 +622,7 @@ def item_closing_post(request):
         deposit_items = DepositItem.objects.filter(depositID_id=int(depositID))
         for i in deposit_items:
             i.isWithdrawn = True
-            i.amount = float(month)
+            i.month = float(month)
             i.withdrawalDate = datetime.strptime(withdrawalDate, '%d/%m/%Y')
             i.save()
         credit(interestPaid, (float(amountWithInterest) - float(interestPaid)), "Interest Paid", depo.depositSerialID,

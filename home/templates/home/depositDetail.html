@@ -339,11 +339,11 @@
                          style="width: 99%;float: right;position: absolute;text-align: left;margin-bottom: 0; margin-top: 0.5em;">
                         <a class="teal item ">
                             <strong style="color: black;">Total(₹) :</strong>
-                            <div class="ui violet label" id="totalAmount">0.00</div>
+                            <div class="ui violet label" id="totalAmount">{{ instance.totalAmountPaid }}</div>
                         </a>
                         <a class="teal item ">
                             <strong style="color: black;">Int. Paid(₹) :</strong>
-                            <div class="ui violet label" id="totalIntAmount">{{ total }}</div>
+                            <div class="ui violet label" id="totalIntAmount">{{ instance.totalInterestPaid }}</div>
                         </a>
 
                     </div>

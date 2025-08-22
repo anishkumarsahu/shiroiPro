@@ -95,9 +95,6 @@
             <th style="text-align: right">Status</th>
             <th style="text-align: right">Total <br>(Rs.)</th>
 
-            {#
-            <th style="text-align: right">Amount <br>(Rs.)</th>
-            #}
         </tr>
 
         </thead>
@@ -120,18 +117,12 @@
                 <td style="text-align: right">N/A</td>
                 <td style="text-align: right">DUE</td>
 
-
-                {#
-                <td style="text-align: right">N/A</td>
-                #}
                 {% else %}
                 <td>{{ foo.withdrawalDate|date:"d-m-Y" }}</td>
                 <td style="text-align: right">{{ foo.month }}</td>
                 <td style="text-align: right">{{ foo.interestPaid }}</td>
                 <td style="text-align: right">PAID</td>
-                {#
-                <td style="text-align: right">{{ foo.total }}</td>
-                #}
+
                 {% endif %}
                 <td style="text-align: right">{{ foo.itemAmount }}</td>
             </tr>
@@ -146,9 +137,7 @@
             <th></th>
             <th></th>
             <th></th>
-            {#
-            <th style="text-align: right"></th>
-            #}
+
         </tr>
         {% if left > 0 %}
             {% for l in loo %}
@@ -161,9 +150,7 @@
                     <th></th>
                     <th></th>
                     <th></th>
-                    {#
-                    <th style="text-align: right"></th>
-                    #}
+
                 </tr>
             {% endfor %}
         {% endif %}
@@ -174,9 +161,7 @@
             <th></th>
             <th class="text-right" colspan="3">Total Deposit Amount:</th>
             <th class="text-right">{{ depo.totalAmount }}</th>
-            {#
-            <th style="text-align: right"></th>
-            #}
+
         </tr>
         <tr class="blank_row">
             <th class="text-right" colspan="2">Payment Type:</th>
@@ -190,21 +175,13 @@
             <th></th>
             <th class="text-right" colspan="3">Total Interest Paid:</th>
             <th class="text-right">{{ depo.totalInterestPaid }}</th>
-            {#
-            <th style="text-align: right"></th>
-            #}
+
         </tr>
         <tr>
             <td rowspan="2" colspan="5">
                 <b>In words:</b> <span style="border-bottom: 1px dotted"> {{ TotalInWords }}</span>
             </td>
             <td class="text-right" colspan="2" rowspan="2"><b>Total Amount Paid:</b></td>
-            {#
-            <td class="text-right" colspan="1" rowspan="2"></td>
-            #}
-            {#
-            <td class="text-right" colspan="1" rowspan="2"></td>
-            #}
             <td class="text-right" rowspan="2"><b>{{ depo.totalAmountPaid }}</b></td>
         </tr>
         <tr>
