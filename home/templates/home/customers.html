@@ -1,0 +1,661 @@
+{% extends 'home/index.html' %}
+{% block title %}
+    <title>Customer List</title>
+{% endblock %}
+
+{% block body %}
+    <style>
+        .cwide {
+            width: 75% !important;
+        }
+
+        #completeTable_length, #partialTable_length, #incompleteTable_length {
+            left: 10px;
+            position: absolute;
+        }
+
+
+        .dt-buttons {
+            position: absolute;
+            left: 200px;
+        }
+
+        .dataTables_scrollHeadInner {
+            width: 100% !important;
+        }
+
+        table {
+            width: 100% !important;
+        }
+    </style>
+
+    <div class="ui right aligned basic  grid">
+        <div class="sixteen wide column">
+            <div class="ui  pointing secondary menu">
+                <div style="cursor: pointer;" class="item active" data-tab="P">Customer List</div>
+
+                <div style=" position: absolute;right: 1.5rem;top: 18px;">
+                    <button onclick="addCustomer()" class="ui green mini plus button right">
+                        <i class="plus square outline icon"></i>
+                        Add New Customer
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="ui tab  active" data-tab="P">
+                <div class="row">
+
+                    <div class="ui internally grid">
+                        <div class="row" style="padding-bottom: 0!important;padding-top: 5px!important;">
+
+                            {% comment %}        <div class="eight wide column">
+                                <div class="ui form">
+
+
+                                    <form class="ui tiny form">
+
+                                        <div class="field inline" id="custom_date">
+                            <span style="float: left;padding: 7px;">
+                            <i class="calendar alternate icon"></i>
+                            <label>Filter By Date Range</label>
+                            </span>
+                                            <div class="three fields">
+                                                <div class="field">
+                                                    <div class="ui calendar" id="rangestartP">
+                                                        <div class="ui input left icon">
+                                                            <input class="" type="text" placeholder="Start Date"
+                                                                   style="width:100%;"
+                                                                   id="startDateP">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="ui calendar" id="rangeendP">
+                                                        <div class="ui input left icon">
+                                                            <input class="" type="text" placeholder="End Date"
+                                                                   style="width:100%;"
+                                                                   id="endDateP">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="ui calendar">
+                                                        <div class="ui input left icon">
+                                                            <button class="ui tiny active button" type="button"
+                                                                    onclick="pDetails()">
+                                                                <i class="funnel dollar icon"></i>
+                                                                Search
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>{% endcomment %}
+
+                        </div>
+                    </div>
+
+                    <div class="ui internally celled grid">
+                        <div class="row">
+                            <div class="sixteen wide column">
+                                <table id="partialTable" class="ui sortable celled very compact table"
+                                       style="margin-top: 5px;width: 100%!important;">
+                                    <thead>
+                                    <tr>
+                                        <th>CustomerName</th>
+                                        <th>PhoneNumber</th>
+                                        <th>Address</th>
+                                        <th>EnteredOn</th>
+                                        <th>UpdatedOn</th>
+                                        <th>TakeAction</th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="ui basic modal custom" id="delSaleModal">
+        <div class="ui icon header">
+            <i class="archive icon"></i>
+            Customer detail will be Deleted.
+        </div>
+        <div class="content">
+            <p style="text-align: center">The customer detail will be deleted, are you sure to delete
+                this Customer?</p>
+        </div>
+        <div class="actions">
+            <div class="ui red basic cancel inverted button">
+                <i class="remove icon"></i>
+                No
+            </div>
+            <input type="hidden" id="DepositID">
+            <div class="ui green ok inverted button" onclick="deleteCustomer()">
+                <i class="checkmark icon"></i>
+                Yes
+            </div>
+        </div>
+    </div>
+    <div class="ui modal" id="EditModal">
+        <i class="close icon"></i>
+        <div class="header">
+            Edit Customer Details
+        </div>
+        <div class="content">
+
+            <form class="ui tiny form" id="EditForm">{% csrf_token %}
+                <div class="two required fields">
+                    <div class="eight wide field">
+                        <label>Customer Name</label>
+                        <input type="text" name="customerNameEdit" placeholder="Customer Name" id="customerNameEdit">
+                    </div>
+                    <div class="eight wide field">
+                        <label>Phone Number</label>
+                        <input type="number" name="phoneNumberEdit" placeholder="Phone Number"
+                               id="phoneNumberEdit">
+                    </div>
+
+                </div>
+                <div class="one fields">
+                    <div class="sixteen wide field">
+                        <label>Address</label>
+                        <input type="text" name="addressEdit" placeholder="Address"
+                               id="addressEdit">
+                    </div>
+
+                </div>
+
+
+                <input type="hidden" id="EditId">
+            </form>
+
+            <div class="actions" style="padding-top: 20px; padding-bottom: 20px ;float: right">
+                <div class="ui cancel button">Cancel</div>
+                <button class="ui right labeled icon button green saveBtn" onclick="updateCustomer()">
+                    Update
+                    <i class="checkmark icon"></i>
+                </button>
+                <button style="display: none" class="ui right labeled icon button green saveBtnLoad">
+                    Saving ...
+                    <i class="checkmark icon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="ui modal" id="AddModal">
+        <i class="close icon"></i>
+        <div class="header">
+            Add New Customer Detail
+        </div>
+        <div class="content">
+
+            <form class="ui tiny form" id="AddForm">{% csrf_token %}
+                <div class="two required fields">
+                    <div class="eight wide field">
+                        <label>Customer Name</label>
+                        <input type="text" name="customerName" placeholder="Customer Name" id="customerName">
+                    </div>
+                    <div class="eight wide field">
+                        <label>Phone Number</label>
+                        <input type="number" name="phoneNumber" placeholder="Phone Number"
+                               id="phoneNumber">
+                    </div>
+
+                </div>
+                <div class="one fields">
+                    <div class="sixteen wide field">
+                        <label>Address</label>
+                        <input type="text" name="address" placeholder="Address"
+                               id="address">
+                    </div>
+
+                </div>
+
+
+            </form>
+
+            <div class="actions" style="padding-top: 20px; padding-bottom: 20px ;float: right">
+                <div class="ui cancel button">Cancel</div>
+                <button class="ui right labeled icon button green saveBtn" onclick="addNewCustomer()">
+                    Save
+                    <i class="checkmark icon"></i>
+                </button>
+                <button style="display: none" class="ui right labeled icon button green saveBtnLoad">
+                    Saving ...
+                    <i class="checkmark icon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $('.menu .item').tab();
+        $('#standard_calendar')
+            .calendar({
+                    monthFirst: false,
+                    type: 'date',
+                    formatter: {
+                        date: function (date, settings) {
+                            if (!date) return '';
+                            var day = date.getDate();
+                            var month = date.getMonth() + 1;
+                            var year = date.getFullYear();
+                            return day + '/' + month + '/' + year;
+                        }
+                    }
+                }
+            );
+        var today = new Date();
+        $('#rangestartP').calendar({
+            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+            monthFirst: false,
+            type: 'date',
+            endCalendar: $('#rangeendP'),
+            formatter: {
+                date: function (date, settings) {
+                    if (!date) return '';
+                    var day = date.getDate();
+                    var month = date.getMonth() + 1;
+                    var year = date.getFullYear();
+                    return day + '/' + month + '/' + year;
+                }
+            }
+        });
+        $('#rangeendP').calendar({
+            initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+            monthFirst: false,
+            type: 'date',
+            startCalendar: $('#rangestartP'),
+            formatter: {
+                date: function (date, settings) {
+                    if (!date) return '';
+                    var day = date.getDate();
+                    var month = date.getMonth() + 1;
+                    var year = date.getFullYear();
+                    return day + '/' + month + '/' + year;
+                }
+            }
+        });
+
+
+        $(getPartial());
+
+        var partialTab;
+
+        function getPartial() {
+            var startDate = 'All';
+            var endDate = 'All';
+
+
+            partialTab = $('#partialTable').DataTable({
+                dom: 'Blfrtip',
+                "scrollY": "450px",
+                "scrollX": true,
+                stateSave: true,
+                buttons: [{
+                    extend: 'excel',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                    }
+                }, {
+                    extend: 'print',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                    }
+                }
+                    , {
+                        extend: 'colvis',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    {"name": "customerName", "targets": 0, "orderable": true},
+                    {"name": "phone", "targets": 1, "orderable": true},
+                    {"name": "address", "targets": 2, "orderable": true},
+                    {"name": "datetime", "targets": 3, "orderable": true},
+                    {"name": "lastUpdatedOn", "targets": 4, "orderable": true},
+                    {"name": "action", "targets": 5, "orderable": false}
+
+                ],
+                aaSorting: [[0, 'asc']],
+                "lengthMenu": [[8, 25, 50, 100, -1], [8, 25, 50, 100, "All"]],
+                "pageLength": 8,
+                "processing": true,
+                "serverSide": true,
+                "ajax": '{% url 'homeApp:CustomerListJson' %}?startDate=' + startDate + '&endDate=' + endDate
+            });
+        }
+
+
+        function pDetails() {
+            var startDate = $('#startDateP').val();
+            var endDate = $('#endDateP').val();
+            partialTab.ajax.url('{% url 'homeApp:CustomerListJson' %}?startDate=' + startDate + '&endDate=' + endDate).load();
+
+        }
+
+        function delSale(id) {
+            $('#delSaleModal')
+                .modal('show')
+            ;
+            $('#DepositID').val(id)
+        }
+
+
+        function deleteCustomer() {
+            var id = $('#DepositID').val();
+            var formdata = new FormData();
+            formdata.append('ID', id);
+            $.ajax({
+                url: "{% url 'homeApp:delete_customer' %}",
+                type: "post",
+                data: formdata,
+                contentType: false,
+                cache: false,
+                processData: false,
+
+                success: function (response) {
+                    if (response.message === 'success') {
+                        $('body')
+                            .toast({
+                                class: 'success',
+                                message: 'Customer Detail Deleted Successfully.'
+                            })
+                        ;
+
+
+                        partialTab.ajax.reload();
+                    } else {
+                        $('body')
+                            .toast({
+                                class: 'error',
+                                message: 'An error occurred !'
+                            })
+                        ;
+
+                    }
+
+                    return response;
+                },
+                error: function () {
+                    $('body')
+                        .toast({
+                            class: 'error',
+                            message: 'An error occurred !'
+                        })
+                    ;
+                }
+            });
+
+        }
+
+
+        function GetSaleDetail(id) {
+            $('#salesID').val(id);
+            $.ajax({
+                type: 'get',
+                url: '/api/get_deposit_detail/' + id + '/',
+
+                success: function (response) {
+
+
+                    $('#itemTableReport tbody tr').remove();
+                    $('#itemTableReportInterest tbody tr').remove();
+                    $('#DepositSerialID').html(response.data.Basic['DepositSerialID']);
+                    $('#Name').html(response.data.Basic['Name']);
+                    $('#Phone').html(response.data.Basic['Phone']);
+                    $('#Address').html(response.data.Basic['Address']);
+                    $('#DepositDate').html(response.data.Basic['DepositDate']);
+                    $('#Status').html(response.data.Basic['Status']);
+                    $('#TotalAmount').html(response.data.Basic['TotalAmount']);
+                    $('#TotalInterestPaid').html(response.data.Basic['TotalInterestPaid']);
+                    $('#ClearanceDate').html(response.data.Basic['ClearanceDate']);
+                    $('#totalWeight').html(response.data.Basic['TotalWeight']);
+                    $('#totalWeightL').html(response.data.Basic['TotalWeightL']);
+                    $('#ClearanceRemark').html(response.data.Basic['ClearanceRemark']);
+                    $('#ActionType').html(response.data.Basic['ActionType']);
+                    $('#TotalAmountPaid').html(response.data.Basic['TotalAmountPaid']);
+                    $('#NewSerial').html(response.data.Basic['NewSerial']);
+
+                    var i;
+                    for (i = 0; i < response.data.Items.length; i++) {
+                        $('#itemTableReport tbody').append('<tr ><td>#</td> <td>' + response.data.Items[i]['ItemName'] + '</td><td >' + response.data.Items[i]['Weight'] + '</td><td >' + response.data.Items[i]['WeightLocal'] + '</td><td >' + response.data.Items[i]['ItemRatePerTenGram'] + '</td><td >' + response.data.Items[i]['InterestRate'] + '</td><td >' + response.data.Items[i]['Description'] + '</td><td>' + response.data.Items[i]['ItemAmount'] + '</td><td >' + response.data.Items[i]['IsWithdrawn'] + '</td><td >' + response.data.Items[i]['WithdrawalDate'] + '</td><td >' + response.data.Items[i]['InterestPaid'] + '</td></tr>');
+
+                    }
+                    var j;
+                    for (j = 0; j < response.data.Interest.length; j++) {
+                        $('#itemTableReportInterest tbody').append('<tr ><td>#</td> <td>' + response.data.Interest[j]['Remark'] + '</td><td >' + response.data.Interest[j]['Amount'] + '</td><td >' + response.data.Interest[j]['Datetime'] + '</td></tr>');
+
+                    }
+                    if (response.data.Basic['ActionType'] === 'repayment' || response.data.Basic['ActionType'] === 'interest') {
+                        $("#displayGreen").css('display', 'block');
+                    } else {
+                        $("#displayGreen").css('display', 'none');
+                    }
+
+
+                },
+
+                error: function () {
+                    $('body')
+                        .toast({
+                            class: 'error',
+                            message: 'An error occurred !'
+                        })
+                    ;
+                }
+            });
+            $('.overlay.fullscreen.modal')
+                .modal('show')
+            ;
+
+        }
+
+        function editCustomer(id) {
+            $('#EditModal').modal('show');
+            $.ajax({
+                type: 'get',
+                url: "{% url 'homeApp:get_customer_detail' 0 %}".replace('0', id),
+                success: function (response) {
+                    $('#EditId').val(response.data['id']);
+                    $('#customerNameEdit').val(response.data['customerName']);
+                    $('#phoneNumberEdit').val(response.data['phone']);
+                    $('#addressEdit').val(response.data['address']);
+
+
+                },
+                error: function () {
+                    $('body')
+                        .toast({
+                            class: 'error',
+                            message: 'An error occurred !'
+                        })
+                    ;
+                }
+            });
+        }
+
+
+        function updateCustomer() {
+            var EditId = $('#EditId').val();
+            var customer_name = $('#customerNameEdit').val();
+            var phone = $('#phoneNumberEdit').val();
+            var address = $('#addressEdit').val();
+
+
+            if (EditId === '' || customer_name === '' || phone === '') {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: '* fields are required.'
+                    })
+                ;
+                hideLoading();
+            } else {
+
+                var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']").val();
+
+                data = new FormData();
+                data.append('customerName', customer_name);
+                data.append('phone', phone);
+                data.append('address', address);
+                data.append('EditId', EditId);
+                data.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
+
+                $.ajax({
+                    type: 'post',
+                    url: '{% url "homeApp:update_customer_detail" %}',
+                    data: data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+
+
+                    success: function (response) {
+                        if (response.message === 'success') {
+                            $('body')
+                                .toast({
+                                    class: 'success',
+                                    message: 'Customer detail updated Successfully.'
+                                })
+                            ;
+
+
+                            partialTab.ajax.reload(null, false);
+                            $('#EditForm').trigger('reset');
+                            $('#EditModal').modal('toggle');
+                        } else {
+                            $('body')
+                                .toast({
+                                    class: 'error',
+                                    message: 'An error occurred !'
+                                })
+                            ;
+
+                        }
+
+                        return response;
+                    },
+                    error: function () {
+                        $('body')
+                            .toast({
+                                class: 'error',
+                                message: 'An error occurred !'
+                            })
+                        ;
+                    }
+                });
+
+
+            }
+        }
+
+        function addCustomer() {
+            $('#AddModal').modal('show');
+        }
+
+        function addNewCustomer() {
+            var customer_name = $('#customerName').val();
+            var phone = $('#phoneNumber').val();
+            var address = $('#address').val();
+
+
+            if (customer_name === '' || phone === '') {
+                $('body')
+                    .toast({
+                        class: 'orange',
+                        message: '* fields are required.'
+                    })
+                ;
+                hideLoading();
+            } else {
+
+                var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']").val();
+
+                data = new FormData();
+                data.append('customerName', customer_name);
+                data.append('phone', phone);
+                data.append('address', address);
+                data.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
+
+                $.ajax({
+                    type: 'post',
+                    url: '{% url "homeApp:add_customer_detail" %}',
+                    data: data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+
+
+                    success: function (response) {
+                        if (response.message === 'success') {
+                            $('body')
+                                .toast({
+                                    class: 'success',
+                                    message: 'Customer detail added Successfully.'
+                                })
+                            ;
+
+
+                            partialTab.ajax.reload(null, false);
+                            $('#AddForm').trigger('reset');
+                            $('#AddModal').modal('toggle');
+                        } else {
+                            $('body')
+                                .toast({
+                                    class: 'error',
+                                    message: 'An error occurred !'
+                                })
+                            ;
+
+                        }
+
+                        return response;
+                    },
+                    error: function () {
+                        $('body')
+                            .toast({
+                                class: 'error',
+                                message: 'An error occurred !'
+                            })
+                        ;
+                    }
+                });
+
+
+            }
+        }
+
+        $(fullTable());
+
+        function fullTable() {
+            $('.dataTables_scrollHeadInner').css('width', '100%');
+            $('.dataTable').css('width', '100%')
+        }
+
+    </script>
+{% endblock %}

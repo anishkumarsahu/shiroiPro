@@ -609,7 +609,10 @@ def item_closing_post(request):
             p.save()
             i.month = float(month)
             i.save()
-        credit(interestPaid, 0, "Interest Paid", depo.depositSerialID, depo.customerName)
+        credit(interestPaid, new_depo.totalAmount, "Interest Paid", depo.depositSerialID, depo.customerName)
+        debit(new_depo.totalAmountPaid, new_depo.totalAmount,
+              f"New Deposit Against Interest Paid - {depo.depositSerialID}", new_depo.depositSerialID,
+              new_depo.customerName)
 
     elif actionType == "repayment":
         depo.totalInterestPaid = depo.totalInterestPaid + float(interestPaid)
@@ -1186,3 +1189,107 @@ def get_today_cashbook_balance(request):
         'date': startDate  # For debugging
     }
     return JsonResponse(context, safe=False)
+
+
+class CustomerListJson(BaseDatatableView):
+    order_columns = ['customerName', 'phone', 'address',
+                     'datetime', 'lastUpdatedOn']
+
+    def get_initial_queryset(self):
+        return Customer.objects.filter(isDeleted__exact=False)
+
+    def filter_queryset(self, qs):
+        search = self.request.GET.get('search[value]', None)
+        if search:
+            qs = qs.filter(
+                Q(customerName__icontains=search)
+                | Q(phone__icontains=search) | Q(address__icontains=search)
+
+            )
+
+        return qs
+
+    def prepare_results(self, qs):
+        json_data = []
+        for item in qs:
+            action = ''' <span style="display:flex">   <button style="font-size:10px;" onclick ="editCustomer('{}')" class="ui circular  icon button orange" data-tooltip="Edit" data-position="bottom right" data-inverted="">
+                              <i class="edit icon"></i>
+                             </button>
+                        
+                             <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px" data-tooltip="Delete" data-position="bottom right" data-inverted="">
+                               <i class="trash alternate icon"></i>
+                             </button> </span>'''.format(item.pk, item.pk),
+            json_data.append([
+                escape(item.customerName),
+                escape(item.phone),
+                escape(item.address),
+                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
+                escape(item.lastUpdatedOn.strftime('%d-%m-%Y %I:%M %p')),
+                action,
+
+            ])
+        return json_data
+
+
+@csrf_exempt
+def delete_customer(request):
+    try:
+        if request.method == 'POST':
+            id = request.POST.get("ID")
+            customer = Customer.objects.get(pk=id)
+            customer.isDeleted = True
+            customer.save()
+            return JsonResponse({'message': 'success'}, safe=False)
+
+    except:
+        return JsonResponse({'message': 'error'}, safe=False)
+
+
+def get_customer_detail(request, pk):
+    try:
+        customer = Customer.objects.get(pk=pk)
+        data = {
+            'customerName': customer.customerName,
+            'phone': customer.phone,
+            'address': customer.address,
+            'id': customer.pk,
+
+        }
+        return JsonResponse({'data': data}, safe=False)
+    except:
+        return JsonResponse({'error': 'Customer not found'}, status=404)
+
+
+def update_customer_detail(request):
+    if request.method == 'POST':
+        id = request.POST.get("EditId")
+        customerName = request.POST.get("customerName")
+        phone = request.POST.get("phone")
+        address = request.POST.get("address")
+        try:
+            customer = Customer.objects.get(pk=id)
+            customer.customerName = customerName
+            customer.phone = phone
+            customer.address = address
+            customer.save()
+            return JsonResponse({'message': 'success'}, safe=False)
+        except:
+            return JsonResponse({'message': 'error'}, safe=False)
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+def add_customer_detail(request):
+    if request.method == 'POST':
+        customerName = request.POST.get("customerName")
+        phone = request.POST.get("phone")
+        address = request.POST.get("address")
+        try:
+            customer = Customer()
+            customer.customerName = customerName
+            customer.phone = phone
+            customer.address = address
+            customer.save()
+            return JsonResponse({'message': 'success'}, safe=False)
+        except:
+            return JsonResponse({'message': 'error'}, safe=False)
+    return JsonResponse({'error': 'Invalid request'}, status=400)

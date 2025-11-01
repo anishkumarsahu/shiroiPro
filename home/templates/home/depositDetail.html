@@ -482,12 +482,21 @@
     function chooseAction(action) {
         if (action == 'repayment') {
             $('#actionType').val('repayment').change();
+            // Set Next Deposit Date to current date for repayment
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = today.getFullYear();
+            const currentDate = `${day}/${month}/${year}`;
+
+            NewCalMonth(currentDate);
+            $('#withdrawalDate').val(currentDate);
         } else if (action == 'interest') {
-
-             $('#actionType').val('interest').change();
-
+            $('#actionType').val('interest').change();
+            NewCalMonth();
+        } else {
+            NewCalMonth();
         }
-         NewCalMonth();
     }
 
     function takeAction() {
@@ -836,7 +845,11 @@
 
 
         interestCal();
-calTaxAndTotal();
+        calTaxAndTotal();
+        let action = $('#actionType').val();
+        if (action == 'repayment') {
+            $('#withdrawalDate').val(withdrawalDate);
+        }
     } else {
         $("#month").val('');
         $("#ICalculate").val('');

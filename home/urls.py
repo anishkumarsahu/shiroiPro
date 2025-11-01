@@ -60,5 +60,14 @@ urlpatterns = [
     path('api/edit_cashbook_post/', edit_cashbook_post, name='edit_cashbook_post'),
     path('api/get_today_cashbook_balance/', get_today_cashbook_balance, name='get_today_cashbook_balance'),
 
+    # customer List
+    path('customers_list/', customers_list, name='customers_list'),
+    path('api/CustomerListJson/', CustomerListJson.as_view(), name='CustomerListJson'),
+    path('api/delete_customer/', delete_customer, name='delete_customer'),
+    path('api/get_customer_detail/<int:pk>/', get_customer_detail, name='get_customer_detail'),
+    path('api/update_customer_detail/', update_customer_detail, name='update_customer_detail'),
+    path('api/add_customer_detail/', add_customer_detail, name='add_customer_detail'),
+
+
 
     ]

@@ -292,3 +292,11 @@ def with_print_billA4(request, *args, **kwargs):
 
     }
     return render(request, 'home/WithPrintA4.html', context)
+
+
+@is_activated()
+def customers_list(request):
+    if request.user.is_authenticated:
+        return render(request, 'home/customers.html')
+    else:
+        return redirect('homeApp:loginPage')
