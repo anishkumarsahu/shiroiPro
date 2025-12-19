@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Q, Sum, OuterRef, Subquery, F
@@ -13,6 +13,25 @@ from .models import *
 from django.db import transaction
 
 
+def add_current_time_to_date(given_date):
+    """
+    Adds the current local time to the given date and returns a datetime object.
+
+    Args:
+        given_date (date | datetime): The date to which the current time will be added.
+
+    Returns:
+        datetime: A datetime object with the given date and current time.
+    """
+    # Ensure we only take the date part if a datetime is passed
+    if isinstance(given_date, datetime):
+        given_date = given_date.date()
+    # Get current local time
+    current_time = datetime.now().time()
+    # Combine given date with current time
+    result = datetime.combine(given_date, current_time)
+    return result
+
 def convertGold(x):
     tola = x // 11.66
     rem_tola = x % 11.66
@@ -20,7 +39,6 @@ def convertGold(x):
     rem_san = rem_tola % (11.66 / 4)
     chaning = rem_san // (11.66 / 96)
     rem_chaning = rem_san % (11.66 / 96)
-    print(tola, san, chaning, rem_chaning)
 
 
 def user_logout(request):
@@ -185,7 +203,8 @@ def deposit_post(request):
 
         p.save()
 
-    debit(0.0, depo.totalAmount, "New Deposit".format(depo.totalAmount, depo.depositSerialID), depo.depositSerialID, depo.customerName)
+    debit(0.0, depo.totalAmount, "New Deposit".format(depo.totalAmount, depo.depositSerialID), depo.depositSerialID,
+          depo.customerName, add_current_time_to_date(depo.depositDate))
     return JsonResponse({'message': 'success', 'depoID': depo.pk}, safe=False)
 
 
@@ -209,7 +228,8 @@ def edit_deposit_post(request):
     initial_amount = depo.totalAmount
     if initial_amount != float(totalAmount):
         credit(0.0, depo.totalAmount, "New Deposit Update".format(depo.totalAmount, depo.depositSerialID),
-               depo.depositSerialID, depo.customerName)
+               depo.depositSerialID, depo.customerName,
+               entryDateTime=add_current_time_to_date(datetime.strptime(pDate, '%d/%m/%Y')))
     depo.customerName = customerName
     depo.oldID = oldID
     depo.phone = phoneNumber
@@ -243,7 +263,7 @@ def edit_deposit_post(request):
         p.save()
     if initial_amount != float(totalAmount):
         debit(0.0, depo.totalAmount, "New Deposit Update".format(depo.totalAmount, depo.depositSerialID),
-              depo.depositSerialID, depo.customerName)
+              depo.depositSerialID, depo.customerName, add_current_time_to_date(depo.depositDate))
     return JsonResponse({'message': 'success', 'depoID': depo.pk}, safe=False)
 
 
@@ -629,7 +649,7 @@ def item_closing_post(request):
             i.withdrawalDate = datetime.strptime(withdrawalDate, '%d/%m/%Y')
             i.save()
         credit(interestPaid, (float(amountWithInterest) - float(interestPaid)), "Interest Paid", depo.depositSerialID,
-               depo.customerName)
+               depo.customerName, entryDateTime=add_current_time_to_date(depo.clearanceDate))
 
     # splited_receive_item = datas.split("@")
     # for item in splited_receive_item[:-1]:
@@ -726,6 +746,8 @@ def item_closing_edit_post(request):
 def inflow_post(request):
     remark = request.POST.get("Remark")
     amount = request.POST.get("Amount")
+    customerNameIn = request.POST.get("customerNameIn")
+    dateIn = request.POST.get("dateIn")
     tType = request.POST.get("tType")
     initial = CashBook.objects.all().count()
 
@@ -737,6 +759,8 @@ def inflow_post(request):
         book.availableBalance = float(amount)
         book.transactionType = tType
         book.totalCredit = book.totalCredit + float(amount)
+        book.entryDateTime = add_current_time_to_date(datetime.strptime(dateIn, '%d/%m/%Y'))
+        book.customerName = customerNameIn
         book.save()
     else:
         last_book = CashBook.objects.last()
@@ -747,6 +771,8 @@ def inflow_post(request):
         book.availableBalance = last_book.availableBalance + float(amount)
         book.transactionType = tType
         book.totalCredit = last_book.totalCredit + float(amount)
+        book.customerName = customerNameIn
+        book.entryDateTime = add_current_time_to_date(datetime.strptime(dateIn, '%d/%m/%Y'))
         book.save()
 
     return JsonResponse({'message': 'success'}, safe=False)
@@ -757,6 +783,8 @@ def inflow_post(request):
 def outflow_post(request):
     remark = request.POST.get("Remark")
     amount = request.POST.get("Amount")
+    customerNameOut = request.POST.get("customerNameOut")
+    dateOut = request.POST.get("dateOut")
     tType = request.POST.get("tType")
     initial = CashBook.objects.all().count()
 
@@ -768,6 +796,8 @@ def outflow_post(request):
         book.availableBalance = -float(amount)
         book.transactionType = tType
         book.totalDebit = book.totalDebit + float(amount)
+        book.customerName = customerNameOut
+        book.entryDateTime = add_current_time_to_date(datetime.strptime(dateOut, '%d/%m/%Y'))
         book.save()
     else:
         last_book = CashBook.objects.last()
@@ -777,13 +807,15 @@ def outflow_post(request):
         book.balanceThatTime = (last_book.balanceThatTime - float(amount))
         book.availableBalance = (last_book.availableBalance - float(amount))
         book.transactionType = tType
+        book.customerName = customerNameOut
         book.totalDebit = (last_book.totalDebit + float(amount))
+        book.entryDateTime = add_current_time_to_date(datetime.strptime(dateOut, '%d/%m/%Y'))
         book.save()
 
     return JsonResponse({'message': 'success'}, safe=False)
 
 
-def credit(interest, amount, remark, serial='N/A', name='N/A'):
+def credit(interest, amount, remark, serial='N/A', name='N/A', entryDateTime=None):
     initial = CashBook.objects.all().count()
 
     if initial == 0:
@@ -797,6 +829,7 @@ def credit(interest, amount, remark, serial='N/A', name='N/A'):
         book.totalCredit = book.totalCredit + float(amount) +float(interest)
         book.depositID = serial
         book.customerName = name
+        book.entryDateTime = entryDateTime if entryDateTime else datetime.today().now()
         book.save()
     else:
         last_book = CashBook.objects.last()
@@ -810,10 +843,11 @@ def credit(interest, amount, remark, serial='N/A', name='N/A'):
         book.totalCredit = round((last_book.totalCredit + float(amount) + float(interest)),2)
         book.depositID = serial
         book.customerName = name
+        book.entryDateTime = entryDateTime if entryDateTime else datetime.today().now()
         book.save()
 
 
-def debit(interest, amount, remark, serial='N/A', name='N/A'):
+def debit(interest, amount, remark, serial='N/A', name='N/A', entryDateTime=None):
     initial = CashBook.objects.all().count()
 
     if initial == 0:
@@ -827,6 +861,7 @@ def debit(interest, amount, remark, serial='N/A', name='N/A'):
         book.totalDebit = book.totalDebit + float(amount)  + float(interest)
         book.depositID = serial
         book.customerName = name
+        book.entryDateTime = entryDateTime if entryDateTime else datetime.today().now()
         book.save()
     else:
         last_book = CashBook.objects.last()
@@ -840,11 +875,12 @@ def debit(interest, amount, remark, serial='N/A', name='N/A'):
         book.totalDebit = round((last_book.totalDebit + float(amount) + float(interest)),2)
         book.depositID = serial
         book.customerName = name
+        book.entryDateTime = entryDateTime if entryDateTime else datetime.today().now()
         book.save()
 
 
 class CashBookDebitListJson(BaseDatatableView):
-    order_columns = ['depositID', 'loanDate', 'customerName', 'amount', 'remark', 'datetime']
+    order_columns = ['depositID', 'loanDate', 'customerName', 'amount', 'remark', 'entryDateTime']
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
@@ -862,8 +898,8 @@ class CashBookDebitListJson(BaseDatatableView):
             loanDate=Subquery(loan_date_subquery)
         ).filter(
             isDeleted=False,
-            datetime__gte=startDate.date(),
-            datetime__lte=endDate.date() + timedelta(days=1),
+            entryDateTime__gte=startDate.date(),
+            entryDateTime__lte=endDate.date() + timedelta(days=1),
             transactionType='Debit'
         )
 
@@ -880,7 +916,7 @@ class CashBookDebitListJson(BaseDatatableView):
                 Q(depositID__icontains=search) | Q(customerName__icontains=search) |
                 Q(amount__icontains=search) | Q(remark__icontains=search) |
                 Q(transactionType__icontains=search) | Q(availableBalance__icontains=search) |
-                Q(datetime__icontains=search) | Q(totalCredit__icontains=search) |
+                Q(entryDateTime__icontains=search) | Q(totalCredit__icontains=search) |
                 Q(loanDate__icontains=search)  # Add loanDate to the search
             )
 
@@ -902,12 +938,13 @@ class CashBookDebitListJson(BaseDatatableView):
 
         for item in qs:
             action = '''<span style="display:flex">  
-             <button style="font-size:10px;" class="ui circular icon button orange" onclick = "editCashbook('{}', '{}', '{}', '{}')" data-tooltip="Edit" data-position="bottom right" data-inverted="">
+             <button style="font-size:10px;" class="ui circular icon button orange" onclick = "editCashbook('{}', '{}', '{}', '{}','{}', '{}')" data-tooltip="Edit" data-position="bottom right" data-inverted="">
                                <i class="edit icon"></i>
                               </button>
                               <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px" data-tooltip="Delete" data-position="bottom right" data-inverted="">
                                 <i class="trash alternate icon"></i>
-                              </button> </span>'''.format(item.pk, 0.0, item.amount, item.remark, item.pk),
+                              </button> </span>'''.format(item.pk, 0.0, item.amount, item.remark, item.customerName,
+                                                          item.entryDateTime.strftime('%d/%m/%Y'), item.pk),
 
             json_data.append([
                 escape(item.depositID),
@@ -915,7 +952,7 @@ class CashBookDebitListJson(BaseDatatableView):
                 escape(item.customerName),
                 escape(item.amount),
                 escape(item.remark),
-                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
+                escape(item.entryDateTime.strftime('%d-%m-%Y %I:%M %p')),
                 action
             ])
 
@@ -927,7 +964,8 @@ class CashBookDebitListJson(BaseDatatableView):
 
 
 class CashBookCreditListJson(BaseDatatableView):
-    order_columns = ['depositID', 'loanDate', 'customerName', 'amount', 'interest', 'totalCredit', 'remark', 'datetime']
+    order_columns = ['depositID', 'loanDate', 'customerName', 'amount', 'interest', 'totalCredit', 'remark',
+                     'entryDateTime']
 
     def get_initial_queryset(self):
         sDate = self.request.GET.get('startDate')
@@ -945,8 +983,8 @@ class CashBookCreditListJson(BaseDatatableView):
             loanDate=Subquery(loan_date_subquery)
         ).filter(
             isDeleted=False,
-            datetime__gte=startDate.date(),
-            datetime__lte=endDate.date() + timedelta(days=1),
+            entryDateTime__gte=startDate.date(),
+            entryDateTime__lte=endDate.date() + timedelta(days=1),
             transactionType='Credit'
         )
 
@@ -965,7 +1003,7 @@ class CashBookCreditListJson(BaseDatatableView):
                 Q(depositID__icontains=search) | Q(customerName__icontains=search) |
                 Q(amount__icontains=search) | Q(remark__icontains=search) |
                 Q(transactionType__icontains=search) | Q(availableBalance__icontains=search) |
-                Q(datetime__icontains=search) | Q(totalCredit__icontains=search) |
+                Q(entryDateTime__icontains=search) | Q(totalCredit__icontains=search) |
                 Q(loanDate__icontains=search)  # Add loanDate to the search
             )
 
@@ -988,12 +1026,14 @@ class CashBookCreditListJson(BaseDatatableView):
 
         for item in qs:
             action = '''<span style="display:flex">  
-             <button style="font-size:10px;" class="ui circular icon button orange" onclick = "editCashbook('{}','{}','{}','{}')" data-tooltip="Edit" data-position="bottom right" data-inverted="">
+             <button style="font-size:10px;" class="ui circular icon button orange" onclick = "editCashbook('{}','{}','{}','{}','{}','{}')" data-tooltip="Edit" data-position="bottom right" data-inverted="">
                                <i class="edit icon"></i>
                               </button>
                               <button style="font-size:10px;" onclick ="delSale('{}')" class="ui circular youtube icon button" style="margin-left: 3px" data-tooltip="Delete" data-position="bottom right" data-inverted="">
                                 <i class="trash alternate icon"></i>
-                              </button> </span>'''.format(item.pk, item.interest, item.amount, item.remark, item.pk),
+                              </button> </span>'''.format(item.pk, item.interest, item.amount, item.remark,
+                                                          item.customerName, item.entryDateTime.strftime('%d/%m/%Y'),
+                                                          item.pk),
 
             json_data.append([
                 escape(item.depositID),
@@ -1003,7 +1043,7 @@ class CashBookCreditListJson(BaseDatatableView):
                 escape(item.interest),
                 escape(round(item.amount + item.interest, 2)),
                 escape(item.remark),
-                escape(item.datetime.strftime('%d-%m-%Y %I:%M %p')),
+                escape(item.entryDateTime.strftime('%d-%m-%Y %I:%M %p')),
                 action
 
             ])
@@ -1144,11 +1184,15 @@ def edit_cashbook_post(request):
     id = request.POST.get("editID")
     amount = request.POST.get("editAmount")
     interest = request.POST.get("editInterest")
+    editCustomerName = request.POST.get("editCustomerName")
+    editEntryDateTime = request.POST.get("editEntryDateTime")
     try:
         book = CashBook.objects.get(pk=int(id))
         book.amount = float(amount) if amount else 0.0
         book.interest = float(interest) if interest else 0.0
         book.remark = remark
+        book.customerName = editCustomerName
+        book.entryDateTime = add_current_time_to_date(datetime.strptime(editEntryDateTime, '%d/%m/%Y'))
         book.save()
 
         return JsonResponse({'message': 'success'}, safe=False)
@@ -1174,7 +1218,7 @@ def get_today_cashbook_balance(request):
     if not convertedDate:
         return JsonResponse({'error': 'Invalid date format'}, status=400)
 
-    data = CashBook.objects.filter(datetime__date=convertedDate, isDeleted=False)
+    data = CashBook.objects.filter(entryDateTime__date=convertedDate, isDeleted=False)
     credit = 0.0
     debit = 0.0
     for i in data:

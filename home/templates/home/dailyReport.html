@@ -46,7 +46,25 @@
                         <i class="left align icon"></i>
                         IN FLOW <span style="color: green;font-size: 20px">+</span>
                     </h5>
-                    <div class="three fields">
+                    <div class="five fields">
+                        <div class="field required">
+                            <label>Customer Name</label>
+
+                            <div class="ui customerList search">
+                                <div class="ui icon input">
+
+                                    <input autocomplete="new-password" type="text" class="prompt" id="customerNameIn"
+                                           placeholder="Customer Name" onfocus="cusSearch()"/>
+
+                                    <i class="user circle icon"></i>
+
+                                    <input type="hidden" id="cusIDIn" value="N/A">
+
+
+                                </div>
+                                <div class="results"></div>
+                            </div>
+                        </div>
 
                         <div class="field">
                             <label>Remark</label>
@@ -56,6 +74,14 @@
                         <div class="field">
                             <label>Amount</label>
                             <input id="inAmount" name="inAmount" placeholder="Amount" type="number">
+                        </div>
+                        <div class="field required" id="standard_calendarIn">
+
+                            <label>Date</label>
+
+                            <input type="text" name="Date" placeholder="Date"
+                                   autocomplete="off"
+                                   id="dateIn">
                         </div>
 
 
@@ -83,8 +109,25 @@
                         OUT-FLOW <span style="color: red;font-size: 20px">-</span>
                     </h5>
 
-                    <div class="three fields">
+                    <div class="five fields">
+                        <div class="field required">
+                            <label>Customer Name</label>
 
+                            <div class="ui customerList search">
+                                <div class="ui icon input">
+
+                                    <input autocomplete="new-password" type="text" class="prompt" id="customerNameOut"
+                                           placeholder="Customer Name" onfocus="cusSearch()"/>
+
+                                    <i class="user circle icon"></i>
+
+                                    <input type="hidden" id="cusIDOut" value="N/A">
+
+
+                                </div>
+                                <div class="results"></div>
+                            </div>
+                        </div>
 
                         <div class="field">
                             <label>Remark</label>
@@ -95,6 +138,14 @@
                         <div class="field">
                             <label>Amount</label>
                             <input id="outAmount" name="outAmount" placeholder="Amount" type="number">
+                        </div>
+                        <div class="field required" id="standard_calendarOut">
+
+                            <label>Date</label>
+
+                            <input type="text" name="Date" placeholder="Date"
+                                   autocomplete="off"
+                                   id="dateOut">
                         </div>
                         <div class="field" style="padding-top: 2.2em;">
                             <button class="ui green mini button" id="addHSNBtn" onclick="outflowAdd()"
@@ -348,6 +399,36 @@
                     <input id="editAmount" placeholder="Amount" type="number">
                 </div>
             </div>
+            <div class="two fields">
+                <div class="field required">
+                    <label>Customer Name</label>
+
+                    <div class="ui customerList search">
+                        <div class="ui icon input">
+
+                            <input autocomplete="new-password" type="text" class="prompt" id="customerNameEdit"
+                                   placeholder="Customer Name" onfocus="cusSearch()"/>
+
+                            <i class="user circle icon"></i>
+
+                            <input type="hidden" id="cusIDEdit" value="N/A">
+
+
+                        </div>
+                        <div class="results"></div>
+                    </div>
+                </div>
+
+                <div class="field required" id="standard_calendarEdit">
+
+                    <label>Date</label>
+
+                    <input type="text" name="Date" placeholder="Date"
+                           autocomplete="off"
+                           id="dateEdit">
+                </div>
+
+            </div>
             <div class="field ">
                 <label>Remark</label>
                 <textarea id="editRemark" name="remark" rows="3"></textarea>
@@ -371,11 +452,15 @@
         ;
         $('#DepositID').val(id)
     }
-    function editCashbook(id, interest, amount, remark) {
+
+    function editCashbook(id, interest, amount, remark, customerName, entryDateTime) {
         $('#editInterest').val(interest);
         $('#editAmount').val(amount);
         $('#editRemark').val(remark);
+        $('#customerNameEdit').val(customerName);
+        $('#dateEdit').val(entryDateTime);
         $('#editID').val(id);
+        debugger;
         $('#editCashbook')
             .modal('show')
         ;
@@ -436,8 +521,10 @@
         var editRemark = $('#editRemark').val();
         var editInterest = $('#editInterest').val();
         var editAmount = $('#editAmount').val();
+        var editCustomerName = $('#customerNameEdit').val();
+        var editEntryDateTime = $('#dateEdit').val();
         var editID = $('#editID').val();
-        if (editAmount ==='' && editInterest ==='') {
+        if (editAmount === '' && editInterest === '') {
             $('body')
                 .toast({
                     class: 'orange',
@@ -452,6 +539,8 @@
             data.append('editAmount', editAmount);
             data.append('editID', editID);
             data.append('editInterest', editInterest);
+            data.append('editCustomerName', editCustomerName);
+            data.append('editEntryDateTime', editEntryDateTime);
             data.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
             $.ajax({
                 type: 'post',
@@ -503,11 +592,13 @@
     function inflowAdd() {
         var inRemark = $('#inRemark').val();
         var inAmount = $('#inAmount').val();
-        if (inRemark === '' || inAmount === '') {
+        var customerNameIn = $('#customerNameIn').val();
+        var dateIn = $('#dateIn').val();
+        if (inRemark === '' || inAmount === '' || customerNameIn === '' || dateIn === '') {
             $('body')
                 .toast({
                     class: 'orange',
-                    message: 'Remark and Amount required !'
+                    message: 'Remark, Amount, Customer Name and Date required !'
                 })
             ;
         } else {
@@ -516,6 +607,8 @@
             data = new FormData();
             data.append('Remark', inRemark);
             data.append('Amount', inAmount);
+            data.append('customerNameIn', customerNameIn);
+            data.append('dateIn', dateIn);
             data.append('tType', 'Credit');
             data.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
             $.ajax({
@@ -568,11 +661,13 @@
     function outflowAdd() {
         var outRemark = $('#outRemark').val();
         var outAmount = $('#outAmount').val();
-        if (outRemark === '' || outAmount === '') {
+        var customerNameOut = $('#customerNameOut').val();
+        var dateOut = $('#dateOut').val();
+        if (outRemark === '' || outAmount === '' || customerNameOut === '' || dateOut === '') {
             $('body')
                 .toast({
                     class: 'orange',
-                    message: 'Remark and Amount required !'
+                    message: 'Remark, Amount, Customer Name and Date required !'
                 })
             ;
         } else {
@@ -581,6 +676,8 @@
             data = new FormData();
             data.append('Remark', outRemark);
             data.append('Amount', outAmount);
+            data.append('customerNameOut', customerNameOut);
+            data.append('dateOut', dateOut);
             data.append('tType', 'Debit');
             data.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
             $.ajax({
@@ -844,6 +941,117 @@ onload = getTodayBalance();
 
         });
     }
+
+    function cusSearch() {
+        $('.ui.customerList').search({
+
+            apiSettings: {
+                url: '/api/get_customer_list/?q={query}'
+            },
+            fields: {
+                results: 'data',
+                title: 'CustomerName',
+                "price": "Phone",
+                "description": "Address",
+            },
+            minCharacters: 1,
+            onSelect: function (result) {
+                <!--                    ClearData();-->
+                $('#cusIDIn').val(result.ID);
+                getCustomerDetailByName();
+
+
+            },
+            cache: false,
+        });
+    }
+
+    function getCustomerDetailByName() {
+        var name = $('#cusIDIn').val();
+
+
+        $.ajax({
+            type: 'get',
+            url: '/api/GetCustomerDetailByName/?q=' + name,
+
+            success: function (response) {
+
+                $('#cusID').val(response.data['ID']);
+                $('#customerName').val(response.data['CustomerName']);
+                $('#phoneNumber').val(response.data['Phone']);
+                $('#address').val(response.data['Address']);
+
+
+            },
+
+            error: function () {
+                $('body')
+                    .toast({
+                        class: 'error',
+                        message: 'An error occurred !'
+                    })
+                ;
+            }
+        });
+    }
+
+    var today = new Date();
+    $('#standard_calendarIn')
+        .calendar({
+                initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+                monthFirst: false,
+                type: 'date',
+                formatter: {
+                    date: function (date, settings) {
+
+                        if (!date) return '';
+                        var day = String(date.getDate());
+                        var month = String(date.getMonth() + 1);
+                        var year = date.getFullYear();
+                        return day + '/' + month + '/' + year;
+                    }
+                }
+            }
+        );
+    $('#standard_calendarOut')
+        .calendar({
+                initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+                monthFirst: false,
+                type: 'date',
+                formatter: {
+                    date: function (date, settings) {
+
+                        if (!date) return '';
+                        var day = String(date.getDate());
+                        var month = String(date.getMonth() + 1);
+                        var year = date.getFullYear();
+                        return day + '/' + month + '/' + year;
+                    }
+                }
+            }
+        );
+    $('#standard_calendarEdit')
+        .calendar({
+                initialDate: today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear(),
+                monthFirst: false,
+                type: 'date',
+                formatter: {
+                    date: function (date, settings) {
+
+                        if (!date) return '';
+                        var day = String(date.getDate());
+                        var month = String(date.getMonth() + 1);
+                        var year = date.getFullYear();
+                        return day + '/' + month + '/' + year;
+                    }
+                },
+
+                popupOptions: {
+                    observeChanges: false
+                }
+
+            }
+        );
 </script>
 
 {% endblock %}

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import F
 
 
 # Create your models here.
@@ -112,6 +113,15 @@ class CashBook(models.Model):
     isDeleted = models.BooleanField(default=False)
     datetime = models.DateTimeField(auto_now_add=True, auto_now=False)
     lastUpdatedOn = models.DateTimeField(auto_now_add=False, auto_now=True)
+    entryDateTime = models.DateTimeField(verbose_name='Entry Date & Time', null=True, blank=True)
+
+    @classmethod
+    def fill_missing_entry_datetime(cls):
+        """
+        Fill entryDateTime with the value from datetime
+        for all rows where entryDateTime is null or blank.
+        """
+        cls.objects.filter(entryDateTime__isnull=True).update(entryDateTime=F('datetime'))
 
     def __str__(self):
         return str(self.remark)
